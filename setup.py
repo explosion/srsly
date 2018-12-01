@@ -5,6 +5,7 @@ import os
 import subprocess
 import sys
 import contextlib
+from glob import glob
 from distutils.command.build_ext import build_ext
 from distutils.sysconfig import get_python_inc
 from distutils import ccompiler, msvccompiler
@@ -132,6 +133,27 @@ def setup_package():
                     extra_link_args=extra_link_args,
                     define_macros=macros,
                     extra_compile_args=extra_compile_args))
+
+
+        double_conversion = glob("./srsly/json/double-conversion/*.cc")
+        double_conversion.append("./srsly/json/lib/dconv_wrapper.cc")
+
+        ext_modules.append(
+            Extension(
+                'srsly.ujson.ujson',
+                sources = [
+                    './srsly/json/ujson.c',
+                    './srsly/json/objToJSON.c',
+                    './srsly/json/JSONtoObj.c',
+                    './srsly/json/lib/ultrajsonenc.c',
+                    './srsly/json/lib/ultrajsondec.c'
+                ] + double_conversion,
+                include_dirs = ['./srsly/json', './srsly/json/lib',
+                                './srsly/json/double-conversion'],
+                extra_compile_args = ['-D_GNU_SOURCE'],
+                extra_link_args = ['-lstdc++', '-lm'],
+            )
+        )
 
         if not is_source_release(root):
             generate_cython(root, 'srsly')
