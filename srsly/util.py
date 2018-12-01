@@ -30,7 +30,7 @@ def write_json(location, contents, indent=2):
     """
     data = _json_dumps(contents, indent=indent)
     if location == "-":  # writing to stdout
-        sys.stdout.write(data)
+        print(data)
         return
     file_path = _force_path(location)
     with file_path.open("w", encoding="utf8") as f:
@@ -61,7 +61,7 @@ def write_jsonl(location, lines):
     """
     if location == "-":  # writing to stdout
         for line in lines:
-            sys.stdout.write(_json_dumps(line))
+            print(_json_dumps(line))
     else:
         file_path = _force_path(location)
         with file_path.open("a", encoding="utf-8") as f:
