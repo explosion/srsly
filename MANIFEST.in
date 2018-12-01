@@ -1,5 +1,5 @@
-recursive-include include *.h
-recursive-include include *.cc
-recursive-include include *.c
+recursive-include srsly *.h
+recursive-include srsly *.cc
+recursive-include srsly *.c
 include LICENSE
 include README.md
