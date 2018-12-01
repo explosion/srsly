@@ -56,7 +56,7 @@ python setup.py build_ext --inplace  # compile the library
 
 ## API
 
-### <kbd>function</kbd> `srsly.read_json`
+#### <kbd>function</kbd> `srsly.read_json`
 
 Load JSON from a file or standard input.
 
@@ -69,7 +69,7 @@ data = srsly.read_json("/path/to/file.json")
 | `location` | unicode / `Path` | The file path or `"-"` to read from stdin. |
 | **RETURNS** | dict / list | The loaded JSON content. |
 
-### <kbd>function</kbd> `srsly.write_json`
+#### <kbd>function</kbd> `srsly.write_json`
 
 Create a JSON file and dump contents or write to standard output.
 
@@ -84,7 +84,7 @@ srsly.write_json("/path/to/file.jsonl", data)
 | `data` | - | The JSON-serializable data to output. |
 | `indent` | int | Number of spaces used to indent JSON. Default to `2`. |
 
-### <kbd>function</kbd> `srsly.read_jsonl`
+#### <kbd>function</kbd> `srsly.read_jsonl`
 
 Read a JSONL file (newline-delimited JSON) or from JSONL data from
 standard input and yield contents line by line. Blank lines will always be
@@ -100,7 +100,7 @@ data = srsly.read_jsonl("/path/to/file.jsonl")
 | `skip` | bool | Skip broken lines and don't raise `ValueError`. Defaults to `False`. |
 | **YIELDS** | - | The loaded JSON contents of each line. |
 
-### <kbd>function</kbd> `srsly.write_jsonl`
+#### <kbd>function</kbd> `srsly.write_jsonl`
 
 Create a JSONL file (newline-delimited JSON) and dump contents line by line, or
 write to standard output.
@@ -115,7 +115,7 @@ srsly.write_jsonl("/path/to/file.jsonl", data)
 | `location` | unicode / `Path` | The file path or `"-"` to write to stdout. |
 | `lines` | iterable | The JSON-serializable lines. |
 
-### <kbd>function</kbd> `srsly.is_json_serializable`
+#### <kbd>function</kbd> `srsly.is_json_serializable`
 
 Check if a Python object is JSON-serializable.
 
