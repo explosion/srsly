@@ -1,0 +1,4 @@
+# Development requirements
+cython >= 0.29.0
+pytest >= 4.0
+pytz
