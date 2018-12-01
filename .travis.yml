@@ -1,0 +1,27 @@
+language: python
+
+sudo: false
+dist: trusty
+group: edge
+
+python:
+   - "2.7"
+   - "3.5"
+   - "3.6"
+   - "3.7"
+
+os:
+  - linux
+
+env:
+  - VIA=compile
+
+install:
+  - "./travis.sh"
+
+script:
+  - "pip install pytest-timeout"
+  - if [[ "${VIA}" == "compile" ]]; then python -m pytest --tb=native srsly; fi
+
+
+cache: pip
