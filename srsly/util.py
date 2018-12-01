@@ -86,10 +86,12 @@ def _yield_json_lines(stream, skip=False):
     line_no = 1
     for line in stream:
         line = line.strip()
+        if line == "":
+            continue
         try:
             yield ujson.loads(line)
         except ValueError:
-            if line == "" or skip:
+            if skip:
                 continue
             raise ValueError("Invalid JSON on line {}: {}".format(line_no, line))
         line_no += 1
