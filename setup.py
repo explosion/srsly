@@ -138,9 +138,6 @@ def setup_package():
             )
 
 
-        double_conversion = glob("./srsly/json/double-conversion/*.cc")
-        double_conversion.append("./srsly/json/lib/dconv_wrapper.cc")
-
         ext_modules.append(
             Extension(
                 'srsly.json.ujson',
@@ -150,9 +147,8 @@ def setup_package():
                     './srsly/json/JSONtoObj.c',
                     './srsly/json/lib/ultrajsonenc.c',
                     './srsly/json/lib/ultrajsondec.c'
-                ] + double_conversion,
-                include_dirs = ['./srsly/json', './srsly/json/lib',
-                                './srsly/json/double-conversion'],
+                ],
+                include_dirs = ['./srsly/json', './srsly/json/lib'],
                 extra_compile_args = ['-D_GNU_SOURCE'],
             )
         )
