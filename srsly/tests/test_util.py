@@ -3,7 +3,9 @@ from __future__ import unicode_literals
 
 import pytest
 import os
+import sys
 import tempfile
+from io import StringIO
 from pathlib import Path
 from contextlib import contextmanager
 
@@ -34,6 +36,14 @@ def test_read_json_file_invalid():
     with make_tempfile(file_contents) as file_path:
         with pytest.raises(ValueError):
             data = read_json(file_path)
+
+
+def test_read_json_stdin(monkeypatch):
+    input_data = '{\n    "hello": "world"\n}'
+    monkeypatch.setattr("sys.stdin", StringIO(input_data))
+    data = read_json("-")
+    assert len(data) == 1
+    assert data["hello"] == "world"
 
 
 def test_write_json_file():
@@ -74,6 +84,20 @@ def test_read_jsonl_file_invalid():
     assert len(data) == 1
     assert len(data[0]) == 1
     assert data[0]["test"] == 123
+
+
+def test_read_jsonl_stdin(monkeypatch):
+    input_data = '{"hello": "world"}\n{"test": 123}'
+    monkeypatch.setattr("sys.stdin", StringIO(input_data))
+    data = read_jsonl("-")
+    # Make sure this returns a generator, not just a list
+    assert not hasattr(data, "__len__")
+    data = list(data)
+    assert len(data) == 2
+    assert len(data[0]) == 1
+    assert len(data[1]) == 1
+    assert data[0]["hello"] == "world"
+    assert data[1]["test"] == 123
 
 
 def test_write_json_file():
