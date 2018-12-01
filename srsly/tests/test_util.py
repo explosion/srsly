@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 
 import pytest
 import os
-import sys
 import tempfile
 from io import StringIO
 from pathlib import Path
@@ -35,7 +34,7 @@ def test_read_json_file_invalid():
     file_contents = '{\n    "hello": world\n}'
     with make_tempfile(file_contents) as file_path:
         with pytest.raises(ValueError):
-            data = read_json(file_path)
+            read_json(file_path)
 
 
 def test_read_json_stdin(monkeypatch):
@@ -51,7 +50,7 @@ def test_write_json_file():
     with make_tempfile() as file_path:
         write_json(file_path, data)
         with Path(file_path).open("r", encoding="utf8") as f:
-            assert f.read() == '{\n  "hello":"word",\n  "test":123\n}'
+            assert f.read() == '{\n  "hello": "word",\n  "test": 123\n}'
 
 
 def test_write_json_stdout(capsys):
@@ -100,7 +99,7 @@ def test_read_jsonl_stdin(monkeypatch):
     assert data[1]["test"] == 123
 
 
-def test_write_json_file():
+def test_write_jsonl_file():
     data = [{"hello": "world"}, {"test": 123}]
     with make_tempfile() as file_path:
         write_jsonl(file_path, data)
