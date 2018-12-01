@@ -8,8 +8,8 @@ from io import StringIO
 from pathlib import Path
 from contextlib import contextmanager
 
-from ..util import read_json, write_json, read_jsonl, write_jsonl
-from ..util import is_json_serializable
+from .._json_api import read_json, write_json, read_jsonl, write_jsonl
+from .._json_api import is_json_serializable
 
 
 @contextmanager
@@ -46,18 +46,20 @@ def test_read_json_stdin(monkeypatch):
 
 
 def test_write_json_file():
-    data = {"hello": "word", "test": 123}
+    data = {"hello": "world", "test": 123}
     with make_tempfile() as file_path:
-        write_json(file_path, data)
+        # Sorting keys to prevent cross-platform inconsistencies
+        write_json(file_path, data, sort_keys=True)
         with Path(file_path).open("r", encoding="utf8") as f:
-            assert f.read() == '{\n  "hello": "word",\n  "test": 123\n}'
+            assert f.read() == '{\n  "hello": "world",\n  "test": 123\n}'
 
 
 def test_write_json_stdout(capsys):
-    data = {"hello": "word", "test": 123}
-    write_json("-", data)
+    data = {"hello": "world", "test": 123}
+    # Sorting keys to prevent cross-platform inconsistencies
+    write_json("-", data, sort_keys=True)
     captured = capsys.readouterr()
-    assert captured.out == '{\n  "hello": "word",\n  "test": 123\n}\n'
+    assert captured.out == '{\n  "hello": "world",\n  "test": 123\n}\n'
 
 
 def test_read_jsonl_file():
