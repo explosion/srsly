@@ -31,10 +31,10 @@ def write_json(location, contents, indent=2):
     data = _json_dumps(contents, indent=indent)
     if location == "-":  # writing to stdout
         print(data)
-        return
-    file_path = _force_path(location)
-    with file_path.open("w", encoding="utf8") as f:
-        f.write(data)
+    else:
+        file_path = _force_path(location)
+        with file_path.open("w", encoding="utf8") as f:
+            f.write(data)
 
 
 def read_jsonl(location, skip=False):
@@ -47,10 +47,11 @@ def read_jsonl(location, skip=False):
     if location == "-":  # reading from sys.stdin
         for line in _yield_json_lines(sys.stdin, skip=skip):
             yield line
-    file_path = _force_path(location)
-    with file_path.open("r", encoding="utf8") as f:
-        for line in _yield_json_lines(f, skip=skip):
-            yield line
+    else:
+        file_path = _force_path(location)
+        with file_path.open("r", encoding="utf8") as f:
+            for line in _yield_json_lines(f, skip=skip):
+                yield line
 
 
 def write_jsonl(location, lines):
