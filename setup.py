@@ -29,7 +29,7 @@ COMPILE_OPTIONS = {
 }
 
 
-LINK_OPTIONS = {"msvc": [], "mingw32": [], "other": []}
+LINK_OPTIONS = {"msvc": [], "mingw32": [], "other": ['-lstdc++', '-lm']}
 
 if sys.byteorder == "big":
     macros = [("__BIG_ENDIAN__", "1")]
@@ -154,7 +154,6 @@ def setup_package():
                 include_dirs = ['./srsly/json', './srsly/json/lib',
                                 './srsly/json/double-conversion'],
                 extra_compile_args = ['-D_GNU_SOURCE'],
-                extra_link_args = ['-lstdc++', '-lm'],
             )
         )
 
