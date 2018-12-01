@@ -15,7 +15,7 @@ def read_json(location):
     """
     if location == "-":  # reading from sys.stdin
         data = sys.stdin.read()
-        return ujson.load(data)
+        return ujson.loads(data)
     file_path = _force_path(location)
     with file_path.open("r", encoding="utf8") as f:
         return ujson.load(f)
