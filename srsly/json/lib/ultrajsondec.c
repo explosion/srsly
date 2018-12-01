@@ -44,7 +44,6 @@ http://www.opensource.apple.com/source/tcl/tcl-14/tcl/license.terms
 #include <wchar.h>
 #include <stdlib.h>
 #include <errno.h>
-#include <stdint.h>
 
 #ifndef TRUE
 #define TRUE 1
@@ -67,7 +66,7 @@ struct DecoderState
   JSONObjectDecoder *dec;
 };
 
-static JSOBJ FASTCALL_MSVC decode_any( struct DecoderState *ds) FASTCALL_ATTR;
+JSOBJ FASTCALL_MSVC decode_any( struct DecoderState *ds) FASTCALL_ATTR;
 typedef JSOBJ (*PFN_DECODER)( struct DecoderState *ds);
 
 static JSOBJ SetError( struct DecoderState *ds, int offset, const char *message)
@@ -77,22 +76,40 @@ static JSOBJ SetError( struct DecoderState *ds, int offset, const char *message)
   return NULL;
 }
 
-static FASTCALL_ATTR JSOBJ FASTCALL_MSVC decodeDouble(struct DecoderState *ds)
+double createDouble(double intNeg, double intValue, double frcValue, int frcDecimalCount)
 {
-  int processed_characters_count;
-  int len = (int)(ds->end - ds->start);
-  double value = dconv_s2d(ds->start, len, &processed_characters_count);
-  ds->lastType = JT_DOUBLE;
-  ds->start += processed_characters_count;
+  static const double g_pow10[] = {1.0, 0.1, 0.01, 0.001, 0.0001, 0.00001, 0.000001,0.0000001, 0.00000001, 0.000000001, 0.0000000001, 0.00000000001, 0.000000000001, 0.0000000000001, 0.00000000000001, 0.000000000000001};
+  return (intValue + (frcValue * g_pow10[frcDecimalCount])) * intNeg;
+}
+
+FASTCALL_ATTR JSOBJ FASTCALL_MSVC decodePreciseFloat(struct DecoderState *ds)
+{
+  char *end;
+  double value;
+  errno = 0;
+
+  value = strtod(ds->start, &end);
+
+  if (errno == ERANGE)
+  {
+    return SetError(ds, -1, "Range error when decoding numeric as double");
+  }
+
+  ds->start = end;
   return ds->dec->newDouble(ds->prv, value);
 }
 
-static FASTCALL_ATTR JSOBJ FASTCALL_MSVC decode_numeric (struct DecoderState *ds)
+FASTCALL_ATTR JSOBJ FASTCALL_MSVC decode_numeric (struct DecoderState *ds)
 {
   int intNeg = 1;
+  int mantSize = 0;
   JSUINT64 intValue;
   JSUINT64 prevIntValue;
   int chr;
+  int decimalCount = 0;
+  double frcValue = 0.0;
+  double expNeg;
+  double expValue;
   char *offset = ds->start;
 
   JSUINT64 overflowLimit = LLONG_MAX;
@@ -138,18 +155,21 @@ static FASTCALL_ATTR JSOBJ FASTCALL_MSVC decode_numeric (struct DecoderState *ds
         }
 
         offset ++;
+        mantSize ++;
         break;
       }
       case '.':
       {
         offset ++;
-        return decodeDouble(ds);
+        goto DECODE_FRACTION;
+        break;
       }
       case 'e':
       case 'E':
       {
         offset ++;
-        return decodeDouble(ds);
+        goto DECODE_EXPONENT;
+        break;
       }
 
       default:
@@ -177,9 +197,119 @@ BREAK_INT_LOOP:
   {
     return ds->dec->newInt(ds->prv, (JSINT32) (intValue * intNeg));
   }
+
+DECODE_FRACTION:
+
+  if (ds->dec->preciseFloat)
+  {
+    return decodePreciseFloat(ds);
+  }
+
+  // Scan fraction part
+  frcValue = 0.0;
+  for (;;)
+  {
+    chr = (int) (unsigned char) *(offset);
+
+    switch (chr)
+    {
+      case '0':
+      case '1':
+      case '2':
+      case '3':
+      case '4':
+      case '5':
+      case '6':
+      case '7':
+      case '8':
+      case '9':
+      {
+        if (decimalCount < JSON_DOUBLE_MAX_DECIMALS)
+        {
+          frcValue = frcValue * 10.0 + (double) (chr - 48);
+          decimalCount ++;
+        }
+        offset ++;
+        break;
+      }
+      case 'e':
+      case 'E':
+      {
+        offset ++;
+        goto DECODE_EXPONENT;
+        break;
+      }
+      default:
+      {
+        goto BREAK_FRC_LOOP;
+      }
+    }
+  }
+
+BREAK_FRC_LOOP:
+  //FIXME: Check for arithemtic overflow here
+  ds->lastType = JT_DOUBLE;
+  ds->start = offset;
+  return ds->dec->newDouble (ds->prv, createDouble( (double) intNeg, (double) intValue, frcValue, decimalCount));
+
+DECODE_EXPONENT:
+  if (ds->dec->preciseFloat)
+  {
+    return decodePreciseFloat(ds);
+  }
+
+  expNeg = 1.0;
+
+  if (*(offset) == '-')
+  {
+    expNeg = -1.0;
+    offset ++;
+  }
+  else
+  if (*(offset) == '+')
+  {
+    expNeg = +1.0;
+    offset ++;
+  }
+
+  expValue = 0.0;
+
+  for (;;)
+  {
+    chr = (int) (unsigned char) *(offset);
+
+    switch (chr)
+    {
+      case '0':
+      case '1':
+      case '2':
+      case '3':
+      case '4':
+      case '5':
+      case '6':
+      case '7':
+      case '8':
+      case '9':
+      {
+        expValue = expValue * 10.0 + (double) (chr - 48);
+        offset ++;
+        break;
+      }
+      default:
+      {
+        goto BREAK_EXP_LOOP;
+      }
+    }
+  }
+
+BREAK_EXP_LOOP:
+  //FIXME: Check for arithemtic overflow here
+  ds->lastType = JT_DOUBLE;
+  ds->start = offset;
+  return ds->dec->newDouble (ds->prv, createDouble( (double) intNeg, (double) intValue , frcValue, decimalCount) * pow(10.0, expValue * expNeg));
 }
 
-static FASTCALL_ATTR JSOBJ FASTCALL_MSVC decode_true ( struct DecoderState *ds)
+FASTCALL_ATTR JSOBJ FASTCALL_MSVC decode_true ( struct DecoderState *ds)
 {
   char *offset = ds->start;
   offset ++;
@@ -199,7 +329,7 @@ SETERROR:
   return SetError(ds, -1, "Unexpected character found when decoding 'true'");
 }
 
-static FASTCALL_ATTR JSOBJ FASTCALL_MSVC decode_false ( struct DecoderState *ds)
+FASTCALL_ATTR JSOBJ FASTCALL_MSVC decode_false ( struct DecoderState *ds)
 {
   char *offset = ds->start;
   offset ++;
@@ -221,7 +351,7 @@ SETERROR:
   return SetError(ds, -1, "Unexpected character found when decoding 'false'");
 }
 
-static FASTCALL_ATTR JSOBJ FASTCALL_MSVC decode_null ( struct DecoderState *ds)
+FASTCALL_ATTR JSOBJ FASTCALL_MSVC decode_null ( struct DecoderState *ds)
 {
   char *offset = ds->start;
   offset ++;
@@ -241,7 +371,7 @@ SETERROR:
   return SetError(ds, -1, "Unexpected character found when decoding 'null'");
 }
 
-static FASTCALL_ATTR void FASTCALL_MSVC SkipWhitespace(struct DecoderState *ds)
+FASTCALL_ATTR void FASTCALL_MSVC SkipWhitespace(struct DecoderState *ds)
 {
   char *offset = ds->start;
 
@@ -292,7 +422,7 @@ static const JSUINT8 g_decoderLookup[256] =
   /* 0xf0 */ 4, 4, 4, 4, 4, 4, 4, 4, DS_UTFLENERROR, DS_UTFLENERROR, DS_UTFLENERROR, DS_UTFLENERROR, DS_UTFLENERROR, DS_UTFLENERROR, DS_UTFLENERROR, DS_UTFLENERROR,
 };
 
-static FASTCALL_ATTR JSOBJ FASTCALL_MSVC decode_string ( struct DecoderState *ds)
+FASTCALL_ATTR JSOBJ FASTCALL_MSVC decode_string ( struct DecoderState *ds)
 {
   JSUTF16 sur[2] = { 0 };
   int iSur = 0;
@@ -366,7 +496,6 @@ static FASTCALL_ATTR JSOBJ FASTCALL_MSVC decode_string ( struct DecoderState *ds
         return SetError (ds, -1, "Invalid UTF-8 sequence length when decoding 'string'");
       }
       case DS_ISESCAPE:
-      {
         inputOffset ++;
         switch (*inputOffset)
         {
@@ -452,14 +581,13 @@ static FASTCALL_ATTR JSOBJ FASTCALL_MSVC decode_string ( struct DecoderState *ds
 #endif
               iSur = 0;
             }
-            break;
-          }
-
-          case '\0': return SetError(ds, -1, "Unterminated escape sequence when decoding 'string'");
-          default: return SetError(ds, -1, "Unrecognized escape sequence when decoding 'string'");
+          break;
         }
-        break;
+
+        case '\0': return SetError(ds, -1, "Unterminated escape sequence when decoding 'string'");
+        default: return SetError(ds, -1, "Unrecognized escape sequence when decoding 'string'");
       }
+      break;
 
       case 1:
       {
@@ -544,7 +672,7 @@ static FASTCALL_ATTR JSOBJ FASTCALL_MSVC decode_string ( struct DecoderState *ds
   }
 }
 
-static FASTCALL_ATTR JSOBJ FASTCALL_MSVC decode_array(struct DecoderState *ds)
+FASTCALL_ATTR JSOBJ FASTCALL_MSVC decode_array(struct DecoderState *ds)
 {
   JSOBJ itemValue;
   JSOBJ newObj;
@@ -604,19 +732,18 @@ static FASTCALL_ATTR JSOBJ FASTCALL_MSVC decode_array(struct DecoderState *ds)
       return SetError(ds, -1, "Unexpected character found when decoding array value (2)");
     }
 
-    len++;
+    len ++;
   }
 }
 
-static FASTCALL_ATTR JSOBJ FASTCALL_MSVC decode_object( struct DecoderState *ds)
+FASTCALL_ATTR JSOBJ FASTCALL_MSVC decode_object( struct DecoderState *ds)
 {
   JSOBJ itemName;
   JSOBJ itemValue;
   JSOBJ newObj;
 
   ds->objDepth++;
-  if (ds->objDepth > JSON_MAX_OBJECT_DEPTH)
-  {
+  if (ds->objDepth > JSON_MAX_OBJECT_DEPTH) {
     return SetError(ds, -1, "Reached object decoding depth limit");
   }
 
@@ -692,7 +819,7 @@ static FASTCALL_ATTR JSOBJ FASTCALL_MSVC decode_object( struct DecoderState *ds)
   }
 }
 
-static FASTCALL_ATTR JSOBJ FASTCALL_MSVC decode_any(struct DecoderState *ds)
+FASTCALL_ATTR JSOBJ FASTCALL_MSVC decode_any(struct DecoderState *ds)
 {
   for (;;)
   {

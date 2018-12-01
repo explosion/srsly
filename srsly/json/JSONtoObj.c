@@ -43,7 +43,7 @@ http://www.opensource.apple.com/source/tcl/tcl-14/tcl/license.terms
 //#define PRINTMARK() fprintf(stderr, "%s: MARK(%d)\n", __FILE__, __LINE__)
 #define PRINTMARK()
 
-static void Object_objectAddKey(void *prv, JSOBJ obj, JSOBJ name, JSOBJ value)
+void Object_objectAddKey(void *prv, JSOBJ obj, JSOBJ name, JSOBJ value)
 {
   PyDict_SetItem (obj, name, value);
   Py_DECREF( (PyObject *) name);
@@ -51,59 +51,59 @@ static void Object_objectAddKey(void *prv, JSOBJ obj, JSOBJ name, JSOBJ value)
   return;
 }
 
-static void Object_arrayAddItem(void *prv, JSOBJ obj, JSOBJ value)
+void Object_arrayAddItem(void *prv, JSOBJ obj, JSOBJ value)
 {
   PyList_Append(obj, value);
   Py_DECREF( (PyObject *) value);
   return;
 }
 
-static JSOBJ Object_newString(void *prv, wchar_t *start, wchar_t *end)
+JSOBJ Object_newString(void *prv, wchar_t *start, wchar_t *end)
 {
   return PyUnicode_FromWideChar (start, (end - start));
 }
 
-static JSOBJ Object_newTrue(void *prv)
+JSOBJ Object_newTrue(void *prv)
 {
   Py_RETURN_TRUE;
 }
 
-static JSOBJ Object_newFalse(void *prv)
+JSOBJ Object_newFalse(void *prv)
 {
   Py_RETURN_FALSE;
 }
 
-static JSOBJ Object_newNull(void *prv)
+JSOBJ Object_newNull(void *prv)
 {
   Py_RETURN_NONE;
 }
 
-static JSOBJ Object_newObject(void *prv)
+JSOBJ Object_newObject(void *prv)
 {
   return PyDict_New();
 }
 
-static JSOBJ Object_newArray(void *prv)
+JSOBJ Object_newArray(void *prv)
 {
   return PyList_New(0);
 }
 
-static JSOBJ Object_newInteger(void *prv, JSINT32 value)
+JSOBJ Object_newInteger(void *prv, JSINT32 value)
 {
   return PyInt_FromLong( (long) value);
 }
 
-static JSOBJ Object_newLong(void *prv, JSINT64 value)
+JSOBJ Object_newLong(void *prv, JSINT64 value)
 {
   return PyLong_FromLongLong (value);
 }
 
-static JSOBJ Object_newUnsignedLong(void *prv, JSUINT64 value)
+JSOBJ Object_newUnsignedLong(void *prv, JSUINT64 value)
 {
   return PyLong_FromUnsignedLongLong (value);
 }
 
-static JSOBJ Object_newDouble(void *prv, double value)
+JSOBJ Object_newDouble(void *prv, double value)
 {
   return PyFloat_FromDouble(value);
 }
@@ -113,13 +113,14 @@ static void Object_releaseObject(void *prv, JSOBJ obj)
   Py_DECREF( ((PyObject *)obj));
 }
 
-static char *g_kwlist[] = {"obj", NULL};
+static char *g_kwlist[] = {"obj", "precise_float", NULL};
 
 PyObject* JSONToObj(PyObject* self, PyObject *args, PyObject *kwargs)
 {
   PyObject *ret;
   PyObject *sarg;
   PyObject *arg;
+  PyObject *opreciseFloat = NULL;
   JSONObjectDecoder decoder =
   {
     Object_newString,
@@ -140,11 +141,17 @@ PyObject* JSONToObj(PyObject* self, PyObject *args, PyObject *kwargs)
     PyObject_Realloc
   };
 
+  decoder.preciseFloat = 0;
   decoder.prv = NULL;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O", g_kwlist, &arg))
+  if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O|O", g_kwlist, &arg, &opreciseFloat))
   {
       return NULL;
+  }
+
+  if (opreciseFloat && PyObject_IsTrue(opreciseFloat))
+  {
+      decoder.preciseFloat = 1;
   }
 
   if (PyString_Check(arg))
@@ -170,11 +177,7 @@ PyObject* JSONToObj(PyObject* self, PyObject *args, PyObject *kwargs)
   decoder.errorStr = NULL;
   decoder.errorOffset = NULL;
 
-  dconv_s2d_init(DCONV_S2D_ALLOW_TRAILING_JUNK, 0.0, 0.0, "Infinity", "NaN");
-
   ret = JSON_DecodeObject(&decoder, PyString_AS_STRING(sarg), PyString_GET_SIZE(sarg));
-
-  dconv_s2d_free();
 
   if (sarg != arg)
   {
