@@ -48,16 +48,14 @@ def test_read_json_stdin(monkeypatch):
 def test_write_json_file():
     data = {"hello": "world", "test": 123}
     with make_tempfile() as file_path:
-        # Sorting keys to prevent cross-platform inconsistencies
-        write_json(file_path, data, sort_keys=True)
+        write_json(file_path, data)
         with Path(file_path).open("r", encoding="utf8") as f:
             assert f.read() == '{\n  "hello": "world",\n  "test": 123\n}'
 
 
 def test_write_json_stdout(capsys):
     data = {"hello": "world", "test": 123}
-    # Sorting keys to prevent cross-platform inconsistencies
-    write_json("-", data, sort_keys=True)
+    write_json("-", data)
     captured = capsys.readouterr()
     assert captured.out == '{\n  "hello": "world",\n  "test": 123\n}\n'
 

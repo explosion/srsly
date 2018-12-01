@@ -83,7 +83,6 @@ srsly.write_json("/path/to/file.jsonl", data)
 | `location` | unicode / `Path` | The file path or `"-"` to write to stdout. |
 | `data` | - | The JSON-serializable data to output. |
 | `indent` | int | Number of spaces used to indent JSON. Defaults to `2`. |
-| `sort_keys` | bool | Sort output of dictionaries by keys. Defaults to `False`. |
 
 #### <kbd>function</kbd> `srsly.read_jsonl`
 

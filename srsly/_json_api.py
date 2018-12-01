@@ -21,14 +21,13 @@ def read_json(location):
         return ujson.load(f)
 
 
-def write_json(location, data, indent=2, sort_keys=False):
+def write_json(location, data, indent=2):
     """Create a .json file and dump contents or write to standard
     output.
 
     location (unicode / Path): The file path. "-" for writing to stdout.
     data: The JSON-serializable data to output.
     indent (int): Number of spaces used to indent JSON.
-    sort_keys (bool): Sort output of dictionaries by keys.
     """
     json_data = _json_dumps(data, indent=indent)
     if location == "-":  # writing to stdout
@@ -111,10 +110,8 @@ def _force_path(location):
     return file_path
 
 
-def _json_dumps(data, indent=0, sort_keys=False):
-    result = ujson.dumps(
-        data, indent=indent, escape_forward_slashes=False, sort_keys=sort_keys
-    )
+def _json_dumps(data, indent=0):
+    result = ujson.dumps(data, indent=indent, escape_forward_slashes=False)
     if sys.version_info[0] == 2:  # Python 2
         return result.decode("utf8")
     return result
