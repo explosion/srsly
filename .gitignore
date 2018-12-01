@@ -108,3 +108,6 @@ venv.bak/
 
 # Cython intermediate files
 *.cpp
+
+# Vim files
+*.sw*
