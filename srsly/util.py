@@ -2,8 +2,9 @@
 from __future__ import unicode_literals
 
 import sys
-import ujson
 from pathlib import Path
+
+from .json import ujson
 
 
 def read_json(location):
