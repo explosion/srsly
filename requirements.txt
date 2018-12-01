@@ -3,3 +3,5 @@ pathlib==1.0.1; python_version < "3.4"
 cython>=0.29.1,<0.30.0
 pytest>=4.0.0,<5.0.0
 pytz==2018.7
+mock>=2.0.0,<3.0.0
+numpy>=1.15.0
