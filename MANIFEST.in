@@ -1,3 +1,5 @@
 recursive-include include *.h
+recursive-include include *.cc
+recursive-include include *.c
 include LICENSE
 include README.md
