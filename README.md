@@ -1,1 +1,1 @@
-# srsly: Modern high-performance serialization utilities for Python
+# srsly: Modern high-performance serialization utilities
