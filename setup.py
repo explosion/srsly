@@ -143,7 +143,7 @@ def setup_package():
 
         ext_modules.append(
             Extension(
-                'srsly.ujson.ujson',
+                'srsly.json.ujson',
                 sources = [
                     './srsly/json/ujson.c',
                     './srsly/json/objToJSON.c',
