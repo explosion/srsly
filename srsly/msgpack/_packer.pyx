@@ -119,6 +119,7 @@ cdef class Packer(object):
         if encoding is not None:
             PyErr_WarnEx(DeprecationWarning, "encoding is deprecated.", 1)
         encoding = ensure_bytes(encoding)
+        unicode_errors = ensure_bytes(unicode_errors)
         self.use_float = use_single_float
         self.strict_types = strict_types
         self.autoreset = autoreset

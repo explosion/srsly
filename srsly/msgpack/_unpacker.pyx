@@ -368,10 +368,12 @@ cdef class Unpacker(object):
 
         if encoding is not None:
             PyErr_WarnEx(DeprecationWarning, "encoding is deprecated, Use raw=False instead.", 1)
+            encoding = ensure_bytes(encoding)
             self.encoding = encoding
             cenc = encoding
 
         if unicode_errors is not None:
+            unicode_errors = ensure_bytes(unicode_errors)
             self.unicode_errors = unicode_errors
             cerr = unicode_errors
 
