@@ -32,7 +32,9 @@ def setup_package():
         version=about["__version__"],
         license=about["__license__"],
         packages=find_packages(),
-        install_requires=[],
+        install_requires=[
+            'pathlib==1.0.1; python_version < "3.4"',
+        ],
         zip_safe=False,
     )
 
