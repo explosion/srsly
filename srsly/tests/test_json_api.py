@@ -8,8 +8,8 @@ from io import StringIO
 from pathlib import Path
 from contextlib import contextmanager
 
-from ..util import read_json, write_json, read_jsonl, write_jsonl
-from ..util import is_json_serializable
+from .._json_api import read_json, write_json, read_jsonl, write_jsonl
+from .._json_api import is_json_serializable
 
 
 @contextmanager
