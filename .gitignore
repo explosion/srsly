@@ -1,5 +1,6 @@
 .env/
 .vscode/
+cythonize.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
