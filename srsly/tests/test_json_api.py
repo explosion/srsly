@@ -47,17 +47,27 @@ def test_read_json_stdin(monkeypatch):
 
 def test_write_json_file():
     data = {"hello": "world", "test": 123}
+    # Provide two expected options, depending on how keys are ordered
+    expected = [
+        '{\n  "hello": "world",\n  "test": 123\n}',
+        '{\n  "test": 123,\n  "hello": "world"\n}',
+    ]
     with make_tempfile() as file_path:
         write_json(file_path, data)
         with Path(file_path).open("r", encoding="utf8") as f:
-            assert f.read() == '{\n  "hello": "world",\n  "test": 123\n}'
+            assert f.read() in expected
 
 
 def test_write_json_stdout(capsys):
     data = {"hello": "world", "test": 123}
+    # Provide two expected options, depending on how keys are ordered
+    expected = [
+        '{\n  "hello": "world",\n  "test": 123\n}\n',
+        '{\n  "test": 123,\n  "hello": "world"\n}\n',
+    ]
     write_json("-", data)
     captured = capsys.readouterr()
-    assert captured.out == '{\n  "hello": "world",\n  "test": 123\n}\n'
+    assert captured.out in expected
 
 
 def test_read_jsonl_file():
