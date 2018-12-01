@@ -8,10 +8,10 @@ from .json import ujson
 
 
 def read_json(location):
-    """Open and load JSON from file.
+    """Load JSON from file or standard input.
 
-    location (Path): The file path. "-" for reading from stdin.
-    RETURNS (dict): Loaded JSON content.
+    location (unicode / Path): The file path. "-" for reading from stdin.
+    RETURNS (dict / list): The loaded JSON content.
     """
     if location == "-":  # reading from sys.stdin
         data = sys.stdin.read()
@@ -21,24 +21,26 @@ def read_json(location):
         return ujson.load(f)
 
 
-def write_json(location, contents, indent=2):
-    """Create a .json file and dump contents.
+def write_json(location, data, indent=2):
+    """Create a .json file and dump contents or write to standard
+    output.
 
     location (unicode / Path): The file path. "-" for writing to stdout.
-    contents: The JSON-serializable contents to output.
+    data: The JSON-serializable data to output.
     indent (int): Number of spaces used to indent JSON.
     """
-    data = _json_dumps(contents, indent=indent)
+    json_data = _json_dumps(data, indent=indent)
     if location == "-":  # writing to stdout
-        print(data)
+        print(json_data)
     else:
         file_path = _force_path(location)
         with file_path.open("w", encoding="utf8") as f:
-            f.write(data)
+            f.write(json_data)
 
 
 def read_jsonl(location, skip=False):
-    """Read a .jsonl file and yield its contents line by line.
+    """Read a .jsonl file or standard input and yield contents line by line.
+    Blank lines will always be skipped.
 
     location (unicode / Path): The file path. "-" for reading from stdin.
     skip (bool): Skip broken lines and don't raise ValueError.
@@ -55,7 +57,7 @@ def read_jsonl(location, skip=False):
 
 
 def write_jsonl(location, lines):
-    """Create a .jsonl file and dump contents.
+    """Create a .jsonl file and dump contents or write to standard output.
 
     location (unicode / Path): The file path. "-" for writing to stdout.
     lines (list): The JSON-serializable contents of each line.
@@ -71,7 +73,11 @@ def write_jsonl(location, lines):
 
 
 def is_json_serializable(obj):
-    """Check if a Python object is JSON-serializable."""
+    """Check if a Python object is JSON-serializable.
+
+    obj: The object to check.
+    RETURNS (bool): Whether the object is JSON-serializable.
+    """
     if hasattr(obj, "__call__"):
         # Check this separately here to prevent infinite recursions
         return False
