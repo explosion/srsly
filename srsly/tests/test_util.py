@@ -7,8 +7,8 @@ import tempfile
 from pathlib import Path
 from contextlib import contextmanager
 
-from srsly.util import read_json, write_json, read_jsonl, write_jsonl
-from srsly.util import is_json_serializable
+from ..util import read_json, write_json, read_jsonl, write_jsonl
+from ..util import is_json_serializable
 
 
 @contextmanager
