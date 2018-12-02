@@ -1,7 +1,6 @@
 language: python
-sudo: false
-dist: trusty
-group: edge
+dist: xenial
+
 python:
    - "2.7"
    - "3.5"
