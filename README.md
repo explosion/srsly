@@ -71,7 +71,7 @@ json_string = srsly.json_dumps(data)
 | Argument | Type | Description |
 | --- | --- | --- |
 | `data` | - | The JSON-serializable data to output. |
-| `indent` | int | Number of spaces used to indent JSON. Defaults to `2`. |
+| `indent` | int | Number of spaces used to indent JSON. Defaults to `0`. |
 | `sort_keys` | bool | Sort dictionary keys. Defaults to `False`. |
 | **RETURNS** | unicode | The serialized string.
 
