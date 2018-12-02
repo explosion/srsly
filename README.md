@@ -57,6 +57,11 @@ python setup.py build_ext --inplace  # compile the library
 
 ## API
 
+### JSON
+
+> To underlying module is exposed via `srsly.ujson`. However, we normally
+> interact with it via the utility functions only.
+
 #### <kbd>function</kbd> `srsly.json_dumps`
 
 Serialize an object to a JSON string. Takes care of Python 2/3 compatibility
@@ -73,7 +78,7 @@ json_string = srsly.json_dumps(data)
 | `data` | - | The JSON-serializable data to output. |
 | `indent` | int | Number of spaces used to indent JSON. Defaults to `0`. |
 | `sort_keys` | bool | Sort dictionary keys. Defaults to `False`. |
-| **RETURNS** | unicode | The serialized string.
+| **RETURNS** | unicode | The serialized string. |
 
 #### <kbd>function</kbd> `srsly.json_loads`
 
@@ -87,20 +92,7 @@ obj = srsly.json_loads(data)
 | Argument | Type | Description |
 | --- | --- | --- |
 | `data` | unicode / bytes | The data to deserialize. |
-| **RETURNS** | - | The deserialized Python object.
-
-#### <kbd>function</kbd> `srsly.read_json`
-
-Load JSON from a file or standard input.
-
-```python
-data = srsly.read_json("/path/to/file.json")
-```
-
-| Argument | Type | Description |
-| --- | --- | --- |
-| `location` | unicode / `Path` | The file path or `"-"` to read from stdin. |
-| **RETURNS** | dict / list | The loaded JSON content. |
+| **RETURNS** | - | The deserialized Python object. |
 
 #### <kbd>function</kbd> `srsly.write_json`
 
@@ -116,6 +108,34 @@ srsly.write_json("/path/to/file.jsonl", data)
 | `location` | unicode / `Path` | The file path or `"-"` to write to stdout. |
 | `data` | - | The JSON-serializable data to output. |
 | `indent` | int | Number of spaces used to indent JSON. Defaults to `2`. |
+
+#### <kbd>function</kbd> `srsly.read_json`
+
+Load JSON from a file or standard input.
+
+```python
+data = srsly.read_json("/path/to/file.json")
+```
+
+| Argument | Type | Description |
+| --- | --- | --- |
+| `location` | unicode / `Path` | The file path or `"-"` to read from stdin. |
+| **RETURNS** | dict / list | The loaded JSON content. |
+
+#### <kbd>function</kbd> `srsly.write_jsonl`
+
+Create a JSONL file (newline-delimited JSON) and dump contents line by line, or
+write to standard output.
+
+```python
+data = [{"foo": "bar"}, {"baz": 123}]
+srsly.write_jsonl("/path/to/file.jsonl", data)
+```
+
+| Argument | Type | Description |
+| --- | --- | --- |
+| `location` | unicode / `Path` | The file path or `"-"` to write to stdout. |
+| `lines` | iterable | The JSON-serializable lines. |
 
 #### <kbd>function</kbd> `srsly.read_jsonl`
 
@@ -133,21 +153,6 @@ data = srsly.read_jsonl("/path/to/file.jsonl")
 | `skip` | bool | Skip broken lines and don't raise `ValueError`. Defaults to `False`. |
 | **YIELDS** | - | The loaded JSON contents of each line. |
 
-#### <kbd>function</kbd> `srsly.write_jsonl`
-
-Create a JSONL file (newline-delimited JSON) and dump contents line by line, or
-write to standard output.
-
-```python
-data = [{"foo": "bar"}, {"baz": 123}]
-srsly.write_jsonl("/path/to/file.jsonl", data)
-```
-
-| Argument | Type | Description |
-| --- | --- | --- |
-| `location` | unicode / `Path` | The file path or `"-"` to write to stdout. |
-| `lines` | iterable | The JSON-serializable lines. |
-
 #### <kbd>function</kbd> `srsly.is_json_serializable`
 
 Check if a Python object is JSON-serializable.
@@ -161,3 +166,99 @@ assert srsly.is_json_serializable(lambda x: x) is False
 | --- | --- | --- |
 | `obj` | - | The object to check. |
 | **RETURNS** | bool | Whether the object is JSON-serializable. |
+
+### msgpack
+
+> To underlying module is exposed via `srsly.msgpack`. However, we normally
+> interact with it via the utility functions only.
+
+#### <kbd>function</kbd> `srsly.msgpack_dumps`
+
+Serialize an object to a msgpack byte string.
+
+```python
+data = {"foo": "bar", "baz": 123}
+msg = srsly.msgpack_dumps(data)
+```
+
+| Argument | Type | Description |
+| --- | --- | --- |
+| `data` | - | The data to serialize. |
+| **RETURNS** | bytes | The serialized bytes. |
+
+#### <kbd>function</kbd> `srsly.msgpack_loads`
+
+Deserialize msgpack bytes to a Python object.
+
+```python
+msg = b"\x82\xa3foo\xa3bar\xa3baz{"
+data = srsly.msgpack_loads(msg)
+```
+
+| Argument | Type | Description |
+| --- | --- | --- |
+| `data` |  bytes | The data to deserialize. |
+| `use_list` | bool | Don't use tuples instead of lists. Can make deserialization slower. Defaults to `True`. |
+| **RETURNS** | - | The deserialized Python object. |
+
+#### <kbd>function</kbd> `srsly.write_msgpack`
+
+Create a msgpack file and dump contents.
+
+```python
+data = {"foo": "bar", "baz": 123}
+srsly.write_msgpack("/path/to/file.msg", data)
+```
+
+| Argument | Type | Description |
+| --- | --- | --- |
+| `location` | unicode / `Path` | The file path. |
+| `data` | - | The data to serialize. |
+
+#### <kbd>function</kbd> `srsly.read_msgpack`
+
+Load a msgpack file.
+
+```python
+data = srsly.read_msgpack("/path/to/file.msg")
+```
+
+| Argument | Type | Description |
+| --- | --- | --- |
+| `location` | unicode / `Path` | The file path. |
+| `use_list` | bool | Don't use tuples instead of lists. Can make deserialization slower. Defaults to `True`. |
+| **RETURNS** | - | The loaded and deserialized content. |
+
+### pickle
+
+> To underlying module is exposed via `srsly.cloudpickle`. However, we normally
+> interact with it via the utility functions only.
+
+#### <kbd>function</kbd> `srsly.pickle_dumps`
+
+Serialize a Python object with pickle.
+
+```python
+data = {"foo": "bar", "baz": 123}
+pickled_data = srsly.pickle_dumps(data)
+```
+
+| Argument | Type | Description |
+| --- | --- | --- |
+| `data` | - | The object to serialize. |
+| `protocol` | int | Protocol to use. `-1` for highest. Defaults to `None`. |
+| **RETURNS** | bytes | The serialized object. |
+
+#### <kbd>function</kbd> `srsly.pickle_loads`
+
+Deserialize bytes with pickle.
+
+```python
+pickled_data = b"\x80\x04\x95\x19\x00\x00\x00\x00\x00\x00\x00}\x94(\x8c\x03foo\x94\x8c\x03bar\x94\x8c\x03baz\x94K{u."
+data = srsly.pickle_loads(pickled_data)
+```
+
+| Argument | Type | Description |
+| --- | --- | --- |
+| `data` |  bytes | The data to deserialize. |
+| **RETURNS** | - | The deserialized Python object. |
