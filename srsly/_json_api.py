@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 import sys
-import json
+import json as _builtin_json
 from pathlib import Path
 
 from .json import ujson
@@ -17,7 +17,10 @@ def json_dumps(data, indent=0, sort_keys=False):
     RETURNS (unicode): The serialized string.
     """
     if sort_keys:
-        result = json.dumps(data, indent=indent, sort_keys=sort_keys)
+        indent = None if indent == 0 else indent
+        result = _builtin_json.dumps(
+            data, indent=indent, separators=(",", ":"), sort_keys=sort_keys
+        )
     else:
         result = ujson.dumps(data, indent=indent, escape_forward_slashes=False)
     if sys.version_info[0] == 2:  # Python 2

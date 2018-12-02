@@ -10,7 +10,7 @@ from contextlib import contextmanager
 import shutil
 
 from .._json_api import read_json, write_json, read_jsonl, write_jsonl
-from .._json_api import is_json_serializable
+from .._json_api import json_dumps, is_json_serializable
 
 
 @contextmanager
@@ -23,6 +23,12 @@ def make_tempdir(files={}):
             file_.write(content)
     yield temp_dir
     shutil.rmtree(temp_dir_str)
+
+
+def test_json_dumps_sort_keys():
+    data = {"a": 1, "c": 3, "b": 2}
+    result = json_dumps(data, sort_keys=True)
+    assert result == '{"a":1,"b":2,"c":3}'
 
 
 def test_read_json_file():
