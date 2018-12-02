@@ -29,7 +29,6 @@ test_script:
   # to put the Python version you want to use on PATH.
   - "%PYTHON%\\python.exe -m pytest srsly/tests/json"
   - "%PYTHON%\\python.exe -m pytest srsly/tests/messagepack"
-  - "%PYTHON%\\python.exe -m pytest srsly/tests/test_json_api.py"
 
 after_test:
   # This step builds your wheels.
