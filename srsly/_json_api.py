@@ -5,7 +5,7 @@ import sys
 import json as _builtin_json
 from pathlib import Path
 
-from .json import ujson
+from . import ujson 
 
 
 def json_dumps(data, indent=0, sort_keys=False):

@@ -18,7 +18,7 @@ if six.PY2:
 else:
     import unittest
 
-from ...json import ujson
+from ... import ujson
 
 json_unicode = json.dumps if six.PY3 else functools.partial(json.dumps, encoding="utf-8")
 

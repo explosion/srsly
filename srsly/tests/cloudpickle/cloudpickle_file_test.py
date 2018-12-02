@@ -28,7 +28,7 @@ class CloudPickleFileTests(unittest.TestCase):
         # Empty file
         open(self.tmpfilepath, 'w').close()
         with open(self.tmpfilepath, 'r') as f:
-            self.assertEqual('', pickle.loads(srsly.pickle.cloudpickle.dumps(f)).read())
+            self.assertEqual('', pickle.loads(srsly.cloudpickle.cloudpickle.dumps(f)).read())
         os.remove(self.tmpfilepath)
 
     def test_closed_file(self):
@@ -36,7 +36,7 @@ class CloudPickleFileTests(unittest.TestCase):
         with open(self.tmpfilepath, 'w') as f:
             f.write(self.teststring)
         with pytest.raises(pickle.PicklingError) as excinfo:
-            srsly.pickle.cloudpickle.dumps(f)
+            srsly.cloudpickle.cloudpickle.dumps(f)
         assert "Cannot pickle closed files" in str(excinfo.value)
         os.remove(self.tmpfilepath)
 
@@ -46,7 +46,7 @@ class CloudPickleFileTests(unittest.TestCase):
             f.write(self.teststring)
         # Open for reading
         with open(self.tmpfilepath, 'r') as f:
-            new_f = pickle.loads(srsly.pickle.cloudpickle.dumps(f))
+            new_f = pickle.loads(srsly.cloudpickle.cloudpickle.dumps(f))
             self.assertEqual(self.teststring, new_f.read())
         os.remove(self.tmpfilepath)
 
@@ -55,7 +55,7 @@ class CloudPickleFileTests(unittest.TestCase):
             f.write(self.teststring)
             f.seek(0)
             self.assertRaises(pickle.PicklingError,
-                              lambda: srsly.pickle.cloudpickle.dumps(f))
+                              lambda: srsly.cloudpickle.cloudpickle.dumps(f))
         os.remove(self.tmpfilepath)
 
     def test_plus_mode(self):
@@ -63,7 +63,7 @@ class CloudPickleFileTests(unittest.TestCase):
         with open(self.tmpfilepath, 'w+') as f:
             f.write(self.teststring)
             f.seek(0)
-            new_f = pickle.loads(srsly.pickle.cloudpickle.dumps(f))
+            new_f = pickle.loads(srsly.cloudpickle.cloudpickle.dumps(f))
             self.assertEqual(self.teststring, new_f.read())
         os.remove(self.tmpfilepath)
 
@@ -72,7 +72,7 @@ class CloudPickleFileTests(unittest.TestCase):
         with open(self.tmpfilepath, 'w+') as f:
             f.write(self.teststring)
             f.seek(4)
-            unpickled = pickle.loads(srsly.pickle.cloudpickle.dumps(f))
+            unpickled = pickle.loads(srsly.cloudpickle.cloudpickle.dumps(f))
             # unpickled StringIO is at position 4
             self.assertEqual(4, unpickled.tell())
             self.assertEqual(self.teststring[4:], unpickled.read())
@@ -89,16 +89,16 @@ class CloudPickleFileTests(unittest.TestCase):
             fp.seek(0)
             f = fp.file
             # FIXME this doesn't work yet: cloudpickle.dumps(fp)
-            newfile = pickle.loads(srsly.pickle.cloudpickle.dumps(f))
+            newfile = pickle.loads(srsly.cloudpickle.cloudpickle.dumps(f))
             self.assertEqual(self.teststring, newfile.read())
 
     #def test_pickling_special_file_handles(self):
     #    # pytest is wrapping the sys.stderr, which ruins this
     #    # Warning: if you want to run your tests with nose, add -s option
     #    for out in sys.stdout, sys.stderr:  # Regression test for SPARK-3415
-    #        self.assertEqual(out, pickle.loads(srsly.pickle.cloudpickle.dumps(out)))
+    #        self.assertEqual(out, pickle.loads(srsly.cloudpickle.cloudpickle.dumps(out)))
     #    self.assertRaises(pickle.PicklingError,
-    #                      lambda: srsly.pickle.cloudpickle.dumps(sys.stdin))
+    #                      lambda: srsly.cloudpickle.cloudpickle.dumps(sys.stdin))
 
     def NOT_WORKING_test_tty(self):
         # FIXME: Mocking 'file' is not trivial... and fails for now
@@ -110,7 +110,7 @@ class CloudPickleFileTests(unittest.TestCase):
 
         with patch.object(builtins, 'open', mock_open(), create=True):
             with open('foo', 'w+') as handle:
-                srsly.pickle.cloudpickle.dumps(handle)
+                srsly.cloudpickle.cloudpickle.dumps(handle)
 
 
 if __name__ == '__main__':
