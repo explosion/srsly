@@ -459,8 +459,13 @@ int Dict_iterNext(JSOBJ obj, JSONTypeContext *tc)
     GET_TC(tc)->itemName = NULL;
   }
 
+  if (!(GET_TC(tc)->itemName = PyIter_Next(GET_TC(tc)->iterator)))
+  {
+    PRINTMARK();
+    return 0;
+  }
 
-  if (!PyDict_Next ( (PyObject *)GET_TC(tc)->dictObj, &GET_TC(tc)->index, &GET_TC(tc)->itemName, &GET_TC(tc)->itemValue))
+  if (!(GET_TC(tc)->itemValue = PyObject_GetItem(GET_TC(tc)->dictObj, GET_TC(tc)->itemName)))
   {
     PRINTMARK();
     return 0;
@@ -495,6 +500,7 @@ void Dict_iterEnd(JSOBJ obj, JSONTypeContext *tc)
     Py_DECREF(GET_TC(tc)->itemName);
     GET_TC(tc)->itemName = NULL;
   }
+  Py_CLEAR(GET_TC(tc)->iterator);
   Py_DECREF(GET_TC(tc)->dictObj);
   PRINTMARK();
 }
@@ -626,20 +632,23 @@ char *SortedDict_iterGetName(JSOBJ obj, JSONTypeContext *tc, size_t *outLen)
 
 void SetupDictIter(PyObject *dictObj, TypeContext *pc, JSONObjectEncoder *enc)
 {
-  if (enc->sortKeys) {
+  pc->dictObj = dictObj;
+  if (enc->sortKeys)
+  {
     pc->iterEnd = SortedDict_iterEnd;
     pc->iterNext = SortedDict_iterNext;
     pc->iterGetValue = SortedDict_iterGetValue;
     pc->iterGetName = SortedDict_iterGetName;
+    pc->index = 0;
   }
-  else {
+  else
+  {
     pc->iterEnd = Dict_iterEnd;
     pc->iterNext = Dict_iterNext;
     pc->iterGetValue = Dict_iterGetValue;
     pc->iterGetName = Dict_iterGetName;
+    pc->iterator = PyObject_GetIter(dictObj);
   }
-  pc->dictObj = dictObj;
-  pc->index = 0;
 }
 
 void Object_beginTypeContext (JSOBJ _obj, JSONTypeContext *tc, JSONObjectEncoder *enc)
@@ -647,7 +656,8 @@ void Object_beginTypeContext (JSOBJ _obj, JSONTypeContext *tc, JSONObjectEncoder
   PyObject *obj, *exc, *iter;
   TypeContext *pc;
   PRINTMARK();
-  if (!_obj) {
+  if (!_obj)
+  {
     tc->type = JT_INVALID;
     return;
   }
