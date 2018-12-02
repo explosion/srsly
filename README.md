@@ -59,7 +59,7 @@ python setup.py build_ext --inplace  # compile the library
 
 ### JSON
 
-> To underlying module is exposed via `srsly.ujson`. However, we normally
+> 📦 The underlying module is exposed via `srsly.ujson`. However, we normally
 > interact with it via the utility functions only.
 
 #### <kbd>function</kbd> `srsly.json_dumps`
@@ -169,7 +169,7 @@ assert srsly.is_json_serializable(lambda x: x) is False
 
 ### msgpack
 
-> To underlying module is exposed via `srsly.msgpack`. However, we normally
+> 📦 The underlying module is exposed via `srsly.msgpack`. However, we normally
 > interact with it via the utility functions only.
 
 #### <kbd>function</kbd> `srsly.msgpack_dumps`
@@ -231,8 +231,8 @@ data = srsly.read_msgpack("/path/to/file.msg")
 
 ### pickle
 
-> To underlying module is exposed via `srsly.cloudpickle`. However, we normally
-> interact with it via the utility functions only.
+> 📦 The underlying module is exposed via `srsly.cloudpickle`. However, we
+> normally interact with it via the utility functions only.
 
 #### <kbd>function</kbd> `srsly.pickle_dumps`
 
