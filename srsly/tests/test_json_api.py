@@ -14,12 +14,12 @@ from .._json_api import is_json_serializable
 
 @contextmanager
 def make_tempfile(data=None):
-    tmp_file = tempfile.NamedTemporaryFile(delete=False)
+    tmp_file = tempfile.NamedTemporaryFile(delete=True)
     if data is not None:
         with Path(tmp_file.name).open("w", encoding="utf8") as f:
             f.write(data)
     yield tmp_file.name
-    os.remove(tmp_file.name)
+    tmp_file.close()
 
 
 def test_read_json_file():
