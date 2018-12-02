@@ -9,7 +9,7 @@ from io import StringIO
 import pytest
 from mock import patch, mock_open
 
-import srsly.pickle.cloudpickle
+import srsly.cloudpickle.cloudpickle
 
 
 class CloudPickleFileTests(unittest.TestCase):
