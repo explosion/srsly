@@ -49,8 +49,8 @@ def test_write_json_file():
     data = {"hello": "world", "test": 123}
     # Provide two expected options, depending on how keys are ordered
     expected = [
-        '{\n  "hello": "world",\n  "test": 123\n}',
-        '{\n  "test": 123,\n  "hello": "world"\n}',
+        '{\n  "hello":"world",\n  "test":123\n}',
+        '{\n  "test":123,\n  "hello":"world"\n}',
     ]
     with make_tempfile() as file_path:
         write_json(file_path, data)
@@ -62,8 +62,8 @@ def test_write_json_stdout(capsys):
     data = {"hello": "world", "test": 123}
     # Provide two expected options, depending on how keys are ordered
     expected = [
-        '{\n  "hello": "world",\n  "test": 123\n}\n',
-        '{\n  "test": 123,\n  "hello": "world"\n}\n',
+        '{\n  "hello":"world",\n  "test":123\n}\n',
+        '{\n  "test":123,\n  "hello":"world"\n}\n',
     ]
     write_json("-", data)
     captured = capsys.readouterr()
