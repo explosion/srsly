@@ -7,6 +7,17 @@ from pathlib import Path
 from .json import ujson
 
 
+def json_dumps(data, indent=0):
+    result = ujson.dumps(data, indent=indent, escape_forward_slashes=False)
+    if sys.version_info[0] == 2:  # Python 2
+        return result.decode("utf8")
+    return result
+
+
+def json_loads(data):
+    return ujson.loads(data)
+
+
 def read_json(location):
     """Load JSON from file or standard input.
 
@@ -29,7 +40,7 @@ def write_json(location, data, indent=2):
     data: The JSON-serializable data to output.
     indent (int): Number of spaces used to indent JSON.
     """
-    json_data = _json_dumps(data, indent=indent)
+    json_data = json_dumps(data, indent=indent)
     if location == "-":  # writing to stdout
         print(json_data)
     else:
@@ -64,12 +75,12 @@ def write_jsonl(location, lines):
     """
     if location == "-":  # writing to stdout
         for line in lines:
-            print(_json_dumps(line))
+            print(json_dumps(line))
     else:
         file_path = _force_path(location, require_exists=False)
         with file_path.open("a", encoding="utf-8") as f:
             for line in lines:
-                f.write(_json_dumps(line) + "\n")
+                f.write(json_dumps(line) + "\n")
 
 
 def is_json_serializable(obj):
@@ -109,10 +120,3 @@ def _force_path(location, require_exists=True):
     if require_exists and not location.exists():
         raise ValueError("Can't read file: {}".format(location))
     return location
-
-
-def _json_dumps(data, indent=0):
-    result = ujson.dumps(data, indent=indent, escape_forward_slashes=False)
-    if sys.version_info[0] == 2:  # Python 2
-        return result.decode("utf8")
-    return result
