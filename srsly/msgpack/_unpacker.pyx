@@ -142,15 +142,17 @@ cdef inline int get_data_from_buffer(object obj,
                      1)
         return 1
 
+cdef Py_ssize_t MAX_LENGTH = 2**32 -1
+
 def unpackb(object packed, object object_hook=None, object list_hook=None,
             bint use_list=True, bint raw=True, bint strict_map_key=False,
             encoding=None, unicode_errors=None,
             object_pairs_hook=None, ext_hook=ExtType,
-            Py_ssize_t max_str_len=1024*1024,
-            Py_ssize_t max_bin_len=1024*1024,
-            Py_ssize_t max_array_len=128*1024,
-            Py_ssize_t max_map_len=32*1024,
-            Py_ssize_t max_ext_len=1024*1024):
+            Py_ssize_t max_str_len=MAX_LENGTH,
+            Py_ssize_t max_bin_len=MAX_LENGTH,
+            Py_ssize_t max_array_len=MAX_LENGTH,
+            Py_ssize_t max_map_len=MAX_LENGTH,
+            Py_ssize_t max_ext_len=MAX_LENGTH):
     """
     Unpack packed_bytes to object. Returns an unpacked object.
 
