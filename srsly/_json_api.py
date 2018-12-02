@@ -33,7 +33,7 @@ def write_json(location, data, indent=2):
     if location == "-":  # writing to stdout
         print(json_data)
     else:
-        file_path = _force_path(location)
+        file_path = _force_path(location, require_exists=False)
         with file_path.open("w", encoding="utf8") as f:
             f.write(json_data)
 
@@ -103,9 +103,9 @@ def _yield_json_lines(stream, skip=False):
         line_no += 1
 
 
-def _force_path(location):
+def _force_path(location, require_exists=True):
     file_path = Path(location)
-    if not file_path.exists():
+    if require_exists and not not file_path.exists():
         raise ValueError("Can't read file: {}".format(location))
     return file_path
 
