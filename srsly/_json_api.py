@@ -66,7 +66,7 @@ def write_jsonl(location, lines):
         for line in lines:
             print(_json_dumps(line))
     else:
-        file_path = _force_path(location)
+        file_path = _force_path(location, require_exists=False)
         with file_path.open("a", encoding="utf-8") as f:
             for line in lines:
                 f.write(_json_dumps(line) + "\n")
@@ -104,10 +104,11 @@ def _yield_json_lines(stream, skip=False):
 
 
 def _force_path(location, require_exists=True):
-    file_path = Path(location)
-    if require_exists and not not file_path.exists():
+    if not isinstance(location, Path):
+        location = Path(location)
+    if require_exists and not location.exists():
         raise ValueError("Can't read file: {}".format(location))
-    return file_path
+    return location
 
 
 def _json_dumps(data, indent=0):
