@@ -3,9 +3,9 @@ from __future__ import unicode_literals
 
 import sys
 import json as _builtin_json
-from pathlib import Path
 
-from . import ujson 
+from . import ujson
+from .util import force_path
 
 
 def json_dumps(data, indent=0, sort_keys=False):
@@ -46,7 +46,7 @@ def read_json(location):
     if location == "-":  # reading from sys.stdin
         data = sys.stdin.read()
         return ujson.loads(data)
-    file_path = _force_path(location)
+    file_path = force_path(location)
     with file_path.open("r", encoding="utf8") as f:
         return ujson.load(f)
 
@@ -63,7 +63,7 @@ def write_json(location, data, indent=2):
     if location == "-":  # writing to stdout
         print(json_data)
     else:
-        file_path = _force_path(location, require_exists=False)
+        file_path = force_path(location, require_exists=False)
         with file_path.open("w", encoding="utf8") as f:
             f.write(json_data)
 
@@ -80,7 +80,7 @@ def read_jsonl(location, skip=False):
         for line in _yield_json_lines(sys.stdin, skip=skip):
             yield line
     else:
-        file_path = _force_path(location)
+        file_path = force_path(location)
         with file_path.open("r", encoding="utf8") as f:
             for line in _yield_json_lines(f, skip=skip):
                 yield line
@@ -96,7 +96,7 @@ def write_jsonl(location, lines):
         for line in lines:
             print(json_dumps(line))
     else:
-        file_path = _force_path(location, require_exists=False)
+        file_path = force_path(location, require_exists=False)
         with file_path.open("a", encoding="utf-8") as f:
             for line in lines:
                 f.write(json_dumps(line) + "\n")
@@ -131,11 +131,3 @@ def _yield_json_lines(stream, skip=False):
                 continue
             raise ValueError("Invalid JSON on line {}: {}".format(line_no, line))
         line_no += 1
-
-
-def _force_path(location, require_exists=True):
-    if not isinstance(location, Path):
-        location = Path(location)
-    if require_exists and not location.exists():
-        raise ValueError("Can't read file: {}".format(location))
-    return location
