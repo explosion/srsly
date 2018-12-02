@@ -7,34 +7,38 @@ import tempfile
 from io import StringIO
 from pathlib import Path
 from contextlib import contextmanager
+import shutil
 
 from .._json_api import read_json, write_json, read_jsonl, write_jsonl
 from .._json_api import is_json_serializable
 
 
 @contextmanager
-def make_tempfile(data=None):
-    tmp_file = tempfile.NamedTemporaryFile(delete=True)
-    if data is not None:
-        with Path(tmp_file.name).open("w", encoding="utf8") as f:
-            f.write(data)
-    yield tmp_file.name
-    tmp_file.close()
+def make_tempdir(files={}):
+    temp_dir = Path(tempfile.mkdtemp())
+    for name, content in files.items():
+        path = temp_dir / name
+        with path.open('w', encoding='utf8') as file_:
+            file_.write(content)
+    yield temp_dir
+    shutil.rmtree(str(temp_dir))
 
 
 def test_read_json_file():
     file_contents = '{\n    "hello": "world"\n}'
-    with make_tempfile(file_contents) as file_path:
-        data = read_json(file_path)
+    with make_tempdir({'tmp.json': file_contents}) as temp_dir:
+        assert (temp_dir / 'tmp.json').exists()
+        data = read_json(temp_dir / 'tmp.json')
     assert len(data) == 1
     assert data["hello"] == "world"
 
 
 def test_read_json_file_invalid():
     file_contents = '{\n    "hello": world\n}'
-    with make_tempfile(file_contents) as file_path:
+    with make_tempdir({'tmp.json': file_contents}) as temp_dir:
+        assert (temp_dir / 'tmp.json').exists()
         with pytest.raises(ValueError):
-            read_json(file_path)
+            read_json(temp_dir / 'tmp.json')
 
 
 def test_read_json_stdin(monkeypatch):
@@ -52,7 +56,8 @@ def test_write_json_file():
         '{\n  "hello":"world",\n  "test":123\n}',
         '{\n  "test":123,\n  "hello":"world"\n}',
     ]
-    with make_tempfile() as file_path:
+    with make_tempdir() as temp_dir:
+        file_path = temp_dir / 'tmp.json'
         write_json(file_path, data)
         with Path(file_path).open("r", encoding="utf8") as f:
             assert f.read() in expected
@@ -72,8 +77,10 @@ def test_write_json_stdout(capsys):
 
 def test_read_jsonl_file():
     file_contents = '{"hello": "world"}\n{"test": 123}'
-    with make_tempfile(file_contents) as f:
-        data = read_jsonl(f)
+    with make_tempdir({'tmp.jsonl': file_contents}) as temp_dir:
+        file_path = temp_dir / 'tmp.jsonl'
+        assert (temp_dir / 'tmp.jsonl').exists()
+        data = read_jsonl(file_path)
         # Make sure this returns a generator, not just a list
         assert not hasattr(data, "__len__")
         data = list(data)
@@ -86,10 +93,12 @@ def test_read_jsonl_file():
 
 def test_read_jsonl_file_invalid():
     file_contents = '{"hello": world}\n{"test": 123}'
-    with make_tempfile(file_contents) as f:
+    with make_tempdir({'tmp.jsonl': file_contents}) as temp_dir:
+        file_path = temp_dir / 'tmp.jsonl'
+        assert (temp_dir / 'tmp.jsonl').exists()
         with pytest.raises(ValueError):
-            data = list(read_jsonl(f))
-        data = list(read_jsonl(f, skip=True))
+            data = list(read_jsonl(file_path))
+        data = list(read_jsonl(file_path, skip=True))
     assert len(data) == 1
     assert len(data[0]) == 1
     assert data[0]["test"] == 123
@@ -111,7 +120,8 @@ def test_read_jsonl_stdin(monkeypatch):
 
 def test_write_jsonl_file():
     data = [{"hello": "world"}, {"test": 123}]
-    with make_tempfile() as file_path:
+    with make_tempdir() as temp_dir:
+        file_path = temp_dir / 'tmp.jsonl'
         write_jsonl(file_path, data)
         with Path(file_path).open("r", encoding="utf8") as f:
             assert f.read() == '{"hello":"world"}\n{"test":123}\n'
