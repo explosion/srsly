@@ -57,6 +57,38 @@ python setup.py build_ext --inplace  # compile the library
 
 ## API
 
+#### <kbd>function</kbd> `srsly.json_dumps`
+
+Serialize an object to a JSON string. Takes care of Python 2/3 compatibility
+and falls back to `json` if `sort_keys=True` is used (until it's fixed in
+`ujson`).
+
+```python
+data = {"foo": "bar", "baz": 123}
+json_string = srsly.json_dumps(data)
+```
+
+| Argument | Type | Description |
+| --- | --- | --- |
+| `data` | - | The JSON-serializable data to output. |
+| `indent` | int | Number of spaces used to indent JSON. Defaults to `2`. |
+| `sort_keys` | bool | Sort dictionary keys. Defaults to `False`. |
+| **RETURNS** | unicode | The serialized string.
+
+#### <kbd>function</kbd> `srsly.json_loads`
+
+Deserialize unicode or bytes to a Python object.
+
+```python
+data = '{"foo": "bar", "baz": 123}'
+obj = srsly.json_loads(data)
+```
+
+| Argument | Type | Description |
+| --- | --- | --- |
+| `data` | unicode / bytes | The data to deserialize. |
+| **RETURNS** | - | The deserialized Python object.
+
 #### <kbd>function</kbd> `srsly.read_json`
 
 Load JSON from a file or standard input.

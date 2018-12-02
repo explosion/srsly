@@ -9,6 +9,13 @@ from .json import ujson
 
 
 def json_dumps(data, indent=0, sort_keys=False):
+    """Serialize an object to a JSON string.
+
+    data: The JSON-serializable data.
+    indent (int): Number of spaces used to indent JSON.
+    sort_keys (bool): Sort dictionary keys. Falls back to json module for now.
+    RETURNS (unicode): The serialized string.
+    """
     if sort_keys:
         result = json.dumps(data, indent=indent, sort_keys=sort_keys)
     else:
@@ -19,6 +26,11 @@ def json_dumps(data, indent=0, sort_keys=False):
 
 
 def json_loads(data):
+    """Deserialize unicode or bytes to a Python object.
+
+    data (unicode / bytes): The data to deserialize.
+    RETURNS: The deserialized Python object.
+    """
     return ujson.loads(data)
 
 
