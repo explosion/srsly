@@ -15,13 +15,14 @@ from .._json_api import is_json_serializable
 
 @contextmanager
 def make_tempdir(files={}):
-    temp_dir = Path(tempfile.mkdtemp())
+    temp_dir_str = tempfile.mkdtemp()
+    temp_dir = Path(temp_dir_str)
     for name, content in files.items():
         path = temp_dir / name
         with path.open('w', encoding='utf8') as file_:
             file_.write(content)
     yield temp_dir
-    shutil.rmtree(str(temp_dir))
+    shutil.rmtree(temp_dir_str)
 
 
 def test_read_json_file():
