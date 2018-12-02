@@ -142,13 +142,13 @@ def setup_package():
             Extension(
                 'srsly.json.ujson',
                 sources = [
-                    './srsly/json/ujson.c',
-                    './srsly/json/objToJSON.c',
-                    './srsly/json/JSONtoObj.c',
-                    './srsly/json/lib/ultrajsonenc.c',
-                    './srsly/json/lib/ultrajsondec.c'
+                    './srsly/ujson/ujson.c',
+                    './srsly/ujson/objToJSON.c',
+                    './srsly/ujson/JSONtoObj.c',
+                    './srsly/ujson/lib/ultrajsonenc.c',
+                    './srsly/ujson/lib/ultrajsondec.c'
                 ],
-                include_dirs = ['./srsly/json', './srsly/json/lib'],
+                include_dirs = ['./srsly/ujson', './srsly/ujson/lib'],
                 extra_compile_args = ['-D_GNU_SOURCE'],
             )
         )
