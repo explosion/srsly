@@ -11,10 +11,10 @@ def msgpack_dumps(data):
     return msgpack.dumps(data, use_bin_type=True)
 
 
-def msgpack_loads(data):
+def msgpack_loads(data, use_list=True):
     # msgpack-python docs suggest disabling gc before unpacking large messages
     gc.disable()
-    msg = msgpack.loads(data, raw=False)
+    msg = msgpack.loads(data, raw=False, use_list=use_list)
     gc.enable()
     return msg
 
