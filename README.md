@@ -100,7 +100,7 @@ Create a JSON file and dump contents or write to standard output.
 
 ```python
 data = {"foo": "bar", "baz": 123}
-srsly.write_json("/path/to/file.jsonl", data)
+srsly.write_json("/path/to/file.json", data)
 ```
 
 | Argument | Type | Description |
