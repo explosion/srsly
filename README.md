@@ -25,7 +25,7 @@ wrap the multiple serialization formats we need to support (especially `json`,
 codebases, so we wanted to put them in one place.
 
 At the same time, we noticed that having a lot of small dependencies was making
-maintainence harder, and making installation slower. To solve this, we've made
+maintenance harder, and making installation slower. To solve this, we've made
 `srsly` standalone, by including the component packages directly within it. This
 way we can provide all the serialization utilities we need in a single binary
 wheel.
