@@ -8,8 +8,7 @@ serialization utilities we need in a single binary wheel.
 
 ⚠️ **Still under construction!**
 
-[![Travis](https://img.shields.io/travis/explosion/srsly/master.svg?style=flat-square&logo=travis)](https://travis-ci.org/explosion/srsly)
-[![Appveyor](https://img.shields.io/appveyor/ci/explosion/srsly/master.svg?style=flat-square&logo=appveyor)](https://ci.appveyor.com/project/explosion/srsly)
+[![Azure Pipelines](https://img.shields.io/azure-devops/build/explosion-ai/public/4.svg?logo=azure-devops&style=flat-square)](https://dev.azure.com/explosion-ai/public/_build?definitionId=4)
 [![PyPi](https://img.shields.io/pypi/v/srsly.svg?style=flat-square)](https://pypi.python.org/pypi/srsly)
 [![GitHub](https://img.shields.io/github/release/explosion/srsly/all.svg?style=flat-square)](https://github.com/explosion/srsly)
 [![Python wheels](https://img.shields.io/badge/wheels-%E2%9C%93-4c1.svg?longCache=true&style=flat-square&logo=python&logoColor=white)](https://github.com/explosion/wheelwright/releases)
