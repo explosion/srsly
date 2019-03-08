@@ -6,8 +6,6 @@ This package bundles some of the best Python serialization libraries into one st
 that's correct across platforms and Pythons. This allows us to provide all the
 serialization utilities we need in a single binary wheel.
 
-⚠️ **Still under construction!**
-
 [![Azure Pipelines](https://img.shields.io/azure-devops/build/explosion-ai/public/4.svg?logo=azure-devops&style=flat-square)](https://dev.azure.com/explosion-ai/public/_build?definitionId=4)
 [![PyPi](https://img.shields.io/pypi/v/srsly.svg?style=flat-square)](https://pypi.python.org/pypi/srsly)
 [![GitHub](https://img.shields.io/github/release/explosion/srsly/all.svg?style=flat-square)](https://github.com/explosion/srsly)
