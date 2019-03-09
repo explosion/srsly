@@ -6,7 +6,7 @@ This package bundles some of the best Python serialization libraries into one st
 that's correct across platforms and Pythons. This allows us to provide all the
 serialization utilities we need in a single binary wheel.
 
-[![Azure Pipelines](https://img.shields.io/azure-devops/build/explosion-ai/public/4.svg?logo=azure-devops&style=flat-square)](https://dev.azure.com/explosion-ai/public/_build?definitionId=4)
+[![Azure Pipelines](https://img.shields.io/azure-devops/build/explosion-ai/public/4/master.svg?logo=azure-devops&style=flat-square)](https://dev.azure.com/explosion-ai/public/_build?definitionId=4)
 [![PyPi](https://img.shields.io/pypi/v/srsly.svg?style=flat-square)](https://pypi.python.org/pypi/srsly)
 [![GitHub](https://img.shields.io/github/release/explosion/srsly/all.svg?style=flat-square)](https://github.com/explosion/srsly)
 [![Python wheels](https://img.shields.io/badge/wheels-%E2%9C%93-4c1.svg?longCache=true&style=flat-square&logo=python&logoColor=white)](https://github.com/explosion/wheelwright/releases)
@@ -29,10 +29,10 @@ wheel.
 
 `srsly` currently includes forks of the following packages:
 
-* [`ujson`](https://github.com/esnme/ultrajson)
-* [`msgpack`](https://github.com/msgpack/msgpack-python)
-* [`msgpack-numpy`](https://github.com/lebedov/msgpack-numpy)
-* [`cloudpickle`](https://github.com/cloudpipe/cloudpickle)
+-   [`ujson`](https://github.com/esnme/ultrajson)
+-   [`msgpack`](https://github.com/msgpack/msgpack-python)
+-   [`msgpack-numpy`](https://github.com/lebedov/msgpack-numpy)
+-   [`cloudpickle`](https://github.com/cloudpipe/cloudpickle)
 
 ## Installation
 
@@ -70,12 +70,12 @@ data = {"foo": "bar", "baz": 123}
 json_string = srsly.json_dumps(data)
 ```
 
-| Argument | Type | Description |
-| --- | --- | --- |
-| `data` | - | The JSON-serializable data to output. |
-| `indent` | int | Number of spaces used to indent JSON. Defaults to `0`. |
-| `sort_keys` | bool | Sort dictionary keys. Defaults to `False`. |
-| **RETURNS** | unicode | The serialized string. |
+| Argument    | Type    | Description                                            |
+| ----------- | ------- | ------------------------------------------------------ |
+| `data`      | -       | The JSON-serializable data to output.                  |
+| `indent`    | int     | Number of spaces used to indent JSON. Defaults to `0`. |
+| `sort_keys` | bool    | Sort dictionary keys. Defaults to `False`.             |
+| **RETURNS** | unicode | The serialized string.                                 |
 
 #### <kbd>function</kbd> `srsly.json_loads`
 
@@ -86,10 +86,10 @@ data = '{"foo": "bar", "baz": 123}'
 obj = srsly.json_loads(data)
 ```
 
-| Argument | Type | Description |
-| --- | --- | --- |
-| `data` | unicode / bytes | The data to deserialize. |
-| **RETURNS** | - | The deserialized Python object. |
+| Argument    | Type            | Description                     |
+| ----------- | --------------- | ------------------------------- |
+| `data`      | unicode / bytes | The data to deserialize.        |
+| **RETURNS** | -               | The deserialized Python object. |
 
 #### <kbd>function</kbd> `srsly.write_json`
 
@@ -100,11 +100,11 @@ data = {"foo": "bar", "baz": 123}
 srsly.write_json("/path/to/file.json", data)
 ```
 
-| Argument | Type | Description |
-| --- | --- | --- |
-| `location` | unicode / `Path` | The file path or `"-"` to write to stdout. |
-| `data` | - | The JSON-serializable data to output. |
-| `indent` | int | Number of spaces used to indent JSON. Defaults to `2`. |
+| Argument   | Type             | Description                                            |
+| ---------- | ---------------- | ------------------------------------------------------ |
+| `location` | unicode / `Path` | The file path or `"-"` to write to stdout.             |
+| `data`     | -                | The JSON-serializable data to output.                  |
+| `indent`   | int              | Number of spaces used to indent JSON. Defaults to `2`. |
 
 #### <kbd>function</kbd> `srsly.read_json`
 
@@ -114,10 +114,10 @@ Load JSON from a file or standard input.
 data = srsly.read_json("/path/to/file.json")
 ```
 
-| Argument | Type | Description |
-| --- | --- | --- |
-| `location` | unicode / `Path` | The file path or `"-"` to read from stdin. |
-| **RETURNS** | dict / list | The loaded JSON content. |
+| Argument    | Type             | Description                                |
+| ----------- | ---------------- | ------------------------------------------ |
+| `location`  | unicode / `Path` | The file path or `"-"` to read from stdin. |
+| **RETURNS** | dict / list      | The loaded JSON content.                   |
 
 #### <kbd>function</kbd> `srsly.write_jsonl`
 
@@ -129,10 +129,10 @@ data = [{"foo": "bar"}, {"baz": 123}]
 srsly.write_jsonl("/path/to/file.jsonl", data)
 ```
 
-| Argument | Type | Description |
-| --- | --- | --- |
+| Argument   | Type             | Description                                |
+| ---------- | ---------------- | ------------------------------------------ |
 | `location` | unicode / `Path` | The file path or `"-"` to write to stdout. |
-| `lines` | iterable | The JSON-serializable lines. |
+| `lines`    | iterable         | The JSON-serializable lines.               |
 
 #### <kbd>function</kbd> `srsly.read_jsonl`
 
@@ -144,11 +144,11 @@ skipped.
 data = srsly.read_jsonl("/path/to/file.jsonl")
 ```
 
-| Argument | Type | Description |
-| --- | --- | --- |
-| `location` | unicode / Path | The file path or `"-"` to read from stdin. |
-| `skip` | bool | Skip broken lines and don't raise `ValueError`. Defaults to `False`. |
-| **YIELDS** | - | The loaded JSON contents of each line. |
+| Argument   | Type           | Description                                                          |
+| ---------- | -------------- | -------------------------------------------------------------------- |
+| `location` | unicode / Path | The file path or `"-"` to read from stdin.                           |
+| `skip`     | bool           | Skip broken lines and don't raise `ValueError`. Defaults to `False`. |
+| **YIELDS** | -              | The loaded JSON contents of each line.                               |
 
 #### <kbd>function</kbd> `srsly.is_json_serializable`
 
@@ -159,9 +159,9 @@ assert srsly.is_json_serializable({"hello": "world"}) is True
 assert srsly.is_json_serializable(lambda x: x) is False
 ```
 
-| Argument | Type | Description |
-| --- | --- | --- |
-| `obj` | - | The object to check. |
+| Argument    | Type | Description                              |
+| ----------- | ---- | ---------------------------------------- |
+| `obj`       | -    | The object to check.                     |
 | **RETURNS** | bool | Whether the object is JSON-serializable. |
 
 ### msgpack
@@ -178,10 +178,10 @@ data = {"foo": "bar", "baz": 123}
 msg = srsly.msgpack_dumps(data)
 ```
 
-| Argument | Type | Description |
-| --- | --- | --- |
-| `data` | - | The data to serialize. |
-| **RETURNS** | bytes | The serialized bytes. |
+| Argument    | Type  | Description            |
+| ----------- | ----- | ---------------------- |
+| `data`      | -     | The data to serialize. |
+| **RETURNS** | bytes | The serialized bytes.  |
 
 #### <kbd>function</kbd> `srsly.msgpack_loads`
 
@@ -192,11 +192,11 @@ msg = b"\x82\xa3foo\xa3bar\xa3baz{"
 data = srsly.msgpack_loads(msg)
 ```
 
-| Argument | Type | Description |
-| --- | --- | --- |
-| `data` |  bytes | The data to deserialize. |
-| `use_list` | bool | Don't use tuples instead of lists. Can make deserialization slower. Defaults to `True`. |
-| **RETURNS** | - | The deserialized Python object. |
+| Argument    | Type  | Description                                                                             |
+| ----------- | ----- | --------------------------------------------------------------------------------------- |
+| `data`      | bytes | The data to deserialize.                                                                |
+| `use_list`  | bool  | Don't use tuples instead of lists. Can make deserialization slower. Defaults to `True`. |
+| **RETURNS** | -     | The deserialized Python object.                                                         |
 
 #### <kbd>function</kbd> `srsly.write_msgpack`
 
@@ -207,10 +207,10 @@ data = {"foo": "bar", "baz": 123}
 srsly.write_msgpack("/path/to/file.msg", data)
 ```
 
-| Argument | Type | Description |
-| --- | --- | --- |
-| `location` | unicode / `Path` | The file path. |
-| `data` | - | The data to serialize. |
+| Argument   | Type             | Description            |
+| ---------- | ---------------- | ---------------------- |
+| `location` | unicode / `Path` | The file path.         |
+| `data`     | -                | The data to serialize. |
 
 #### <kbd>function</kbd> `srsly.read_msgpack`
 
@@ -220,11 +220,11 @@ Load a msgpack file.
 data = srsly.read_msgpack("/path/to/file.msg")
 ```
 
-| Argument | Type | Description |
-| --- | --- | --- |
-| `location` | unicode / `Path` | The file path. |
-| `use_list` | bool | Don't use tuples instead of lists. Can make deserialization slower. Defaults to `True`. |
-| **RETURNS** | - | The loaded and deserialized content. |
+| Argument    | Type             | Description                                                                             |
+| ----------- | ---------------- | --------------------------------------------------------------------------------------- |
+| `location`  | unicode / `Path` | The file path.                                                                          |
+| `use_list`  | bool             | Don't use tuples instead of lists. Can make deserialization slower. Defaults to `True`. |
+| **RETURNS** | -                | The loaded and deserialized content.                                                    |
 
 ### pickle
 
@@ -240,11 +240,11 @@ data = {"foo": "bar", "baz": 123}
 pickled_data = srsly.pickle_dumps(data)
 ```
 
-| Argument | Type | Description |
-| --- | --- | --- |
-| `data` | - | The object to serialize. |
-| `protocol` | int | Protocol to use. `-1` for highest. Defaults to `None`. |
-| **RETURNS** | bytes | The serialized object. |
+| Argument    | Type  | Description                                            |
+| ----------- | ----- | ------------------------------------------------------ |
+| `data`      | -     | The object to serialize.                               |
+| `protocol`  | int   | Protocol to use. `-1` for highest. Defaults to `None`. |
+| **RETURNS** | bytes | The serialized object.                                 |
 
 #### <kbd>function</kbd> `srsly.pickle_loads`
 
@@ -255,7 +255,7 @@ pickled_data = b"\x80\x04\x95\x19\x00\x00\x00\x00\x00\x00\x00}\x94(\x8c\x03foo\x
 data = srsly.pickle_loads(pickled_data)
 ```
 
-| Argument | Type | Description |
-| --- | --- | --- |
-| `data` |  bytes | The data to deserialize. |
-| **RETURNS** | - | The deserialized Python object. |
+| Argument    | Type  | Description                     |
+| ----------- | ----- | ------------------------------- |
+| `data`      | bytes | The data to deserialize.        |
+| **RETURNS** | -     | The deserialized Python object. |
