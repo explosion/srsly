@@ -156,7 +156,7 @@ def setup_package():
             generate_cython(root, "srsly")
 
         setup(
-            name=about["__title__"],
+            name="srsly",
             zip_safe=True,
             packages=PACKAGES,
             package_data=PACKAGE_DATA,
