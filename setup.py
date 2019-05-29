@@ -29,7 +29,7 @@ COMPILE_OPTIONS = {
 }
 
 
-LINK_OPTIONS = {"msvc": [], "mingw32": [], "other": ['-lstdc++', '-lm']}
+LINK_OPTIONS = {"msvc": [], "mingw32": [], "other": ["-lstdc++", "-lm"]}
 
 if sys.byteorder == "big":
     macros = [("__BIG_ENDIAN__", "1")]
@@ -137,19 +137,18 @@ def setup_package():
                 )
             )
 
-
         ext_modules.append(
             Extension(
-                'srsly.ujson.ujson',
-                sources = [
-                    './srsly/ujson/ujson.c',
-                    './srsly/ujson/objToJSON.c',
-                    './srsly/ujson/JSONtoObj.c',
-                    './srsly/ujson/lib/ultrajsonenc.c',
-                    './srsly/ujson/lib/ultrajsondec.c'
+                "srsly.ujson.ujson",
+                sources=[
+                    "./srsly/ujson/ujson.c",
+                    "./srsly/ujson/objToJSON.c",
+                    "./srsly/ujson/JSONtoObj.c",
+                    "./srsly/ujson/lib/ultrajsonenc.c",
+                    "./srsly/ujson/lib/ultrajsondec.c",
                 ],
-                include_dirs = ['./srsly/ujson', './srsly/ujson/lib'],
-                extra_compile_args = ['-D_GNU_SOURCE'],
+                include_dirs=["./srsly/ujson", "./srsly/ujson/lib"],
+                extra_compile_args=["-D_GNU_SOURCE"],
             )
         )
 
