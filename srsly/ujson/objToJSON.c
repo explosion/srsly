@@ -449,9 +449,7 @@ char *List_iterGetName(JSOBJ obj, JSONTypeContext *tc, size_t *outLen)
 
 int Dict_iterNext(JSOBJ obj, JSONTypeContext *tc)
 {
-#if PY_MAJOR_VERSION >= 3
   PyObject* itemNameTmp;
-#endif
 
   if (GET_TC(tc)->itemName)
   {
