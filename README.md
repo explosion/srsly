@@ -43,7 +43,7 @@ wheel.
 pip install srsly
 ```
 
-Alternatively, you can also comile the library from source. You'll need to make
+Alternatively, you can also compile the library from source. You'll need to make
 sure that you have a development environment consisting of a Python distribution
 including header files, a compiler (XCode command-line tools on macOS / OS X or
 Visual C++ build tools on Windows), pip, virtualenv and git installed.
