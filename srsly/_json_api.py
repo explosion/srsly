@@ -86,7 +86,7 @@ def read_jsonl(location, skip=False):
                 yield line
 
 
-def write_jsonl(location, lines):
+def write_jsonl(location, lines, append=False):
     """Create a .jsonl file and dump contents or write to standard output.
 
     location (unicode / Path): The file path. "-" for writing to stdout.
@@ -96,8 +96,11 @@ def write_jsonl(location, lines):
         for line in lines:
             print(json_dumps(line))
     else:
+        mode = "a" if append else "w"
         file_path = force_path(location, require_exists=False)
-        with file_path.open("a", encoding="utf-8") as f:
+        with file_path.open(mode, encoding="utf-8") as f:
+            if append:
+                f.write("\n")
             for line in lines:
                 f.write(json_dumps(line) + "\n")
 
