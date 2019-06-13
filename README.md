@@ -130,10 +130,11 @@ data = [{"foo": "bar"}, {"baz": 123}]
 srsly.write_jsonl("/path/to/file.jsonl", data)
 ```
 
-| Argument   | Type             | Description                                |
-| ---------- | ---------------- | ------------------------------------------ |
-| `location` | unicode / `Path` | The file path or `"-"` to write to stdout. |
-| `lines`    | iterable         | The JSON-serializable lines.               |
+| Argument   | Type             | Description                                                                                                            |
+| ---------- | ---------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `location` | unicode / `Path` | The file path or `"-"` to write to stdout.                                                                             |
+| `lines`    | iterable         | The JSON-serializable lines.                                                                                           |
+| `append`   | bool             | Append to an existing file. Will open it in `"a"` mode and insert a newline before writing lines. Defaults to `False`. |
 
 #### <kbd>function</kbd> `srsly.read_jsonl`
 
