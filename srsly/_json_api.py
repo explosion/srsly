@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 import sys
 import json as _builtin_json
+import gzip
 
 from . import ujson
 from .util import force_path
@@ -37,7 +38,7 @@ def json_loads(data):
     return ujson.loads(data)
 
 
-def read_json(location):
+def read_json(location, use_gzip=False):
     """Load JSON from file or standard input.
 
     location (unicode / Path): The file path. "-" for reading from stdin.
@@ -45,13 +46,19 @@ def read_json(location):
     """
     if location == "-":  # reading from sys.stdin
         data = sys.stdin.read()
+        if use_gzip:
+            data = gzip.uncompress(data)
         return ujson.loads(data)
     file_path = force_path(location)
-    with file_path.open("r", encoding="utf8") as f:
-        return ujson.load(f)
+    if use_gzip:
+        with gzip.open(file_path, "r") as f:
+            return ujson.load(f)
+    else:
+        with file_path.open("r", encoding="utf8") as f:
+            return ujson.load(f)
 
 
-def write_json(location, data, indent=2):
+def write_json(location, data, indent=2, use_gzip=False):
     """Create a .json file and dump contents or write to standard
     output.
 
@@ -61,11 +68,18 @@ def write_json(location, data, indent=2):
     """
     json_data = json_dumps(data, indent=indent)
     if location == "-":  # writing to stdout
-        print(json_data)
+        if use_gzip:
+            print(gzip.compress(json_data.encode('utf-8')))
+        else:
+            print(json_data)
     else:
         file_path = force_path(location, require_exists=False)
-        with file_path.open("w", encoding="utf8") as f:
-            f.write(json_data)
+        if use_gzip:
+            with gzip.open(file_path, "w") as f:
+                f.write(json_data.encode('utf-8'))
+        else:
+            with file_path.open("w", encoding="utf8") as f:
+                f.write(json_data)
 
 
 def read_jsonl(location, skip=False):
