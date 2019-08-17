@@ -38,7 +38,7 @@ def json_loads(data):
     return ujson.loads(data)
 
 
-def read_json(location, use_gzip=False):
+def read_json(location):
     """Load JSON from file or standard input.
 
     location (unicode / Path): The file path. "-" for reading from stdin.
@@ -46,19 +46,22 @@ def read_json(location, use_gzip=False):
     """
     if location == "-":  # reading from sys.stdin
         data = sys.stdin.read()
-        if use_gzip:
-            data = gzip.uncompress(data)
         return ujson.loads(data)
     file_path = force_path(location)
-    if use_gzip:
-        with gzip.open(file_path, "r") as f:
-            return ujson.load(f)
-    else:
-        with file_path.open("r", encoding="utf8") as f:
-            return ujson.load(f)
+    with file_path.open("r", encoding="utf8") as f:
+        return ujson.load(f)
 
+def read_gzip_json(location):
+    """Load JSON from a gzipped file.
 
-def write_json(location, data, indent=2, use_gzip=False):
+        location (unicode / Path): The file path.
+        RETURNS (dict / list): The loaded JSON content.
+    """
+    file_path = force_path(location)
+    with gzip.open(file_path, "r") as f:
+        return ujson.load(f)
+
+def write_json(location, data, indent=2):
     """Create a .json file and dump contents or write to standard
     output.
 
@@ -68,19 +71,23 @@ def write_json(location, data, indent=2, use_gzip=False):
     """
     json_data = json_dumps(data, indent=indent)
     if location == "-":  # writing to stdout
-        if use_gzip:
-            print(gzip.compress(json_data.encode('utf-8')))
-        else:
-            print(json_data)
+        print(json_data)
     else:
         file_path = force_path(location, require_exists=False)
-        if use_gzip:
-            with gzip.open(file_path, "w") as f:
-                f.write(json_data.encode('utf-8'))
-        else:
-            with file_path.open("w", encoding="utf8") as f:
-                f.write(json_data)
+        with file_path.open("w", encoding="utf8") as f:
+            f.write(json_data)
 
+def write_gzip_json(location, data, indent=2):
+    """Create a .json.gz file and dump contents.
+
+    location (unicode / Path): The file path.
+    data: The JSON-serializable data to output.
+    indent (int): Number of spaces used to indent JSON.
+    """
+    json_data = json_dumps(data, indent=indent)
+    file_path = force_path(location, require_exists=False)
+    with gzip.open(file_path, "w") as f:
+        f.write(json_data.encode('utf-8'))
 
 def read_jsonl(location, skip=False):
     """Read a .jsonl file or standard input and yield contents line by line.

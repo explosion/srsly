@@ -9,7 +9,7 @@ from contextlib import contextmanager
 import shutil
 import gzip
 
-from .._json_api import read_json, write_json, read_jsonl, write_jsonl
+from .._json_api import read_json, write_json, read_jsonl, write_jsonl, write_gzip_json
 from .._json_api import json_dumps, is_json_serializable
 
 
@@ -80,10 +80,9 @@ def test_write_json_file_gzip():
     ]
     with make_tempdir() as temp_dir:
         file_path = temp_dir / "tmp.json"
-        write_json(file_path, data, use_gzip=True)
+        write_gzip_json(file_path, data)
         with gzip.open(file_path, "r") as f:
             assert f.read().decode("utf8") in expected
-
 
 def test_write_json_stdout(capsys):
     data = {"hello": "world", "test": 123}
