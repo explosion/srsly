@@ -7,9 +7,11 @@ from io import StringIO
 from pathlib import Path
 from contextlib import contextmanager
 import shutil
+import gzip
 
-from .._json_api import read_json, write_json, read_jsonl, write_jsonl
+from .._json_api import read_json, write_json, read_jsonl, write_jsonl, write_gzip_json
 from .._json_api import json_dumps, is_json_serializable
+from ..util import force_string
 
 
 @contextmanager
@@ -69,6 +71,20 @@ def test_write_json_file():
         write_json(file_path, data)
         with Path(file_path).open("r", encoding="utf8") as f:
             assert f.read() in expected
+
+
+def test_write_json_file_gzip():
+    data = {"hello": "world", "test": 123}
+    # Provide two expected options, depending on how keys are ordered
+    expected = [
+        '{\n  "hello":"world",\n  "test":123\n}',
+        '{\n  "test":123,\n  "hello":"world"\n}',
+    ]
+    with make_tempdir() as temp_dir:
+        file_path = force_string(temp_dir / "tmp.json")
+        write_gzip_json(file_path, data)
+        with gzip.open(file_path, "r") as f:
+            assert f.read().decode("utf8") in expected
 
 
 def test_write_json_stdout(capsys):
