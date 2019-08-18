@@ -120,6 +120,34 @@ data = srsly.read_json("/path/to/file.json")
 | `location`  | unicode / `Path` | The file path or `"-"` to read from stdin. |
 | **RETURNS** | dict / list      | The loaded JSON content.                   |
 
+#### <kbd>function</kbd> `srsly.write_gzip_json`
+
+Create a gzipped JSON file and dump contents.
+
+```python
+data = {"foo": "bar", "baz": 123}
+srsly.write_gzip_json("/path/to/file.json.gz", data)
+```
+
+| Argument   | Type             | Description                                            |
+| ---------- | ---------------- | ------------------------------------------------------ |
+| `location` | unicode / `Path` | The file path.                                         |
+| `data`     | -                | The JSON-serializable data to output.                  |
+| `indent`   | int              | Number of spaces used to indent JSON. Defaults to `2`. |
+
+#### <kbd>function</kbd> `srsly.read_gzip_json`
+
+Load gzipped JSON from a file.
+
+```python
+data = srsly.read_json("/path/to/file.json.gz")
+```
+
+| Argument    | Type             | Description              |
+| ----------- | ---------------- | ------------------------ |
+| `location`  | unicode / `Path` | The file path.           |
+| **RETURNS** | dict / list      | The loaded JSON content. |
+
 #### <kbd>function</kbd> `srsly.write_jsonl`
 
 Create a JSONL file (newline-delimited JSON) and dump contents line by line, or
