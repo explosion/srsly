@@ -71,6 +71,7 @@ def test_write_json_file():
         with Path(file_path).open("r", encoding="utf8") as f:
             assert f.read() in expected
 
+
 def test_write_json_file_gzip():
     data = {"hello": "world", "test": 123}
     # Provide two expected options, depending on how keys are ordered
@@ -83,6 +84,7 @@ def test_write_json_file_gzip():
         write_gzip_json(file_path, data)
         with gzip.open(file_path, "r") as f:
             assert f.read().decode("utf8") in expected
+
 
 def test_write_json_stdout(capsys):
     data = {"hello": "world", "test": 123}
