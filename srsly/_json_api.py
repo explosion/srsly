@@ -51,6 +51,7 @@ def read_json(location):
     with file_path.open("r", encoding="utf8") as f:
         return ujson.load(f)
 
+
 def read_gzip_json(location):
     """Load JSON from a gzipped file.
 
@@ -60,6 +61,7 @@ def read_gzip_json(location):
     file_path = force_path(location)
     with gzip.open(file_path, "r") as f:
         return ujson.load(f)
+
 
 def write_json(location, data, indent=2):
     """Create a .json file and dump contents or write to standard
@@ -77,6 +79,7 @@ def write_json(location, data, indent=2):
         with file_path.open("w", encoding="utf8") as f:
             f.write(json_data)
 
+
 def write_gzip_json(location, data, indent=2):
     """Create a .json.gz file and dump contents.
 
@@ -87,7 +90,8 @@ def write_gzip_json(location, data, indent=2):
     json_data = json_dumps(data, indent=indent)
     file_path = force_path(location, require_exists=False)
     with gzip.open(file_path, "w") as f:
-        f.write(json_data.encode('utf-8'))
+        f.write(json_data.encode("utf-8"))
+
 
 def read_jsonl(location, skip=False):
     """Read a .jsonl file or standard input and yield contents line by line.
