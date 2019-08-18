@@ -6,7 +6,7 @@ import json as _builtin_json
 import gzip
 
 from . import ujson
-from .util import force_path
+from .util import force_path, force_string
 
 
 def json_dumps(data, indent=0, sort_keys=False):
@@ -58,7 +58,7 @@ def read_gzip_json(location):
         location (unicode / Path): The file path.
         RETURNS (dict / list): The loaded JSON content.
     """
-    file_path = force_path(location)
+    file_path = force_string(location)
     with gzip.open(file_path, "r") as f:
         return ujson.load(f)
 
@@ -88,7 +88,7 @@ def write_gzip_json(location, data, indent=2):
     indent (int): Number of spaces used to indent JSON.
     """
     json_data = json_dumps(data, indent=indent)
-    file_path = force_path(location, require_exists=False)
+    file_path = force_string(location)
     with gzip.open(file_path, "w") as f:
         f.write(json_data.encode("utf-8"))
 
