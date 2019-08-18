@@ -1,5 +1,5 @@
 __title__ = "srsly"
-__version__ = "0.0.5"
+__version__ = "0.1.0"
 __summary__ = "Modern high-performance serialization utilities for Python"
 __uri__ = "https://explosion.ai"
 __author__ = "Explosion AI"

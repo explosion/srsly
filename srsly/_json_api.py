@@ -3,9 +3,10 @@ from __future__ import unicode_literals
 
 import sys
 import json as _builtin_json
+import gzip
 
 from . import ujson
-from .util import force_path
+from .util import force_path, force_string
 
 
 def json_dumps(data, indent=0, sort_keys=False):
@@ -51,6 +52,17 @@ def read_json(location):
         return ujson.load(f)
 
 
+def read_gzip_json(location):
+    """Load JSON from a gzipped file.
+
+        location (unicode / Path): The file path.
+        RETURNS (dict / list): The loaded JSON content.
+    """
+    file_path = force_string(location)
+    with gzip.open(file_path, "r") as f:
+        return ujson.load(f)
+
+
 def write_json(location, data, indent=2):
     """Create a .json file and dump contents or write to standard
     output.
@@ -66,6 +78,19 @@ def write_json(location, data, indent=2):
         file_path = force_path(location, require_exists=False)
         with file_path.open("w", encoding="utf8") as f:
             f.write(json_data)
+
+
+def write_gzip_json(location, data, indent=2):
+    """Create a .json.gz file and dump contents.
+
+    location (unicode / Path): The file path.
+    data: The JSON-serializable data to output.
+    indent (int): Number of spaces used to indent JSON.
+    """
+    json_data = json_dumps(data, indent=indent)
+    file_path = force_string(location)
+    with gzip.open(file_path, "w") as f:
+        f.write(json_data.encode("utf-8"))
 
 
 def read_jsonl(location, skip=False):
@@ -86,7 +111,7 @@ def read_jsonl(location, skip=False):
                 yield line
 
 
-def write_jsonl(location, lines):
+def write_jsonl(location, lines, append=False):
     """Create a .jsonl file and dump contents or write to standard output.
 
     location (unicode / Path): The file path. "-" for writing to stdout.
@@ -96,8 +121,11 @@ def write_jsonl(location, lines):
         for line in lines:
             print(json_dumps(line))
     else:
+        mode = "a" if append else "w"
         file_path = force_path(location, require_exists=False)
-        with file_path.open("a", encoding="utf-8") as f:
+        with file_path.open(mode, encoding="utf-8") as f:
+            if append:
+                f.write("\n")
             for line in lines:
                 f.write(json_dumps(line) + "\n")
 
