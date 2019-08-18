@@ -11,6 +11,7 @@ import gzip
 
 from .._json_api import read_json, write_json, read_jsonl, write_jsonl, write_gzip_json
 from .._json_api import json_dumps, is_json_serializable
+from ..util import force_string
 
 
 @contextmanager
@@ -80,7 +81,7 @@ def test_write_json_file_gzip():
         '{\n  "test":123,\n  "hello":"world"\n}',
     ]
     with make_tempdir() as temp_dir:
-        file_path = temp_dir / "tmp.json"
+        file_path = force_string(temp_dir / "tmp.json")
         write_gzip_json(file_path, data)
         with gzip.open(file_path, "r") as f:
             assert f.read().decode("utf8") in expected
