@@ -1,0 +1,5 @@
+steps:
+  -
+    command: "./bin/build-sdist.sh"
+    label: ":dizzy: :python:"
+    artifact_paths: "dist/*.tar.gz"
