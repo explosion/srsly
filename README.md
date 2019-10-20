@@ -2,14 +2,15 @@
 
 # srsly: Modern high-performance serialization utilities for Python
 
-This package bundles some of the best Python serialization libraries into one standalone package, with a high-level API that makes it easy to write code
+This package bundles some of the best Python serialization libraries into one
+standalone package, with a high-level API that makes it easy to write code
 that's correct across platforms and Pythons. This allows us to provide all the
 serialization utilities we need in a single binary wheel.
 
-[![Azure Pipelines](https://img.shields.io/azure-devops/build/explosion-ai/public/4/master.svg?logo=azure-devops&style=flat-square)](https://dev.azure.com/explosion-ai/public/_build?definitionId=4)
-[![PyPi](https://img.shields.io/pypi/v/srsly.svg?style=flat-square)](https://pypi.python.org/pypi/srsly)
-[![conda](https://img.shields.io/conda/vn/conda-forge/srsly.svg?style=flat-square)](https://anaconda.org/conda-forge/srsly)
-[![GitHub](https://img.shields.io/github/release/explosion/srsly/all.svg?style=flat-square)](https://github.com/explosion/srsly)
+[![Azure Pipelines](https://img.shields.io/azure-devops/build/explosion-ai/public/4/master.svg?logo=azure-pipelines&style=flat-square)](https://dev.azure.com/explosion-ai/public/_build?definitionId=4)
+[![PyPi](https://img.shields.io/pypi/v/srsly.svg?style=flat-square&logo=pypi&logoColor=white)](https://pypi.python.org/pypi/srsly)
+[![conda](https://img.shields.io/conda/vn/conda-forge/srsly.svg?style=flat-square&logo=conda-forge&logoColor=white)](https://anaconda.org/conda-forge/srsly)
+[![GitHub](https://img.shields.io/github/release/explosion/srsly/all.svg?style=flat-square&logo=github)](https://github.com/explosion/srsly)
 [![Python wheels](https://img.shields.io/badge/wheels-%E2%9C%93-4c1.svg?longCache=true&style=flat-square&logo=python&logoColor=white)](https://github.com/explosion/wheelwright/releases)
 
 ## Motivation
@@ -62,9 +63,8 @@ python setup.py build_ext --inplace  # compile the library
 
 #### <kbd>function</kbd> `srsly.json_dumps`
 
-Serialize an object to a JSON string. Takes care of Python 2/3 compatibility
-and falls back to `json` if `sort_keys=True` is used (until it's fixed in
-`ujson`).
+Serialize an object to a JSON string. Takes care of Python 2/3 compatibility and
+falls back to `json` if `sort_keys=True` is used (until it's fixed in `ujson`).
 
 ```python
 data = {"foo": "bar", "baz": 123}
@@ -166,9 +166,8 @@ srsly.write_jsonl("/path/to/file.jsonl", data)
 
 #### <kbd>function</kbd> `srsly.read_jsonl`
 
-Read a JSONL file (newline-delimited JSON) or from JSONL data from
-standard input and yield contents line by line. Blank lines will always be
-skipped.
+Read a JSONL file (newline-delimited JSON) or from JSONL data from standard
+input and yield contents line by line. Blank lines will always be skipped.
 
 ```python
 data = srsly.read_jsonl("/path/to/file.jsonl")
