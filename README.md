@@ -44,6 +44,12 @@ wheel.
 pip install srsly
 ```
 
+Or from conda via conda-forge:
+
+```bash
+conda install -c conda-forge srsly
+```
+
 Alternatively, you can also compile the library from source. You'll need to make
 sure that you have a development environment consisting of a Python distribution
 including header files, a compiler (XCode command-line tools on macOS / OS X or
