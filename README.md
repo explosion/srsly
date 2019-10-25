@@ -169,6 +169,7 @@ srsly.write_jsonl("/path/to/file.jsonl", data)
 | `location` | unicode / `Path` | The file path or `"-"` to write to stdout.                                                                             |
 | `lines`    | iterable         | The JSON-serializable lines.                                                                                           |
 | `append`   | bool             | Append to an existing file. Will open it in `"a"` mode and insert a newline before writing lines. Defaults to `False`. |
+| `append_new_line`   | bool             | Defines whether a new line should first be written when appending to an existing file. Defaults to `True`. |
 
 #### <kbd>function</kbd> `srsly.read_jsonl`
 
