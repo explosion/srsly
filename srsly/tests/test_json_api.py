@@ -9,8 +9,8 @@ from contextlib import contextmanager
 import shutil
 import gzip
 
-from .._json_api import read_json, write_json, read_jsonl, write_jsonl, write_gzip_json
-from .._json_api import json_dumps, is_json_serializable
+from .._json_api import read_json, write_json, read_jsonl, write_jsonl
+from .._json_api import write_gzip_json, json_dumps, is_json_serializable
 from ..util import force_string
 
 
@@ -153,22 +153,24 @@ def test_write_jsonl_file():
 
 def test_write_jsonl_file_append():
     data = [{"hello": "world"}, {"test": 123}]
+    expected = '{"hello":"world"}\n{"test":123}\n\n{"hello":"world"}\n{"test":123}\n'
     with make_tempdir() as temp_dir:
         file_path = temp_dir / "tmp.json"
         write_jsonl(file_path, data)
         write_jsonl(file_path, data, append=True)
         with Path(file_path).open("r", encoding="utf8") as f:
-            assert f.read() == '{"hello":"world"}\n{"test":123}\n\n{"hello":"world"}\n{"test":123}\n'
+            assert f.read() == expected
+
 
 def test_write_jsonl_file_append_no_new_line():
     data = [{"hello": "world"}, {"test": 123}]
+    expected = '{"hello":"world"}\n{"test":123}\n{"hello":"world"}\n{"test":123}\n'
     with make_tempdir() as temp_dir:
         file_path = temp_dir / "tmp.json"
         write_jsonl(file_path, data)
         write_jsonl(file_path, data, append=True, append_new_line=False)
         with Path(file_path).open("r", encoding="utf8") as f:
-            assert f.read() == '{"hello":"world"}\n{"test":123}\n{"hello":"world"}\n{"test":123}\n'
-
+            assert f.read() == expected
 
 
 def test_write_jsonl_stdout(capsys):
