@@ -19,7 +19,7 @@ if sys.version_info[0] < 3:
         return a
 
     def get_data(a):
-        return a.tobytes()
+        return a.tostring()
 else:
     make_memoryview = memoryview
 
