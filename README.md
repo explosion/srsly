@@ -146,7 +146,7 @@ srsly.write_gzip_json("/path/to/file.json.gz", data)
 Load gzipped JSON from a file.
 
 ```python
-data = srsly.read_json("/path/to/file.json.gz")
+data = srsly.read_gzip_json("/path/to/file.json.gz")
 ```
 
 | Argument    | Type             | Description              |
