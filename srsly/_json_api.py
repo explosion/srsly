@@ -4,12 +4,12 @@ import json as _builtin_json
 import gzip
 
 from . import ujson
-from .types import FilePath, StandardIO, JSONObject
+from .types import FilePath, StandardIO, JSONInput, JSONOutput
 from .util import force_path, force_string
 
 
 def json_dumps(
-    data: JSONObject, indent: Optional[int] = 0, sort_keys: bool = False
+    data: JSONInput, indent: Optional[int] = 0, sort_keys: bool = False
 ) -> str:
     """Serialize an object to a JSON string.
 
@@ -28,7 +28,7 @@ def json_dumps(
     return result
 
 
-def json_loads(data: Union[str, bytes]) -> JSONObject:
+def json_loads(data: Union[str, bytes]) -> JSONOutput:
     """Deserialize unicode or bytes to a Python object.
 
     data (str / bytes): The data to deserialize.
@@ -37,7 +37,7 @@ def json_loads(data: Union[str, bytes]) -> JSONObject:
     return ujson.loads(data)
 
 
-def read_json(location: Union[FilePath, StandardIO]) -> JSONObject:
+def read_json(location: Union[FilePath, StandardIO]) -> JSONOutput:
     """Load JSON from file or standard input.
 
     location (unicode / Path): The file path. "-" for reading from stdin.
@@ -51,7 +51,7 @@ def read_json(location: Union[FilePath, StandardIO]) -> JSONObject:
         return ujson.load(f)
 
 
-def read_gzip_json(location: FilePath) -> JSONObject:
+def read_gzip_json(location: FilePath) -> JSONOutput:
     """Load JSON from a gzipped file.
 
         location (unicode / Path): The file path.
@@ -63,7 +63,7 @@ def read_gzip_json(location: FilePath) -> JSONObject:
 
 
 def write_json(
-    location: Union[FilePath, StandardIO], data: JSONObject, indent: int = 2
+    location: Union[FilePath, StandardIO], data: JSONInput, indent: int = 2
 ) -> None:
     """Create a .json file and dump contents or write to standard
     output.
@@ -81,7 +81,7 @@ def write_json(
             f.write(json_data)
 
 
-def write_gzip_json(location: FilePath, data: JSONObject, indent: int = 2) -> None:
+def write_gzip_json(location: FilePath, data: JSONInput, indent: int = 2) -> None:
     """Create a .json.gz file and dump contents.
 
     location (unicode / Path): The file path.
@@ -94,7 +94,7 @@ def write_gzip_json(location: FilePath, data: JSONObject, indent: int = 2) -> No
         f.write(json_data.encode("utf-8"))
 
 
-def read_jsonl(location: FilePath, skip: bool = False) -> Iterable[JSONObject]:
+def read_jsonl(location: FilePath, skip: bool = False) -> Iterable[JSONOutput]:
     """Read a .jsonl file or standard input and yield contents line by line.
     Blank lines will always be skipped.
 
@@ -114,7 +114,7 @@ def read_jsonl(location: FilePath, skip: bool = False) -> Iterable[JSONObject]:
 
 def write_jsonl(
     location: FilePath,
-    lines: Sequence[JSONObject],
+    lines: Sequence[JSONInput],
     append: bool = False,
     append_new_line: bool = True,
 ) -> None:
@@ -157,7 +157,7 @@ def is_json_serializable(obj: Any) -> bool:
 
 def _yield_json_lines(
     stream: Iterable[str], skip: bool = False
-) -> Iterable[JSONObject]:
+) -> Iterable[JSONOutput]:
     line_no = 1
     for line in stream:
         line = line.strip()

@@ -1,10 +1,10 @@
 from typing import Optional
 
 from . import cloudpickle
-from .types import JSONObject
+from .types import JSONInput, JSONOutput
 
 
-def pickle_dumps(data: JSONObject, protocol: Optional[int] = None) -> bytes:
+def pickle_dumps(data: JSONInput, protocol: Optional[int] = None) -> bytes:
     """Serialize a Python object with pickle.
 
     data: The object to serialize.
@@ -14,7 +14,7 @@ def pickle_dumps(data: JSONObject, protocol: Optional[int] = None) -> bytes:
     return cloudpickle.dumps(data, protocol=protocol)
 
 
-def pickle_loads(data: bytes) -> JSONObject:
+def pickle_loads(data: bytes) -> JSONOutput:
     """Deserialize bytes with pickle.
 
     data (bytes): The data to deserialize.
