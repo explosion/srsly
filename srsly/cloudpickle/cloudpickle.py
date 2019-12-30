@@ -43,7 +43,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 from __future__ import print_function
 
 import dis
-from functools import partial
 import io
 import itertools
 import logging
@@ -53,12 +52,14 @@ import pickle
 import platform
 import struct
 import sys
-import traceback
 import types
 import weakref
 import uuid
 import threading
-
+from pickle import _Pickler as Pickler
+from io import BytesIO as StringIO
+from importlib._bootstrap import _find_spec
+from pickle import _getattribute
 
 try:
     from enum import Enum
@@ -84,25 +85,8 @@ if PYPY:
     # builtin-code objects only exist in pypy
     builtin_code_type = type(float.__new__.__code__)
 
-if sys.version_info[0] < 3:  # pragma: no branch
-    from pickle import Pickler
-
-    try:
-        from cStringIO import StringIO
-    except ImportError:
-        from StringIO import StringIO
-    string_types = (basestring,)  # noqa
-    PY3 = False
-    PY2 = True
-else:
-    types.ClassType = type
-    from pickle import _Pickler as Pickler
-    from io import BytesIO as StringIO
-
-    string_types = (str,)
-    PY3 = True
-    PY2 = False
-    from importlib._bootstrap import _find_spec
+types.ClassType = type
+string_types = (str,)
 
 _extract_code_globals_cache = weakref.WeakKeyDictionary()
 
@@ -125,25 +109,6 @@ def _lookup_class_or_track(class_tracker_id, class_def):
             )
             _DYNAMIC_CLASS_TRACKER_BY_CLASS[class_def] = class_tracker_id
     return class_def
-
-
-if sys.version_info[:2] >= (3, 5):
-    from pickle import _getattribute
-elif sys.version_info[:2] >= (3, 4):
-    from pickle import _getattribute as _py34_getattribute
-
-    #  pickle._getattribute does not return the parent under Python 3.4
-    def _getattribute(obj, name):
-        return _py34_getattribute(obj, name), None
-
-
-else:
-    # pickle._getattribute is a python3 addition and enchancement of getattr,
-    # that can handle dotted attribute names. In cloudpickle for python2,
-    # handling dotted names is not needed, so we simply define _getattribute as
-    # a wrapper around getattr.
-    def _getattribute(obj, name):
-        return getattr(obj, name, None), None
 
 
 def _whichmodule(obj, name):
@@ -356,42 +321,23 @@ def _make_cell_set_template_code():
         cell = value
 
     co = _cell_set_factory.__code__
-
-    if PY2:  # pragma: no branch
-        _cell_set_template_code = types.CodeType(
-            co.co_argcount,
-            co.co_nlocals,
-            co.co_stacksize,
-            co.co_flags,
-            co.co_code,
-            co.co_consts,
-            co.co_names,
-            co.co_varnames,
-            co.co_filename,
-            co.co_name,
-            co.co_firstlineno,
-            co.co_lnotab,
-            co.co_cellvars,  # co_freevars is initialized with co_cellvars
-            (),  # co_cellvars is made empty
-        )
-    else:
-        _cell_set_template_code = types.CodeType(
-            co.co_argcount,
-            co.co_kwonlyargcount,  # Python 3 only argument
-            co.co_nlocals,
-            co.co_stacksize,
-            co.co_flags,
-            co.co_code,
-            co.co_consts,
-            co.co_names,
-            co.co_varnames,
-            co.co_filename,
-            co.co_name,
-            co.co_firstlineno,
-            co.co_lnotab,
-            co.co_cellvars,  # co_freevars is initialized with co_cellvars
-            (),  # co_cellvars is made empty
-        )
+    _cell_set_template_code = types.CodeType(
+        co.co_argcount,
+        co.co_kwonlyargcount,  # Python 3 only argument
+        co.co_nlocals,
+        co.co_stacksize,
+        co.co_flags,
+        co.co_code,
+        co.co_consts,
+        co.co_names,
+        co.co_varnames,
+        co.co_filename,
+        co.co_name,
+        co.co_firstlineno,
+        co.co_lnotab,
+        co.co_cellvars,  # co_freevars is initialized with co_cellvars
+        (),  # co_cellvars is made empty
+    )
     return _cell_set_template_code
 
 
@@ -417,44 +363,15 @@ def _builtin_type(name):
     return getattr(types, name)
 
 
-if sys.version_info < (3, 4):  # pragma: no branch
-
-    def _walk_global_ops(code):
-        """
-        Yield (opcode, argument number) tuples for all
-        global-referencing instructions in *code*.
-        """
-        code = getattr(code, "co_code", b"")
-        if PY2:  # pragma: no branch
-            code = map(ord, code)
-
-        n = len(code)
-        i = 0
-        extended_arg = 0
-        while i < n:
-            op = code[i]
-            i += 1
-            if op >= HAVE_ARGUMENT:
-                oparg = code[i] + code[i + 1] * 256 + extended_arg
-                extended_arg = 0
-                i += 2
-                if op == EXTENDED_ARG:
-                    extended_arg = oparg * 65536
-                if op in GLOBAL_OPS:
-                    yield op, oparg
-
-
-else:
-
-    def _walk_global_ops(code):
-        """
-        Yield (opcode, argument number) tuples for all
-        global-referencing instructions in *code*.
-        """
-        for instr in dis.get_instructions(code):
-            op = instr.opcode
-            if op in GLOBAL_OPS:
-                yield op, instr.arg
+def _walk_global_ops(code):
+    """
+    Yield (opcode, argument number) tuples for all
+    global-referencing instructions in *code*.
+    """
+    for instr in dis.get_instructions(code):
+        op = instr.opcode
+        if op in GLOBAL_OPS:
+            yield op, instr.arg
 
 
 def _extract_class_dict(cls):
@@ -506,13 +423,6 @@ class CloudPickler(Pickler):
 
     dispatch[memoryview] = save_memoryview
 
-    if PY2:  # pragma: no branch
-
-        def save_buffer(self, obj):
-            self.save(str(obj))
-
-        dispatch[buffer] = save_buffer  # noqa: F821 'buffer' was removed in Python 3
-
     def save_module(self, obj):
         """
         Save a module as an import
@@ -528,44 +438,25 @@ class CloudPickler(Pickler):
         """
         Save a code object
         """
-        if PY3:  # pragma: no branch
-            if hasattr(obj, "co_posonlyargcount"):  # pragma: no branch
-                args = (
-                    obj.co_argcount,
-                    obj.co_posonlyargcount,
-                    obj.co_kwonlyargcount,
-                    obj.co_nlocals,
-                    obj.co_stacksize,
-                    obj.co_flags,
-                    obj.co_code,
-                    obj.co_consts,
-                    obj.co_names,
-                    obj.co_varnames,
-                    obj.co_filename,
-                    obj.co_name,
-                    obj.co_firstlineno,
-                    obj.co_lnotab,
-                    obj.co_freevars,
-                    obj.co_cellvars,
-                )
-            else:
-                args = (
-                    obj.co_argcount,
-                    obj.co_kwonlyargcount,
-                    obj.co_nlocals,
-                    obj.co_stacksize,
-                    obj.co_flags,
-                    obj.co_code,
-                    obj.co_consts,
-                    obj.co_names,
-                    obj.co_varnames,
-                    obj.co_filename,
-                    obj.co_name,
-                    obj.co_firstlineno,
-                    obj.co_lnotab,
-                    obj.co_freevars,
-                    obj.co_cellvars,
-                )
+        if hasattr(obj, "co_posonlyargcount"):  # pragma: no branch
+            args = (
+                obj.co_argcount,
+                obj.co_posonlyargcount,
+                obj.co_kwonlyargcount,
+                obj.co_nlocals,
+                obj.co_stacksize,
+                obj.co_flags,
+                obj.co_code,
+                obj.co_consts,
+                obj.co_names,
+                obj.co_varnames,
+                obj.co_filename,
+                obj.co_name,
+                obj.co_firstlineno,
+                obj.co_lnotab,
+                obj.co_freevars,
+                obj.co_cellvars,
+            )
         else:
             args = (
                 obj.co_argcount,
@@ -881,45 +772,6 @@ class CloudPickler(Pickler):
 
         return (code, f_globals, defaults, closure, dct, base_globals)
 
-    if not PY3:  # pragma: no branch
-        # Python3 comes with native reducers that allow builtin functions and
-        # methods pickling as module/class attributes.  The following method
-        # extends this for python2.
-        # Please note that currently, neither pickle nor cloudpickle support
-        # dynamically created builtin functions/method pickling.
-        def save_builtin_function_or_method(self, obj):
-            is_bound = getattr(obj, "__self__", None) is not None
-            if is_bound:
-                # obj is a bound builtin method.
-                rv = (getattr, (obj.__self__, obj.__name__))
-                return self.save_reduce(obj=obj, *rv)
-
-            is_unbound = hasattr(obj, "__objclass__")
-            if is_unbound:
-                # obj is an unbound builtin method (accessed from its class)
-                rv = (getattr, (obj.__objclass__, obj.__name__))
-                return self.save_reduce(obj=obj, *rv)
-
-            # Otherwise, obj is not a method, but a function. Fallback to
-            # default pickling by attribute.
-            return Pickler.save_global(self, obj)
-
-        dispatch[types.BuiltinFunctionType] = save_builtin_function_or_method
-
-        # A comprehensive summary of the various kinds of builtin methods can
-        # be found in PEP 579: https://www.python.org/dev/peps/pep-0579/
-        classmethod_descriptor_type = type(float.__dict__["fromhex"])
-        wrapper_descriptor_type = type(float.__repr__)
-        method_wrapper_type = type(1.5 .__repr__)
-
-        dispatch[classmethod_descriptor_type] = save_builtin_function_or_method
-        dispatch[wrapper_descriptor_type] = save_builtin_function_or_method
-        dispatch[method_wrapper_type] = save_builtin_function_or_method
-
-    if sys.version_info[:2] < (3, 4):
-        method_descriptor = type(str.upper)
-        dispatch[method_descriptor] = save_builtin_function_or_method
-
     def save_getset_descriptor(self, obj):
         return self.save_reduce(getattr, (obj.__objclass__, obj.__name__))
 
@@ -932,7 +784,7 @@ class CloudPickler(Pickler):
         The name of this method is somewhat misleading: all types get
         dispatched here.
         """
-        if obj is type(None):
+        if obj is type(None):  # noqa
             return self.save_reduce(type, (None,), obj=obj)
         elif obj is type(Ellipsis):
             return self.save_reduce(type, (Ellipsis,), obj=obj)
@@ -955,16 +807,7 @@ class CloudPickler(Pickler):
         if obj.__self__ is None:
             self.save_reduce(getattr, (obj.im_class, obj.__name__))
         else:
-            if PY3:  # pragma: no branch
-                self.save_reduce(
-                    types.MethodType, (obj.__func__, obj.__self__), obj=obj
-                )
-            else:
-                self.save_reduce(
-                    types.MethodType,
-                    (obj.__func__, obj.__self__, type(obj.__self__)),
-                    obj=obj,
-                )
+            self.save_reduce(types.MethodType, (obj.__func__, obj.__self__), obj=obj)
 
     dispatch[types.MethodType] = save_instancemethod
 
@@ -1012,9 +855,6 @@ class CloudPickler(Pickler):
             pickle._keep_alive(stuff, memo)
         save(stuff)
         write(pickle.BUILD)
-
-    if PY2:  # pragma: no branch
-        dispatch[types.InstanceType] = save_inst
 
     def save_property(self, obj):
         # properties not correctly saved in python

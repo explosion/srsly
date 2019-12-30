@@ -8,90 +8,46 @@ Support for serialization of numpy data types with msgpack.
 # All rights reserved.
 # Distributed under the terms of the BSD license:
 # http://www.opensource.org/licenses/bsd-license
-from __future__ import unicode_literals
-
-
-import sys
-import functools
-
-from ._ext_type import ExtType
-
 try:
     import numpy as np
 except ImportError:
     pass
 
 
-if sys.version_info >= (3, 0):
+def encode_numpy(obj, chain=None):
+    """
+    Data encoder for serializing numpy data types.
+    """
 
-    def encode_numpy(obj, chain=None):
-        """
-        Data encoder for serializing numpy data types.
-        """
-
-        if isinstance(obj, np.ndarray):
-            # If the dtype is structured, store the interface description;
-            # otherwise, store the corresponding array protocol type string:
-            if obj.dtype.kind == "V":
-                kind = b"V"
-                descr = obj.dtype.descr
-            else:
-                kind = b""
-                descr = obj.dtype.str
-            return {
-                b"nd": True,
-                b"type": descr,
-                b"kind": kind,
-                b"shape": obj.shape,
-                b"data": obj.data if obj.flags["C_CONTIGUOUS"] else obj.tobytes(),
-            }
-        elif isinstance(obj, (np.bool_, np.number)):
-            return {b"nd": False, b"type": obj.dtype.str, b"data": obj.data}
-        elif isinstance(obj, complex):
-            return {b"complex": True, b"data": obj.__repr__()}
+    if isinstance(obj, np.ndarray):
+        # If the dtype is structured, store the interface description;
+        # otherwise, store the corresponding array protocol type string:
+        if obj.dtype.kind == "V":
+            kind = b"V"
+            descr = obj.dtype.descr
         else:
-            return obj if chain is None else chain(obj)
+            kind = b""
+            descr = obj.dtype.str
+        return {
+            b"nd": True,
+            b"type": descr,
+            b"kind": kind,
+            b"shape": obj.shape,
+            b"data": obj.data if obj.flags["C_CONTIGUOUS"] else obj.tobytes(),
+        }
+    elif isinstance(obj, (np.bool_, np.number)):
+        return {b"nd": False, b"type": obj.dtype.str, b"data": obj.data}
+    elif isinstance(obj, complex):
+        return {b"complex": True, b"data": obj.__repr__()}
+    else:
+        return obj if chain is None else chain(obj)
 
-    def tostr(x):
-        if isinstance(x, bytes):
-            return x.decode()
-        else:
-            return str(x)
 
-
-else:
-
-    def encode_numpy(obj, chain=None):
-        """
-        Data encoder for serializing numpy data types.
-        """
-        if isinstance(obj, np.ndarray):
-            # If the dtype is structured, store the interface description;
-            # otherwise, store the corresponding array protocol type string:
-            if obj.dtype.kind == "V":
-                kind = b"V"
-                descr = obj.dtype.descr
-            else:
-                kind = b""
-                descr = obj.dtype.str
-            return {
-                b"nd": True,
-                b"type": descr,
-                b"kind": kind,
-                b"shape": obj.shape,
-                b"data": memoryview(obj.data)
-                if obj.flags["C_CONTIGUOUS"]
-                else obj.tobytes(),
-            }
-        elif isinstance(obj, (np.bool_, np.number)):
-            return {b"nd": False, b"type": obj.dtype.str, b"data": memoryview(obj.data)}
-        elif isinstance(obj, complex):
-            return {b"complex": True, b"data": obj.__repr__()}
-        else:
-            return obj if chain is None else chain(obj)
-
-    def tostr(x):
-        return x
+def tostr(x):
+    if isinstance(x, bytes):
+        return x.decode()
+    else:
+        return str(x)
 
 
 def decode_numpy(obj, chain=None):

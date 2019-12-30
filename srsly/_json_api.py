@@ -21,8 +21,6 @@ def json_dumps(data, indent=0, sort_keys=False):
         )
     else:
         result = ujson.dumps(data, indent=indent, escape_forward_slashes=False)
-    if sys.version_info[0] == 2:  # Python 2
-        return result.decode("utf8")
     return result
 
 

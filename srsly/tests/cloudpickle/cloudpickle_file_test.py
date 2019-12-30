@@ -3,7 +3,6 @@ import tempfile
 import os
 import shutil
 import pickle
-import sys
 import pytest
 from mock import patch, mock_open
 import srsly.cloudpickle.cloudpickle
@@ -80,24 +79,6 @@ class CloudPickleFileTests(unittest.TestCase):
             unpickled.seek(0)
             self.assertEqual(self.teststring, unpickled.read())
         os.remove(self.tmpfilepath)
-
-    @pytest.mark.skipif(sys.version_info >= (3,), reason="only works on Python 2.x")
-    def test_temp_file(self):
-        with tempfile.NamedTemporaryFile(mode="ab+") as fp:
-            fp.write(self.teststring.encode("UTF-8"))
-            fp.seek(0)
-            f = fp.file
-            # FIXME this doesn't work yet: cloudpickle.dumps(fp)
-            newfile = pickle.loads(srsly.cloudpickle.cloudpickle.dumps(f))
-            self.assertEqual(self.teststring, newfile.read())
-
-    # def test_pickling_special_file_handles(self):
-    #    # pytest is wrapping the sys.stderr, which ruins this
-    #    # Warning: if you want to run your tests with nose, add -s option
-    #    for out in sys.stdout, sys.stderr:  # Regression test for SPARK-3415
-    #        self.assertEqual(out, pickle.loads(srsly.cloudpickle.cloudpickle.dumps(out)))
-    #    self.assertRaises(pickle.PicklingError,
-    #                      lambda: srsly.cloudpickle.cloudpickle.dumps(sys.stdin))
 
     def NOT_WORKING_test_tty(self):
         # FIXME: Mocking 'file' is not trivial... and fails for now

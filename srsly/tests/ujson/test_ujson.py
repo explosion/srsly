@@ -347,7 +347,6 @@ class UltraJSONTests(unittest.TestCase):
         input = -float("inf")
         self.assertRaises(OverflowError, ujson.encode, input)
 
-    @unittest.skipIf(sys.version_info < (2, 7), "No Ordered dict in < 2.7")
     def test_encodeOrderedDict(self):
         from collections import OrderedDict
 
