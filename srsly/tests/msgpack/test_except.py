@@ -6,7 +6,6 @@ import datetime
 from ...msgpack import packb, unpackb, Unpacker, FormatError, StackError, OutOfData
 
 
-
 class DummyException(Exception):
     pass
 
