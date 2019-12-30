@@ -1,6 +1,3 @@
-# coding: utf8
-from __future__ import unicode_literals
-
 from .._pickle_api import pickle_dumps, pickle_loads
 
 

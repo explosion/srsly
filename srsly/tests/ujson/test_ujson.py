@@ -1,6 +1,4 @@
-﻿# coding=UTF-8
-from __future__ import print_function, unicode_literals
-import six
+﻿import six
 from six.moves import range, zip
 
 import calendar
