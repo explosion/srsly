@@ -1,38 +1,18 @@
-#!/usr/bin/env python
-# coding: utf-8
-
 from array import array
-from ...msgpack import packb, unpackb
-import sys
+from srsly.msgpack import packb, unpackb
 
 
-# For Python < 3:
-#  - array type only supports old buffer interface
-#  - array.frombytes is not available, must use deprecated array.fromstring
-if sys.version_info[0] < 3:
-
-    def make_memoryview(obj):
-        return memoryview(buffer(obj))
-
-    def make_array(f, data):
-        a = array(f)
-        a.fromstring(data)
-        return a
-
-    def get_data(a):
-        return a.tostring()
+make_memoryview = memoryview
 
 
-else:
-    make_memoryview = memoryview
+def make_array(f, data):
+    a = array(f)
+    a.frombytes(data)
+    return a
 
-    def make_array(f, data):
-        a = array(f)
-        a.frombytes(data)
-        return a
 
-    def get_data(a):
-        return a.tobytes()
+def get_data(a):
+    return a.tobytes()
 
 
 def _runtest(format, nbytes, expected_header, expected_prefix, use_bin_type):

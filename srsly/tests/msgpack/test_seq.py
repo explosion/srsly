@@ -1,8 +1,5 @@
-#!/usr/bin/env python
-# coding: utf-8
-
 import io
-from ... import msgpack
+from srsly import msgpack
 
 
 binarydata = bytes(bytearray(range(256)))

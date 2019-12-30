@@ -3,7 +3,6 @@ import os
 import os.path as op
 import tempfile
 from subprocess import Popen, check_output, PIPE, STDOUT, CalledProcessError
-
 from srsly.cloudpickle.cloudpickle import dumps
 from pickle import loads
 

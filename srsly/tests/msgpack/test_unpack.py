@@ -1,7 +1,7 @@
 from io import BytesIO
 import sys
-from ...msgpack import Unpacker, packb, OutOfData, ExtType
-from pytest import raises, mark
+import pytest
+from srsly.msgpack import Unpacker, packb, OutOfData, ExtType
 
 
 def test_unpack_array_header_from_file():
@@ -12,11 +12,11 @@ def test_unpack_array_header_from_file():
     assert unpacker.unpack() == 2
     assert unpacker.unpack() == 3
     assert unpacker.unpack() == 4
-    with raises(OutOfData):
+    with pytest.raises(OutOfData):
         unpacker.unpack()
 
 
-@mark.skipif(
+@pytest.mark.skipif(
     "not hasattr(sys, 'getrefcount') == True",
     reason="sys.getrefcount() is needed to pass this test",
 )

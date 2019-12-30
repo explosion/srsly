@@ -1,14 +1,8 @@
-#!/usr/bin/env python
-# coding: utf-8
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import struct
-from pytest import raises, xfail
-
-from ...msgpack import packb, unpackb, Unpacker, Packer, pack
-
+import pytest
 from collections import OrderedDict
 from io import BytesIO
+from srsly.msgpack import packb, unpackb, Unpacker, Packer
 
 
 def check(data, use_list=False):
@@ -73,7 +67,7 @@ def testPackUTF32():  # deprecated
             re = unpackb(packb(td, encoding="utf-32"), use_list=1, encoding="utf-32")
             assert re == td
     except LookupError as e:
-        xfail(e)
+        pytest.xfail(e)
 
 
 def testPackBytes():
@@ -96,12 +90,12 @@ def testIgnoreUnicodeErrors():  # deprecated
 
 
 def testStrictUnicodeUnpack():
-    with raises(UnicodeDecodeError):
+    with pytest.raises(UnicodeDecodeError):
         unpackb(packb(b"abc\xeddef"), raw=False, use_list=1)
 
 
 def testStrictUnicodePack():  # deprecated
-    with raises(UnicodeEncodeError):
+    with pytest.raises(UnicodeEncodeError):
         packb("abc\xeddef", encoding="ascii", unicode_errors="strict")
 
 

@@ -1,4 +1,4 @@
-from ...msgpack import packb, unpackb
+from srsly.msgpack import packb, unpackb
 
 
 def check(length, obj):

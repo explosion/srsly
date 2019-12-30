@@ -1,14 +1,7 @@
-try:
-    range = xrange  # Python 2
-except NameError:
-    pass  # Python 3
-
-from unittest import main, TestCase
+from unittest import TestCase
 from numpy.testing import assert_equal, assert_array_equal
 import numpy as np
-import sys
-
-from ... import msgpack
+from srsly import msgpack
 
 
 class ThirdParty(object):
@@ -45,11 +38,6 @@ class test_numpy_msgpack(TestCase):
 
     def test_str(self):
         assert_equal(type(self.encode_decode("foo")), bytes)
-        if sys.version_info.major == 2:
-            assert_equal(type(self.encode_decode(u"foo")), str)
-
-            # Test non-default string encoding/decoding:
-            assert_equal(type(self.encode_decode(u"foo", True, False)), unicode)
 
     def test_numpy_scalar_bool(self):
         x = np.bool_(True)

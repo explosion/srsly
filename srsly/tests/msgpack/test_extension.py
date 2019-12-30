@@ -1,7 +1,6 @@
-from __future__ import print_function
 import array
-from ... import msgpack
-from ...msgpack._ext_type import ExtType
+from srsly import msgpack
+from srsly.msgpack._ext_type import ExtType
 
 
 def test_pack_ext_type():
@@ -61,20 +60,14 @@ def test_extension_type():
     assert obj == obj2
 
 
-import sys
-
-if sys.version > "3":
-    long = int
-
-
 def test_overriding_hooks():
     def default(obj):
-        if isinstance(obj, long):
+        if isinstance(obj, int):
             return {"__type__": "long", "__data__": str(obj)}
         else:
             return obj
 
-    obj = {"testval": long(1823746192837461928374619)}
+    obj = {"testval": int(1823746192837461928374619)}
     refobj = {"testval": default(obj["testval"])}
     refout = msgpack.packb(refobj)
     assert isinstance(refout, (str, bytes))

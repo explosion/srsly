@@ -4,11 +4,8 @@ import os
 import shutil
 import pickle
 import sys
-from io import StringIO
-
 import pytest
 from mock import patch, mock_open
-
 import srsly.cloudpickle.cloudpickle
 
 

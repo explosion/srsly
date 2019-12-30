@@ -1,18 +1,6 @@
-#!/usr/bin/env python
-# coding: utf-8
-from __future__ import absolute_import, division, print_function, unicode_literals
 import pytest
-
-from ...msgpack import (
-    packb,
-    unpackb,
-    Packer,
-    Unpacker,
-    ExtType,
-    PackOverflowError,
-    PackValueError,
-    UnpackValueError,
-)
+from srsly.msgpack import packb, unpackb, Packer, Unpacker, ExtType
+from srsly.msgpack import PackOverflowError, PackValueError, UnpackValueError
 
 
 def test_integer():
