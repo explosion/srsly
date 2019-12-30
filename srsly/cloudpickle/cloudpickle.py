@@ -40,8 +40,6 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
-from __future__ import print_function
-
 import dis
 import io
 import itertools
@@ -60,11 +58,9 @@ from pickle import _Pickler as Pickler
 from io import BytesIO as StringIO
 from importlib._bootstrap import _find_spec
 from pickle import _getattribute
+from enum import Enum
+import collections
 
-try:
-    from enum import Enum
-except ImportError:
-    Enum = None
 
 # cloudpickle is meant for inter process communication: we expect all
 # communicating processes to run the same Python version hence we favor
@@ -85,7 +81,6 @@ if PYPY:
     # builtin-code objects only exist in pypy
     builtin_code_type = type(float.__new__.__code__)
 
-types.ClassType = type
 string_types = (str,)
 
 _extract_code_globals_cache = weakref.WeakKeyDictionary()
@@ -800,7 +795,6 @@ class CloudPickler(Pickler):
             Pickler.save_global(self, obj, name=name)
 
     dispatch[type] = save_global
-    dispatch[types.ClassType] = save_global
 
     def save_instancemethod(self, obj):
         # Memoization rarely is ever useful due to python bounding
@@ -962,10 +956,7 @@ class CloudPickler(Pickler):
     def save_not_implemented(self, obj):
         self.save_reduce(_gen_not_implemented, ())
 
-    try:  # Python 2
-        dispatch[file] = save_file
-    except NameError:  # Python 3  # pragma: no branch
-        dispatch[io.TextIOWrapper] = save_file
+    dispatch[io.TextIOWrapper] = save_file
 
     dispatch[type(Ellipsis)] = save_ellipsis
     dispatch[type(NotImplemented)] = save_not_implemented
@@ -1272,11 +1263,6 @@ def _make_skeleton_enum(
         classdict[member_name] = member_value
     enum_class = metacls.__new__(metacls, name, bases, classdict)
     enum_class.__module__ = module
-
-    # Python 2.7 compat
-    if qualname is not None:
-        enum_class.__qualname__ = qualname
-
     return _lookup_class_or_track(class_tracker_id, enum_class)
 
 
@@ -1289,42 +1275,25 @@ def _is_dynamic(module):
     if hasattr(module, "__file__"):
         return False
 
-    if hasattr(module, "__spec__"):
-        if module.__spec__ is not None:
-            return False
-
-        # In PyPy, Some built-in modules such as _codecs can have their
-        # __spec__ attribute set to None despite being imported.  For such
-        # modules, the ``_find_spec`` utility of the standard library is used.
-        parent_name = module.__name__.rpartition(".")[0]
-        if parent_name:  # pragma: no cover
-            # This code handles the case where an imported package (and not
-            # module) remains with __spec__ set to None. It is however untested
-            # as no package in the PyPy stdlib has __spec__ set to None after
-            # it is imported.
-            try:
-                parent = sys.modules[parent_name]
-            except KeyError:
-                msg = "parent {!r} not in sys.modules"
-                raise ImportError(msg.format(parent_name))
-            else:
-                pkgpath = parent.__path__
-        else:
-            pkgpath = None
-        return _find_spec(module.__name__, pkgpath, module) is None
-
-    else:
-        # Backward compat for Python 2
-        import imp
-
-        try:
-            path = None
-            for part in module.__name__.split("."):
-                if path is not None:
-                    path = [path]
-                f, path, description = imp.find_module(part, path)
-                if f is not None:
-                    f.close()
-        except ImportError:
-            return True
+    if module.__spec__ is not None:
         return False
+
+    # In PyPy, Some built-in modules such as _codecs can have their
+    # __spec__ attribute set to None despite being imported.  For such
+    # modules, the ``_find_spec`` utility of the standard library is used.
+    parent_name = module.__name__.rpartition(".")[0]
+    if parent_name:  # pragma: no cover
+        # This code handles the case where an imported package (and not
+        # module) remains with __spec__ set to None. It is however untested
+        # as no package in the PyPy stdlib has __spec__ set to None after
+        # it is imported.
+        try:
+            parent = sys.modules[parent_name]
+        except KeyError:
+            msg = "parent {!r} not in sys.modules"
+            raise ImportError(msg.format(parent_name))
+        else:
+            pkgpath = parent.__path__
+    else:
+        pkgpath = None
+    return _find_spec(module.__name__, pkgpath, module) is None

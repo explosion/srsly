@@ -5,17 +5,7 @@ import tempfile
 from subprocess import Popen, check_output, PIPE, STDOUT, CalledProcessError
 from srsly.cloudpickle.cloudpickle import dumps
 from pickle import loads
-
-try:
-    from suprocess import TimeoutExpired
-
-    timeout_supported = True
-except ImportError:
-    # no support for timeout in Python 2
-    class TimeoutExpired(Exception):
-        pass
-
-    timeout_supported = False
+from suprocess import TimeoutExpired
 
 
 TEST_GLOBALS = "a test value"
@@ -53,8 +43,7 @@ def subprocess_pickle_echo(input_data, protocol=None):
     proc = Popen(cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE, cwd=cwd, env=env)
     try:
         comm_kwargs = {}
-        if timeout_supported:
-            comm_kwargs["timeout"] = 5
+        comm_kwargs["timeout"] = 5
         out, err = proc.communicate(pickled_input_data, **comm_kwargs)
         if proc.returncode != 0 or len(err):
             message = "Subprocess returned %d: " % proc.returncode
@@ -115,8 +104,7 @@ def assert_run_python_script(source_code, timeout=5):
         coverage_rc = os.environ.get("COVERAGE_PROCESS_START")
         if coverage_rc:
             kwargs["env"]["COVERAGE_PROCESS_START"] = coverage_rc
-        if timeout_supported:
-            kwargs["timeout"] = timeout
+        kwargs["timeout"] = timeout
         try:
             try:
                 out = check_output(cmd, **kwargs)
