@@ -1,10 +1,11 @@
 import gc
 
 from . import msgpack
+from .types import FilePath, JSONObject
 from .util import force_path
 
 
-def msgpack_dumps(data):
+def msgpack_dumps(data: JSONObject) -> bytes:
     """Serialize an object to a msgpack byte string.
 
     data: The data to serialize.
@@ -13,7 +14,7 @@ def msgpack_dumps(data):
     return msgpack.dumps(data, use_bin_type=True)
 
 
-def msgpack_loads(data, use_list=True):
+def msgpack_loads(data: bytes, use_list: bool = True) -> JSONObject:
     """Deserialize msgpack bytes to a Python object.
 
     data (bytes): The data to deserialize.
@@ -28,7 +29,7 @@ def msgpack_loads(data, use_list=True):
     return msg
 
 
-def write_msgpack(location, data):
+def write_msgpack(location: FilePath, data: JSONObject) -> None:
     """Create a msgpack file and dump contents.
 
     location (unicode / Path): The file path.
@@ -39,7 +40,7 @@ def write_msgpack(location, data):
         msgpack.dump(data, f, use_bin_type=True)
 
 
-def read_msgpack(location, use_list=True):
+def read_msgpack(location: FilePath, use_list: bool = True) -> JSONObject:
     """Load a msgpack file.
 
     location (unicode / Path): The file path.

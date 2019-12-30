@@ -1,18 +1,22 @@
+from typing import Union, Iterable, Sequence, Any, Optional
 import sys
 import json as _builtin_json
 import gzip
 
 from . import ujson
+from .types import FilePath, StandardIO, JSONObject
 from .util import force_path, force_string
 
 
-def json_dumps(data, indent=0, sort_keys=False):
+def json_dumps(
+    data: JSONObject, indent: Optional[int] = 0, sort_keys: bool = False
+) -> str:
     """Serialize an object to a JSON string.
 
     data: The JSON-serializable data.
     indent (int): Number of spaces used to indent JSON.
     sort_keys (bool): Sort dictionary keys. Falls back to json module for now.
-    RETURNS (unicode): The serialized string.
+    RETURNS (str): The serialized string.
     """
     if sort_keys:
         indent = None if indent == 0 else indent
@@ -24,16 +28,16 @@ def json_dumps(data, indent=0, sort_keys=False):
     return result
 
 
-def json_loads(data):
+def json_loads(data: Union[str, bytes]) -> JSONObject:
     """Deserialize unicode or bytes to a Python object.
 
-    data (unicode / bytes): The data to deserialize.
+    data (str / bytes): The data to deserialize.
     RETURNS: The deserialized Python object.
     """
     return ujson.loads(data)
 
 
-def read_json(location):
+def read_json(location: Union[FilePath, StandardIO]) -> JSONObject:
     """Load JSON from file or standard input.
 
     location (unicode / Path): The file path. "-" for reading from stdin.
@@ -47,7 +51,7 @@ def read_json(location):
         return ujson.load(f)
 
 
-def read_gzip_json(location):
+def read_gzip_json(location: FilePath) -> JSONObject:
     """Load JSON from a gzipped file.
 
         location (unicode / Path): The file path.
@@ -58,7 +62,9 @@ def read_gzip_json(location):
         return ujson.load(f)
 
 
-def write_json(location, data, indent=2):
+def write_json(
+    location: Union[FilePath, StandardIO], data: JSONObject, indent: int = 2
+) -> None:
     """Create a .json file and dump contents or write to standard
     output.
 
@@ -75,7 +81,7 @@ def write_json(location, data, indent=2):
             f.write(json_data)
 
 
-def write_gzip_json(location, data, indent=2):
+def write_gzip_json(location: FilePath, data: JSONObject, indent: int = 2) -> None:
     """Create a .json.gz file and dump contents.
 
     location (unicode / Path): The file path.
@@ -88,7 +94,7 @@ def write_gzip_json(location, data, indent=2):
         f.write(json_data.encode("utf-8"))
 
 
-def read_jsonl(location, skip=False):
+def read_jsonl(location: FilePath, skip: bool = False) -> Iterable[JSONObject]:
     """Read a .jsonl file or standard input and yield contents line by line.
     Blank lines will always be skipped.
 
@@ -106,14 +112,19 @@ def read_jsonl(location, skip=False):
                 yield line
 
 
-def write_jsonl(location, lines, append=False, append_new_line=True):
+def write_jsonl(
+    location: FilePath,
+    lines: Sequence[JSONObject],
+    append: bool = False,
+    append_new_line: bool = True,
+) -> None:
     """Create a .jsonl file and dump contents or write to standard output.
 
     location (unicode / Path): The file path. "-" for writing to stdout.
     lines (list): The JSON-serializable contents of each line.
     append (bool): Whether or not to append to the location.
     append_new_line (bool): Whether or not to write a new line before appending
-                            to the file.
+        to the file.
     """
     if location == "-":  # writing to stdout
         for line in lines:
@@ -128,7 +139,7 @@ def write_jsonl(location, lines, append=False, append_new_line=True):
                 f.write(json_dumps(line) + "\n")
 
 
-def is_json_serializable(obj):
+def is_json_serializable(obj: Any) -> bool:
     """Check if a Python object is JSON-serializable.
 
     obj: The object to check.
@@ -144,7 +155,9 @@ def is_json_serializable(obj):
         return False
 
 
-def _yield_json_lines(stream, skip=False):
+def _yield_json_lines(
+    stream: Iterable[str], skip: bool = False
+) -> Iterable[JSONObject]:
     line_no = 1
     for line in stream:
         line = line.strip()

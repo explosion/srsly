@@ -54,13 +54,14 @@ import types
 import weakref
 import uuid
 import threading
-from pickle import _Pickler as Pickler
+from pickle import _Pickler as Pickler  # type: ignore
+from pickle import _getattribute  # type: ignore
 from io import BytesIO as StringIO
 from importlib._bootstrap import _find_spec
-from pickle import _getattribute
 from enum import Enum
 import collections
 
+WeakKeyDictType = collections.MutableMapping
 
 # cloudpickle is meant for inter process communication: we expect all
 # communicating processes to run the same Python version hence we favor
@@ -70,8 +71,8 @@ DEFAULT_PROTOCOL = pickle.HIGHEST_PROTOCOL
 # Track the provenance of reconstructed dynamic classes to make it possible to
 # recontruct instances from the matching singleton class definition when
 # appropriate and preserve the usual "isinstance" semantics of Python objects.
-_DYNAMIC_CLASS_TRACKER_BY_CLASS = weakref.WeakKeyDictionary()
-_DYNAMIC_CLASS_TRACKER_BY_ID = weakref.WeakValueDictionary()
+_DYNAMIC_CLASS_TRACKER_BY_CLASS: WeakKeyDictType = weakref.WeakKeyDictionary()
+_DYNAMIC_CLASS_TRACKER_BY_ID: WeakKeyDictType = weakref.WeakValueDictionary()
 _DYNAMIC_CLASS_TRACKER_LOCK = threading.Lock()
 
 PYPY = platform.python_implementation() == "PyPy"
@@ -83,7 +84,7 @@ if PYPY:
 
 string_types = (str,)
 
-_extract_code_globals_cache = weakref.WeakKeyDictionary()
+_extract_code_globals_cache: WeakKeyDictType = weakref.WeakKeyDictionary()
 
 
 def _ensure_tracking(class_def):
