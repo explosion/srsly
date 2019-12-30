@@ -155,5 +155,5 @@ def _yield_json_lines(stream, skip=False):
         except ValueError:
             if skip:
                 continue
-            raise ValueError("Invalid JSON on line {}: {}".format(line_no, line))
+            raise ValueError(f"Invalid JSON on line {line_no}: {line}")
         line_no += 1
