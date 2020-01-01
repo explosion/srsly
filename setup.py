@@ -39,9 +39,9 @@ else:
 # http://stackoverflow.com/questions/724664/python-distutils-how-to-get-a-compiler-that-is-going-to-be-used
 class build_ext_options:
     def build_options(self):
-        # if hasattr(self.compiler, "initialize"):
-        #     self.compiler.initialize()
-        # self.compiler.platform = sys.platform[:6]
+        if hasattr(self.compiler, "initialize"):
+            self.compiler.initialize()
+        self.compiler.platform = sys.platform[:6]
         for e in self.extensions:
             e.extra_compile_args += COMPILE_OPTIONS.get(
                 self.compiler.compiler_type, COMPILE_OPTIONS["other"]
@@ -106,8 +106,9 @@ def setup_package():
             extra_compile_args=["-D_GNU_SOURCE"],
         )
     )
-    print("Cythonizing sources")
-    ext_modules = cythonize(ext_modules, compiler_directives=COMPILER_DIRECTIVES)
+    if not (root / "PKG-INFO").exists():  # not source release
+        print("Cythonizing sources")
+        ext_modules = cythonize(ext_modules, compiler_directives=COMPILER_DIRECTIVES)
 
     setup(
         name="srsly",
