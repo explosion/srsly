@@ -106,9 +106,9 @@ def setup_package():
             extra_compile_args=["-D_GNU_SOURCE"],
         )
     )
-    if not (root / "PKG-INFO").exists():  # not source release
-        print("Cythonizing sources")
-        ext_modules = cythonize(ext_modules, compiler_directives=COMPILER_DIRECTIVES)
+    # if not (root / "PKG-INFO").exists():  # not source release
+    print("Cythonizing sources")
+    ext_modules = cythonize(ext_modules, compiler_directives=COMPILER_DIRECTIVES)
 
     setup(
         name="srsly",
