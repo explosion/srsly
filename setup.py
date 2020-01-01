@@ -6,6 +6,8 @@ from setuptools import Extension, setup, find_packages
 from pathlib import Path
 from Cython.Build import cythonize
 from Cython.Compiler import Options
+import contextlib
+import os
 
 
 # Preserve `__doc__` on functions and classes
@@ -69,6 +71,18 @@ def clean(path):
     print(f"Cleaned {n_cleaned} files")
 
 
+@contextlib.contextmanager
+def chdir(new_dir):
+    old_dir = os.getcwd()
+    try:
+        os.chdir(new_dir)
+        sys.path.insert(0, new_dir)
+        yield
+    finally:
+        del sys.path[0]
+        os.chdir(old_dir)
+
+
 def setup_package():
     root = Path(__file__).parent
 
@@ -79,45 +93,46 @@ def setup_package():
         about = {}
         exec(f.read(), about)
 
-    include_dirs = [get_python_inc(plat_specific=True), "."]
-    ext_modules = []
-    for name in MOD_NAMES:
-        mod_path = name.replace(".", "/") + ".pyx"
+    with chdir(root):
+        include_dirs = [get_python_inc(plat_specific=True), "."]
+        ext_modules = []
+        for name in MOD_NAMES:
+            mod_path = name.replace(".", "/") + ".pyx"
+            ext_modules.append(
+                Extension(
+                    name,
+                    [mod_path],
+                    language="c++",
+                    include_dirs=include_dirs,
+                    define_macros=macros,
+                )
+            )
         ext_modules.append(
             Extension(
-                name,
-                [mod_path],
-                language="c++",
-                include_dirs=include_dirs,
-                define_macros=macros,
+                "srsly.ujson.ujson",
+                sources=[
+                    "./srsly/ujson/ujson.c",
+                    "./srsly/ujson/objToJSON.c",
+                    "./srsly/ujson/JSONtoObj.c",
+                    "./srsly/ujson/lib/ultrajsonenc.c",
+                    "./srsly/ujson/lib/ultrajsondec.c",
+                ],
+                include_dirs=["./srsly/ujson", "./srsly/ujson/lib"],
+                extra_compile_args=["-D_GNU_SOURCE"],
             )
         )
-    ext_modules.append(
-        Extension(
-            "srsly.ujson.ujson",
-            sources=[
-                "./srsly/ujson/ujson.c",
-                "./srsly/ujson/objToJSON.c",
-                "./srsly/ujson/JSONtoObj.c",
-                "./srsly/ujson/lib/ultrajsonenc.c",
-                "./srsly/ujson/lib/ultrajsondec.c",
-            ],
-            include_dirs=["./srsly/ujson", "./srsly/ujson/lib"],
-            extra_compile_args=["-D_GNU_SOURCE"],
-        )
-    )
-    # if not (root / "PKG-INFO").exists():  # not source release
-    print("Cythonizing sources")
-    ext_modules = cythonize(ext_modules, compiler_directives=COMPILER_DIRECTIVES)
+        # if not (root / "PKG-INFO").exists():  # not source release
+        print("Cythonizing sources")
+        ext_modules = cythonize(ext_modules, compiler_directives=COMPILER_DIRECTIVES)
 
-    setup(
-        name="srsly",
-        packages=PACKAGES,
-        version=about["__version__"],
-        ext_modules=ext_modules,
-        cmdclass={"build_ext": build_ext_subclass},
-        package_data=PACKAGE_DATA,
-    )
+        setup(
+            name="srsly",
+            packages=PACKAGES,
+            version=about["__version__"],
+            ext_modules=ext_modules,
+            cmdclass={"build_ext": build_ext_subclass},
+            package_data=PACKAGE_DATA,
+        )
 
 
 if __name__ == "__main__":
