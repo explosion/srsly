@@ -1,7 +1,7 @@
 from typing import Optional
 
 from . import cloudpickle
-from .types import JSONInput, JSONOutput
+from .util import JSONInput, JSONOutput
 
 
 def pickle_dumps(data: JSONInput, protocol: Optional[int] = None) -> bytes:

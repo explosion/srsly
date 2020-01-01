@@ -4,8 +4,7 @@ import json as _builtin_json
 import gzip
 
 from . import ujson
-from .types import FilePath, StandardIO, JSONInput, JSONOutput
-from .util import force_path, force_string
+from .util import force_path, force_string, FilePath, JSONInput, JSONOutput
 
 
 def json_dumps(
@@ -37,7 +36,7 @@ def json_loads(data: Union[str, bytes]) -> JSONOutput:
     return ujson.loads(data)
 
 
-def read_json(location: Union[FilePath, StandardIO]) -> JSONOutput:
+def read_json(location: FilePath) -> JSONOutput:
     """Load JSON from file or standard input.
 
     location (unicode / Path): The file path. "-" for reading from stdin.
@@ -62,9 +61,7 @@ def read_gzip_json(location: FilePath) -> JSONOutput:
         return ujson.load(f)
 
 
-def write_json(
-    location: Union[FilePath, StandardIO], data: JSONInput, indent: int = 2
-) -> None:
+def write_json(location: FilePath, data: JSONInput, indent: int = 2) -> None:
     """Create a .json file and dump contents or write to standard
     output.
 
