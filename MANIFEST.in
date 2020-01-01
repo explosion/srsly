@@ -1,5 +1,3 @@
-recursive-include srsly *.h
-recursive-include srsly *.cc
-recursive-include srsly *.c
+recursive-include thinc *.h *.pyx *.pxd *.cc *.c
 include LICENSE
 include README.md
