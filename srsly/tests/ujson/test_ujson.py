@@ -377,6 +377,10 @@ class UltraJSONTests(unittest.TestCase):
         input = "}"
         self.assertRaises(ValueError, ujson.decode, input)
 
+    def test_decodeObjectTrailingCommaFail(self):
+        input = '{"one":1,}'
+        self.assertRaises(ValueError, ujson.decode, input)
+
     def test_decodeObjectDepthTooBig(self):
         input = "{" * (1024 * 1024)
         self.assertRaises(ValueError, ujson.decode, input)
@@ -703,11 +707,6 @@ class UltraJSONTests(unittest.TestCase):
         input = "[]"
         obj = ujson.decode(input)
         self.assertEqual([], obj)
-
-    def test_decodeArrayDict(self):
-        input = "{}"
-        obj = ujson.decode(input)
-        self.assertEqual({}, obj)
 
     def test_decodeArrayOneItem(self):
         input = "[31337]"
