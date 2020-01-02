@@ -31,12 +31,14 @@ wheel.
 
 `srsly` currently includes forks of the following packages:
 
--   [`ujson`](https://github.com/esnme/ultrajson)
--   [`msgpack`](https://github.com/msgpack/msgpack-python)
--   [`msgpack-numpy`](https://github.com/lebedov/msgpack-numpy)
--   [`cloudpickle`](https://github.com/cloudpipe/cloudpickle)
+- [`ujson`](https://github.com/esnme/ultrajson)
+- [`msgpack`](https://github.com/msgpack/msgpack-python)
+- [`msgpack-numpy`](https://github.com/lebedov/msgpack-numpy)
+- [`cloudpickle`](https://github.com/cloudpipe/cloudpickle)
 
 ## Installation
+
+> ⚠️ Note that `v2.x` is only compatible with **Python 3.6+**. For 2.7+ compatibility, use `v1.x`.
 
 `srsly` can be installed from pip:
 
@@ -164,12 +166,12 @@ data = [{"foo": "bar"}, {"baz": 123}]
 srsly.write_jsonl("/path/to/file.jsonl", data)
 ```
 
-| Argument   | Type             | Description                                                                                                            |
-| ---------- | ---------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| `location` | unicode / `Path` | The file path or `"-"` to write to stdout.                                                                             |
-| `lines`    | iterable         | The JSON-serializable lines.                                                                                           |
-| `append`   | bool             | Append to an existing file. Will open it in `"a"` mode and insert a newline before writing lines. Defaults to `False`. |
-| `append_new_line`   | bool             | Defines whether a new line should first be written when appending to an existing file. Defaults to `True`. |
+| Argument          | Type             | Description                                                                                                            |
+| ----------------- | ---------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `location`        | unicode / `Path` | The file path or `"-"` to write to stdout.                                                                             |
+| `lines`           | iterable         | The JSON-serializable lines.                                                                                           |
+| `append`          | bool             | Append to an existing file. Will open it in `"a"` mode and insert a newline before writing lines. Defaults to `False`. |
+| `append_new_line` | bool             | Defines whether a new line should first be written when appending to an existing file. Defaults to `True`.             |
 
 #### <kbd>function</kbd> `srsly.read_jsonl`
 
