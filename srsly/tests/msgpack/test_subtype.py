@@ -1,19 +1,21 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-from ...msgpack import packb, unpackb
 from collections import namedtuple
+from srsly.msgpack import packb
+
 
 class MyList(list):
     pass
 
+
 class MyDict(dict):
     pass
+
 
 class MyTuple(tuple):
     pass
 
-MyNamedTuple = namedtuple('MyNamedTuple', 'x y')
+
+MyNamedTuple = namedtuple("MyNamedTuple", "x y")
+
 
 def test_types():
     assert packb(MyDict()) == packb(dict())

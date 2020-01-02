@@ -1,34 +1,33 @@
 #!/usr/bin/env python
-from __future__ import print_function
-
-import io
-import os
-import subprocess
 import sys
-import contextlib
-from glob import glob
 from distutils.command.build_ext import build_ext
 from distutils.sysconfig import get_python_inc
-from distutils import ccompiler, msvccompiler
 from setuptools import Extension, setup, find_packages
+from pathlib import Path
+from Cython.Build import cythonize
+from Cython.Compiler import Options
+import contextlib
+import os
+
+
+# Preserve `__doc__` on functions and classes
+# http://docs.cython.org/en/latest/src/userguide/source_files_and_compilation.html#compiler-options
+Options.docstrings = True
 
 
 PACKAGE_DATA = {"": ["*.pyx", "*.pxd", "*.c", "*.h"]}
-
-
 PACKAGES = find_packages()
-
-
 MOD_NAMES = ["srsly.msgpack._unpacker", "srsly.msgpack._packer"]
-
-
 COMPILE_OPTIONS = {
     "msvc": ["/Ox", "/EHsc"],
     "mingw32": ["-O2", "-Wno-strict-prototypes", "-Wno-unused-function"],
     "other": ["-O2", "-Wno-strict-prototypes", "-Wno-unused-function"],
 }
-
-
+COMPILER_DIRECTIVES = {
+    "language_level": -3,
+    "embedsignature": True,
+    "annotation_typing": False,
+}
 LINK_OPTIONS = {"msvc": [], "mingw32": [], "other": ["-lstdc++", "-lm"]}
 
 if sys.byteorder == "big":
@@ -37,15 +36,18 @@ else:
     macros = [("__LITTLE_ENDIAN__", "1")]
 
 
-# By subclassing build_extensions we have the actual compiler that will be used which is really known only after finalize_options
+# By subclassing build_extensions we have the actual compiler that will be used
+# which is really known only after finalize_options
 # http://stackoverflow.com/questions/724664/python-distutils-how-to-get-a-compiler-that-is-going-to-be-used
 class build_ext_options:
     def build_options(self):
+        if hasattr(self.compiler, "initialize"):
+            self.compiler.initialize()
+        self.compiler.platform = sys.platform[:6]
         for e in self.extensions:
             e.extra_compile_args += COMPILE_OPTIONS.get(
                 self.compiler.compiler_type, COMPILE_OPTIONS["other"]
             )
-        for e in self.extensions:
             e.extra_link_args += LINK_OPTIONS.get(
                 self.compiler.compiler_type, LINK_OPTIONS["other"]
             )
@@ -57,27 +59,16 @@ class build_ext_subclass(build_ext, build_ext_options):
         build_ext.build_extensions(self)
 
 
-def generate_cython(root, source):
-    print("Cythonizing sources")
-    p = subprocess.call(
-        [sys.executable, os.path.join(root, "bin", "cythonize.py"), source],
-        env=os.environ,
-    )
-    if p != 0:
-        raise RuntimeError("Running cythonize failed")
-
-
-def is_source_release(path):
-    return os.path.exists(os.path.join(path, "PKG-INFO"))
-
-
 def clean(path):
+    n_cleaned = 0
     for name in MOD_NAMES:
         name = name.replace(".", "/")
-        for ext in [".so", ".html", ".cpp", ".c"]:
-            file_path = os.path.join(path, name + ext)
-            if os.path.exists(file_path):
-                os.unlink(file_path)
+        for ext in ["so", "html", "cpp", "c"]:
+            file_path = path / f"{name}.{ext}"
+            if file_path.exists():
+                file_path.unlink()
+                n_cleaned += 1
+    print(f"Cleaned {n_cleaned} files")
 
 
 @contextlib.contextmanager
@@ -93,50 +84,29 @@ def chdir(new_dir):
 
 
 def setup_package():
-    root = os.path.abspath(os.path.dirname(__file__))
+    root = Path(__file__).parent
 
     if len(sys.argv) > 1 and sys.argv[1] == "clean":
         return clean(root)
 
+    with (root / "srsly" / "about.py").open("r") as f:
+        about = {}
+        exec(f.read(), about)
+
     with chdir(root):
-        with io.open(os.path.join(root, "srsly", "about.py"), encoding="utf8") as f:
-            about = {}
-            exec(f.read(), about)
-
-        with io.open(os.path.join(root, "README.md"), encoding="utf8") as f:
-            readme = f.read()
-
-        include_dirs = [
-            get_python_inc(plat_specific=True),
-            ".",
-            os.path.join(root, "include"),
-        ]
-
+        include_dirs = [get_python_inc(plat_specific=True), "."]
         ext_modules = []
-        for mod_name in MOD_NAMES:
-            mod_path = mod_name.replace(".", "/") + ".cpp"
-            extra_link_args = []
-            extra_compile_args = []
-            # ???
-            # Imported from patch from @mikepb
-            # See Issue #267. Running blind here...
-            if sys.platform == "darwin":
-                dylib_path = [".." for _ in range(mod_name.count("."))]
-                dylib_path = "/".join(dylib_path)
-                dylib_path = "@loader_path/%s/srsly/platform/darwin/lib" % dylib_path
-                extra_link_args.append("-Wl,-rpath,%s" % dylib_path)
+        for name in MOD_NAMES:
+            mod_path = name.replace(".", "/") + ".pyx"
             ext_modules.append(
                 Extension(
-                    mod_name,
+                    name,
                     [mod_path],
                     language="c++",
                     include_dirs=include_dirs,
-                    extra_link_args=extra_link_args,
                     define_macros=macros,
-                    extra_compile_args=extra_compile_args,
                 )
             )
-
         ext_modules.append(
             Extension(
                 "srsly.ujson.ujson",
@@ -151,47 +121,16 @@ def setup_package():
                 extra_compile_args=["-D_GNU_SOURCE"],
             )
         )
-
-        if not is_source_release(root):
-            generate_cython(root, "srsly")
+        print("Cythonizing sources")
+        ext_modules = cythonize(ext_modules, compiler_directives=COMPILER_DIRECTIVES)
 
         setup(
             name="srsly",
-            zip_safe=True,
             packages=PACKAGES,
-            package_data=PACKAGE_DATA,
-            description=about["__summary__"],
-            long_description=readme,
-            long_description_content_type="text/markdown",
-            author=about["__author__"],
-            author_email=about["__email__"],
             version=about["__version__"],
-            url=about["__uri__"],
-            license=about["__license__"],
             ext_modules=ext_modules,
-            setup_requires=[],
-            install_requires=['pathlib==1.0.1; python_version < "3.4"'],
-            classifiers=[
-                "Development Status :: 5 - Production/Stable",
-                "Environment :: Console",
-                "Intended Audience :: Developers",
-                "Intended Audience :: Science/Research",
-                "License :: OSI Approved :: MIT License",
-                "Operating System :: POSIX :: Linux",
-                "Operating System :: MacOS :: MacOS X",
-                "Operating System :: Microsoft :: Windows",
-                "Programming Language :: Cython",
-                "Programming Language :: Python :: 2",
-                "Programming Language :: Python :: 2.7",
-                "Programming Language :: Python :: 3",
-                "Programming Language :: Python :: 3.4",
-                "Programming Language :: Python :: 3.5",
-                "Programming Language :: Python :: 3.6",
-                "Programming Language :: Python :: 3.7",
-                "Programming Language :: Python :: 3.8",
-                "Topic :: Scientific/Engineering",
-            ],
             cmdclass={"build_ext": build_ext_subclass},
+            package_data=PACKAGE_DATA,
         )
 
 

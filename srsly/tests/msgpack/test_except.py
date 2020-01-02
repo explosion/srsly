@@ -1,10 +1,6 @@
-#!/usr/bin/env python
-# coding: utf-8
-
 from pytest import raises
 import datetime
-from ...msgpack import packb, unpackb, Unpacker, FormatError, StackError, OutOfData
-
+from srsly.msgpack import packb, unpackb, Unpacker, FormatError, StackError, OutOfData
 
 
 class DummyException(Exception):

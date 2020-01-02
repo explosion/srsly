@@ -15,13 +15,17 @@ from ._msgpack_numpy import decode_numpy as _decode_numpy
 # msgpack_numpy extensions
 class Packer(_Packer):
     def __init__(self, *args, **kwargs):
-        kwargs['default'] = functools.partial(_encode_numpy, chain=kwargs.get('default'))
+        kwargs["default"] = functools.partial(
+            _encode_numpy, chain=kwargs.get("default")
+        )
         super(Packer, self).__init__(*args, **kwargs)
 
 
 class Unpacker(_Unpacker):
     def __init__(self, *args, **kwargs):
-        kwargs['object_hook'] = functools.partial(_decode_numpy, chain=kwargs.get('object_hook'))
+        kwargs["object_hook"] = functools.partial(
+            _decode_numpy, chain=kwargs.get("object_hook")
+        )
         super(Unpacker, self).__init__(*args, **kwargs)
 
 
@@ -44,9 +48,9 @@ def unpack(stream, **kwargs):
     """
     Unpack a packed object from a stream.
     """
-    if 'object_pairs_hook' not in kwargs:
-        object_hook = kwargs.get('object_hook')
-        kwargs['object_hook'] = functools.partial(_decode_numpy, chain=object_hook)
+    if "object_pairs_hook" not in kwargs:
+        object_hook = kwargs.get("object_hook")
+        kwargs["object_hook"] = functools.partial(_decode_numpy, chain=object_hook)
     return _unpack(stream, **kwargs)
 
 
@@ -54,9 +58,9 @@ def unpackb(packed, **kwargs):
     """
     Unpack a packed object.
     """
-    if 'object_pairs_hook' not in kwargs:
-        object_hook = kwargs.get('object_hook')
-        kwargs['object_hook'] = functools.partial(_decode_numpy, chain=object_hook)
+    if "object_pairs_hook" not in kwargs:
+        object_hook = kwargs.get("object_hook")
+        kwargs["object_hook"] = functools.partial(_decode_numpy, chain=object_hook)
     return _unpackb(packed, **kwargs)
 
 

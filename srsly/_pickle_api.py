@@ -1,20 +1,20 @@
-# coding: utf8
-from __future__ import unicode_literals
+from typing import Optional
 
 from . import cloudpickle
+from .util import JSONInput, JSONOutput
 
 
-def pickle_dumps(data, protocol=None):
+def pickle_dumps(data: JSONInput, protocol: Optional[int] = None) -> bytes:
     """Serialize a Python object with pickle.
 
     data: The object to serialize.
     protocol (int): Protocol to use. -1 for highest.
-    RETURNS (bytest): The serialized object.
+    RETURNS (bytes): The serialized object.
     """
     return cloudpickle.dumps(data, protocol=protocol)
 
 
-def pickle_loads(data):
+def pickle_loads(data: bytes) -> JSONOutput:
     """Deserialize bytes with pickle.
 
     data (bytes): The data to deserialize.
