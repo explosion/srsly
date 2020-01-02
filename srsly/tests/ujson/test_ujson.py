@@ -758,7 +758,7 @@ class UltraJSONTests(unittest.TestCase):
         self.assertEqual(-1.4567893, ujson.loads("-1.4567893"))
         self.assertEqual(-1.567893, ujson.loads("-1.567893"))
         self.assertEqual(-1.67893, ujson.loads("-1.67893"))
-        self.assertEqual(-1.7893, ujson.loads("-1.7893"))
+        self.assertEqual(-1.7894, ujson.loads("-1.7894"))
         self.assertEqual(-1.893, ujson.loads("-1.893"))
         self.assertEqual(-1.3, ujson.loads("-1.3"))
 
@@ -768,7 +768,7 @@ class UltraJSONTests(unittest.TestCase):
         self.assertEqual(1.4567893, ujson.loads("1.4567893"))
         self.assertEqual(1.567893, ujson.loads("1.567893"))
         self.assertEqual(1.67893, ujson.loads("1.67893"))
-        self.assertEqual(1.7893, ujson.loads("1.7893"))
+        self.assertEqual(1.7894, ujson.loads("1.7894"))
         self.assertEqual(1.893, ujson.loads("1.893"))
         self.assertEqual(1.3, ujson.loads("1.3"))
 
