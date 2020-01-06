@@ -38,7 +38,7 @@ wheel.
 
 ## Installation
 
-> ⚠️ Note that `v2.x` is only compatible with **Python 3.6+**. For 2.7+ compatibility, use `v0.2.0`.
+> ⚠️ Note that `v2.x` is only compatible with **Python 3.6+**. For 2.7+ compatibility, use `v1.x`.
 
 `srsly` can be installed from pip:
 
