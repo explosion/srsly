@@ -13,12 +13,19 @@ try:
 except ImportError:
     pass
 
+try:
+    import cupy
+    has_cupy = True
+except ImportError:
+    has_cupy = False
 
 def encode_numpy(obj, chain=None):
     """
     Data encoder for serializing numpy data types.
     """
 
+    if has_cupy and isinstance(obj, cupy.ndarray):
+        obj = obj.get()
     if isinstance(obj, np.ndarray):
         # If the dtype is structured, store the interface description;
         # otherwise, store the corresponding array protocol type string:
