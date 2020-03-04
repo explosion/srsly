@@ -18,8 +18,9 @@ from ._ext_type import ExtType
 
 try:
     import numpy as np
+    has_numpy = True
 except ImportError:
-    pass
+    has_numpy = False
 
 try:
     import cupy
@@ -32,7 +33,8 @@ if sys.version_info >= (3, 0):
         """
         Data encoder for serializing numpy data types.
         """
-
+        if not has_numpy:
+            return obj if chain is None else chain(obj)
         if has_cupy and isinstance(obj, cupy.ndarray):
             obj = obj.get()
         if isinstance(obj, np.ndarray):
@@ -69,6 +71,10 @@ else:
         """
         Data encoder for serializing numpy data types.
         """
+        if not has_numpy:
+            return obj if chain is None else chain(obj)
+        if has_cupy and isinstance(obj, cupy.ndarray):
+            obj = obj.get()
         if isinstance(obj, np.ndarray):
             # If the dtype is structured, store the interface description;
             # otherwise, store the corresponding array protocol type string:
