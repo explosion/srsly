@@ -3,6 +3,8 @@ import tempfile
 from pathlib import Path
 from contextlib import contextmanager
 import shutil
+import datetime
+from mock import patch
 
 from .._msgpack_api import read_msgpack, write_msgpack
 from .._msgpack_api import msgpack_loads, msgpack_dumps
@@ -62,3 +64,13 @@ def test_write_msgpack_file():
         write_msgpack(file_path, data)
         with Path(file_path).open("rb") as f:
             assert f.read() in expected
+
+
+@patch("srsly.msgpack._msgpack_numpy.np", None)
+@patch("srsly.msgpack._msgpack_numpy.has_numpy", False)
+def test_msgpack_without_numpy():
+    """Test that msgpack works without numpy and raises correct errors (e.g.
+    when serializing datetime objects, the error should be msgpack's TypeError,
+    not a "'np' is not defined error")."""
+    with pytest.raises(TypeError):
+        msgpack_loads(msgpack_dumps(datetime.datetime.now()))

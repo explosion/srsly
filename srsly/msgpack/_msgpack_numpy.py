@@ -10,20 +10,25 @@ Support for serialization of numpy data types with msgpack.
 # http://www.opensource.org/licenses/bsd-license
 try:
     import numpy as np
+
+    has_numpy = True
 except ImportError:
-    pass
+    has_numpy = False
 
 try:
     import cupy
+
     has_cupy = True
 except ImportError:
     has_cupy = False
+
 
 def encode_numpy(obj, chain=None):
     """
     Data encoder for serializing numpy data types.
     """
-
+    if not has_numpy:
+        return obj if chain is None else chain(obj)
     if has_cupy and isinstance(obj, cupy.ndarray):
         obj = obj.get()
     if isinstance(obj, np.ndarray):
