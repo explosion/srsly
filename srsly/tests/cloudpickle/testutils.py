@@ -5,7 +5,7 @@ import tempfile
 from subprocess import Popen, check_output, PIPE, STDOUT, CalledProcessError
 from srsly.cloudpickle.cloudpickle import dumps
 from pickle import loads
-from suprocess import TimeoutExpired
+from subprocess import TimeoutExpired
 
 
 TEST_GLOBALS = "a test value"
