@@ -10,13 +10,14 @@ from .util import make_tempdir
 def test_yaml_dumps():
     data = {"a": [1, "hello"], "b": {"foo": "bar", "baz": [10.5, 120]}}
     result = yaml_dumps(data)
-    assert result == "a:\n- 1\n- hello\nb:\n  foo: bar\n  baz:\n  - 10.5\n  - 120\n"
+    expected = "a:\n  - 1\n  - hello\nb:\n  foo: bar\n  baz:\n    - 10.5\n    - 120\n"
+    assert result == expected
 
 
 def test_yaml_dumps_indent():
     data = {"a": [1, "hello"], "b": {"foo": "bar", "baz": [10.5, 120]}}
-    result = yaml_dumps(data, indent_mapping=2, indent_sequence=4, indent_offset=2)
-    expected = "a:\n  - 1\n  - hello\nb:\n  foo: bar\n  baz:\n    - 10.5\n    - 120\n"
+    result = yaml_dumps(data, indent_mapping=2, indent_sequence=2, indent_offset=0)
+    expected = "a:\n- 1\n- hello\nb:\n  foo: bar\n  baz:\n  - 10.5\n  - 120\n"
     assert result == expected
 
 
@@ -37,7 +38,7 @@ def test_read_yaml_file():
 
 
 def test_read_yaml_file_invalid():
-    file_contents = "a: - 1\n- hello\nb:\n  foo: bar\n  baz:\n  - 10.5\n  - 120\n"
+    file_contents = "a: - 1\n- hello\nb:\n  foo: bar\n  baz:\n    - 10.5\n    - 120\n"
     with make_tempdir({"tmp.yaml": file_contents}) as temp_dir:
         file_path = temp_dir / "tmp.yaml"
         assert file_path.exists()
@@ -46,7 +47,7 @@ def test_read_yaml_file_invalid():
 
 
 def test_read_yaml_stdin(monkeypatch):
-    input_data = "a:\n- 1\n- hello\nb:\n  foo: bar\n  baz:\n  - 10.5\n  - 120\n"
+    input_data = "a:\n  - 1\n  - hello\nb:\n  foo: bar\n  baz:\n    - 10.5\n    - 120\n"
     monkeypatch.setattr("sys.stdin", StringIO(input_data))
     data = read_yaml("-")
     assert len(data) == 2
@@ -55,7 +56,7 @@ def test_read_yaml_stdin(monkeypatch):
 
 def test_write_yaml_file():
     data = {"hello": "world", "test": [123, 456]}
-    expected = "hello: world\ntest:\n- 123\n- 456\n"
+    expected = "hello: world\ntest:\n  - 123\n  - 456\n"
     with make_tempdir() as temp_dir:
         file_path = temp_dir / "tmp.yaml"
         write_yaml(file_path, data)
@@ -65,7 +66,7 @@ def test_write_yaml_file():
 
 def test_write_yaml_stdout(capsys):
     data = {"hello": "world", "test": [123, 456]}
-    expected = "hello: world\ntest:\n- 123\n- 456\n\n"
+    expected = "hello: world\ntest:\n  - 123\n  - 456\n\n"
     write_yaml("-", data)
     captured = capsys.readouterr()
     assert captured.out == expected

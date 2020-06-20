@@ -33,8 +33,8 @@ yaml = CustomYaml()
 def yaml_dumps(
     data: YAMLInput,
     indent_mapping: int = 2,
-    indent_sequence: int = 2,
-    indent_offset: int = 0,
+    indent_sequence: int = 4,
+    indent_offset: int = 2,
     sort_keys: bool = False,
 ) -> str:
     """Serialize an object to a YAML string. See the ruamel.yaml docs on
@@ -83,8 +83,8 @@ def write_yaml(
     location: FilePath,
     data: YAMLInput,
     indent_mapping: int = 2,
-    indent_sequence: int = 2,
-    indent_offset: int = 0,
+    indent_sequence: int = 4,
+    indent_offset: int = 2,
     sort_keys: bool = False,
 ) -> None:
     """Create a .json file and dump contents or write to standard

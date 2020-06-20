@@ -316,8 +316,8 @@ yaml_string = srsly.yaml_dumps(data)
 | ----------------- | ---- | ------------------------------------------ |
 | `data`            | -    | The JSON-serializable data to output.      |
 | `indent_mapping`  | int  | Mapping indentation. Defaults to `2`.      |
-| `indent_sequence` | int  | Sequence indentation. Default to `2`.      |
-| `indent_offset`   | int  | Indentation offset. Defaults to `0`.       |
+| `indent_sequence` | int  | Sequence indentation. Default to `4`.      |
+| `indent_offset`   | int  | Indentation offset. Defaults to `2`.       |
 | `sort_keys`       | bool | Sort dictionary keys. Defaults to `False`. |
 | **RETURNS**       | str  | The serialized string.                     |
 
@@ -349,8 +349,8 @@ srsly.write_yaml("/path/to/file.yaml", data)
 | `location`        | str / `Path` | The file path or `"-"` to write to stdout. |
 | `data`            | -            | The JSON-serializable data to output.      |
 | `indent_mapping`  | int          | Mapping indentation. Defaults to `2`.      |
-| `indent_sequence` | int          | Sequence indentation. Default to `2`.      |
-| `indent_offset`   | int          | Indentation offset. Defaults to `0`.       |
+| `indent_sequence` | int          | Sequence indentation. Default to `4`.      |
+| `indent_offset`   | int          | Indentation offset. Defaults to `2`.       |
 | `sort_keys`       | bool         | Sort dictionary keys. Defaults to `False`. |
 
 #### <kbd>function</kbd> `srsly.yaml`
