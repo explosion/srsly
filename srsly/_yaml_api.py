@@ -8,6 +8,14 @@ from .util import force_path, FilePath, YAMLInput, YAMLOutput
 
 
 class CustomYaml(YAML):
+    def __init__(self):
+        YAML.__init__(self)
+        self.typ = ["safe"]
+        self.pure = True
+        self.default_flow_style = False
+        self.allow_unicode = True
+        self.encoding = "utf-8"
+
     # https://yaml.readthedocs.io/en/latest/example.html#output-of-dump-as-a-string
     def dump(self, data, stream=None, **kw):
         inefficient = False
@@ -19,8 +27,7 @@ class CustomYaml(YAML):
             return stream.getvalue()
 
 
-yaml = CustomYaml(typ="safe", pure=True)
-yaml.default_flow_style = False
+yaml = CustomYaml()
 
 
 def yaml_dumps(
