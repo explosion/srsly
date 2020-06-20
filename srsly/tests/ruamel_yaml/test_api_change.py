@@ -202,7 +202,7 @@ class TestDumpLoadUnicode:
         yaml = YAML()
         text_dict = {"text": u"HELLO_WORLD©"}
         file_name = str(tmpdir) + "/tstFile.yaml"
-        yaml.dump(text_dict, open(file_name, "w"))
+        yaml.dump(text_dict, open(file_name, "w", encoding="utf8"))
         assert open(file_name, "rb").read().decode("utf-8") == u"text: HELLO_WORLD©\n"
 
     def test_read_unicode(self, tmpdir):
@@ -212,7 +212,7 @@ class TestDumpLoadUnicode:
         file_name = str(tmpdir) + "/tstFile.yaml"
         with open(file_name, "wb") as fp:
             fp.write(u"text: HELLO_WORLD©\n".encode("utf-8"))
-        text_dict = yaml.load(open(file_name, "r"))
+        text_dict = yaml.load(open(file_name, "r", encoding="utf8"))
         assert text_dict["text"] == u"HELLO_WORLD©"
 
 
