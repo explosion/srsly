@@ -8,10 +8,8 @@ from .util import force_path, FilePath, YAMLInput, YAMLOutput
 
 
 class CustomYaml(YAML):
-    def __init__(self):
-        YAML.__init__(self)
-        self.typ = ["safe"]
-        self.pure = True
+    def __init__(self, typ="safe", pure=True):
+        YAML.__init__(self, typ=typ, pure=pure)
         self.default_flow_style = False
         self.allow_unicode = True
         self.encoding = "utf-8"
