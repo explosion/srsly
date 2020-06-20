@@ -353,7 +353,7 @@ srsly.write_yaml("/path/to/file.yaml", data)
 | `indent_offset`   | int          | Indentation offset. Defaults to `2`.       |
 | `sort_keys`       | bool         | Sort dictionary keys. Defaults to `False`. |
 
-#### <kbd>function</kbd> `srsly.yaml`
+#### <kbd>function</kbd> `srsly.read_yaml`
 
 Load YAML from a file or standard input.
 
