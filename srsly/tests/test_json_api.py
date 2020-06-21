@@ -1,26 +1,12 @@
 import pytest
-import tempfile
 from io import StringIO
 from pathlib import Path
-from contextlib import contextmanager
-import shutil
 import gzip
 
 from .._json_api import read_json, write_json, read_jsonl, write_jsonl
 from .._json_api import write_gzip_json, json_dumps, is_json_serializable
 from ..util import force_string
-
-
-@contextmanager
-def make_tempdir(files={}):
-    temp_dir_str = tempfile.mkdtemp()
-    temp_dir = Path(temp_dir_str)
-    for name, content in files.items():
-        path = temp_dir / name
-        with path.open("w", encoding="utf8") as file_:
-            file_.write(content)
-    yield temp_dir
-    shutil.rmtree(temp_dir_str)
+from .util import make_tempdir
 
 
 def test_json_dumps_sort_keys():
