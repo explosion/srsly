@@ -341,7 +341,7 @@ Create a YAML file and dump contents or write to standard output.
 
 ```python
 data = {"foo": "bar", "baz": 123}
-srsly.write_yaml("/path/to/file.yaml", data)
+srsly.write_yaml("/path/to/file.yml", data)
 ```
 
 | Argument          | Type         | Description                                |
@@ -358,7 +358,7 @@ srsly.write_yaml("/path/to/file.yaml", data)
 Load YAML from a file or standard input.
 
 ```python
-data = srsly.read_yaml("/path/to/file.yaml")
+data = srsly.read_yaml("/path/to/file.yml")
 ```
 
 | Argument    | Type         | Description                                |
