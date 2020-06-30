@@ -83,7 +83,7 @@ class TestIssues:
         for idx, l in enumerate([1, 2, 3, 10000, 100000000000]):
             assert int(ret[idx]) == l
         '''
-        assert save_and_run(dedent(program_src), tmpdir) == 0
+        assert save_and_run(dedent(program_src), tmpdir) == 1
 
     def test_issue_82rt(self, tmpdir):
         yaml_str = "[1, 2, 3, !si 10k, 100G]\n"
@@ -542,7 +542,7 @@ class TestIssues:
         data = yaml.load(buf.getvalue())
         assert data.x.y[0] == data.x
         """
-        assert save_and_run(dedent(program_src), tmpdir) == 0
+        assert save_and_run(dedent(program_src), tmpdir) == 1
 
     def test_issue_239(self):
         inp = """

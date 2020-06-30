@@ -828,235 +828,51 @@ if PY2:
 
 class Constructor(SafeConstructor):
     def construct_python_str(self, node):
-        # type: (Any) -> Any
-        return utf8(self.construct_scalar(node))
+        raise ValueError("Unsafe constructor not implemented in this library")
 
     def construct_python_unicode(self, node):
-        # type: (Any) -> Any
-        return self.construct_scalar(node)
+        raise ValueError("Unsafe constructor not implemented in this library")
 
     if PY3:
 
         def construct_python_bytes(self, node):
-            # type: (Any) -> Any
-            try:
-                value = self.construct_scalar(node).encode("ascii")
-            except UnicodeEncodeError as exc:
-                raise ConstructorError(
-                    None,
-                    None,
-                    "failed to convert base64 data into ascii: %s" % exc,
-                    node.start_mark,
-                )
-            try:
-                if hasattr(base64, "decodebytes"):
-                    return base64.decodebytes(value)
-                else:
-                    return base64.decodestring(value)
-            except binascii.Error as exc:
-                raise ConstructorError(
-                    None,
-                    None,
-                    "failed to decode base64 data: %s" % exc,
-                    node.start_mark,
-                )
+            raise ValueError("Unsafe constructor not implemented in this library")
 
     def construct_python_long(self, node):
-        # type: (Any) -> int
-        val = self.construct_yaml_int(node)
-        if PY3:
-            return val
-        return int(val)
+        raise ValueError("Unsafe constructor not implemented in this library")
 
     def construct_python_complex(self, node):
-        # type: (Any) -> Any
-        return complex(self.construct_scalar(node))
+        raise ValueError("Unsafe constructor not implemented in this library")
 
     def construct_python_tuple(self, node):
-        # type: (Any) -> Any
-        return tuple(self.construct_sequence(node))
+        raise ValueError("Unsafe constructor not implemented in this library")
 
     def find_python_module(self, name, mark):
-        # type: (Any, Any) -> Any
-        if not name:
-            raise ConstructorError(
-                "while constructing a Python module",
-                mark,
-                "expected non-empty name appended to the tag",
-                mark,
-            )
-        try:
-            __import__(name)
-        except ImportError as exc:
-            raise ConstructorError(
-                "while constructing a Python module",
-                mark,
-                "cannot find module %r (%s)" % (utf8(name), exc),
-                mark,
-            )
-        return sys.modules[name]
+        raise ValueError("Unsafe constructor not implemented in this library")
 
     def find_python_name(self, name, mark):
-        # type: (Any, Any) -> Any
-        if not name:
-            raise ConstructorError(
-                "while constructing a Python object",
-                mark,
-                "expected non-empty name appended to the tag",
-                mark,
-            )
-        if u"." in name:
-            lname = name.split(".")
-            lmodule_name = lname
-            lobject_name = []  # type: List[Any]
-            while len(lmodule_name) > 1:
-                lobject_name.insert(0, lmodule_name.pop())
-                module_name = ".".join(lmodule_name)
-                try:
-                    __import__(module_name)
-                    # object_name = '.'.join(object_name)
-                    break
-                except ImportError:
-                    continue
-        else:
-            module_name = builtins_module
-            lobject_name = [name]
-        try:
-            __import__(module_name)
-        except ImportError as exc:
-            raise ConstructorError(
-                "while constructing a Python object",
-                mark,
-                "cannot find module %r (%s)" % (utf8(module_name), exc),
-                mark,
-            )
-        module = sys.modules[module_name]
-        object_name = ".".join(lobject_name)
-        obj = module
-        while lobject_name:
-            if not hasattr(obj, lobject_name[0]):
-
-                raise ConstructorError(
-                    "while constructing a Python object",
-                    mark,
-                    "cannot find %r in the module %r"
-                    % (utf8(object_name), module.__name__),
-                    mark,
-                )
-            obj = getattr(obj, lobject_name.pop(0))
-        return obj
+        raise ValueError("Unsafe constructor not implemented in this library")
 
     def construct_python_name(self, suffix, node):
-        # type: (Any, Any) -> Any
-        value = self.construct_scalar(node)
-        if value:
-            raise ConstructorError(
-                "while constructing a Python name",
-                node.start_mark,
-                "expected the empty value, but found %r" % utf8(value),
-                node.start_mark,
-            )
-        return self.find_python_name(suffix, node.start_mark)
+        raise ValueError("Unsafe constructor not implemented in this library")
 
     def construct_python_module(self, suffix, node):
-        # type: (Any, Any) -> Any
-        value = self.construct_scalar(node)
-        if value:
-            raise ConstructorError(
-                "while constructing a Python module",
-                node.start_mark,
-                "expected the empty value, but found %r" % utf8(value),
-                node.start_mark,
-            )
-        return self.find_python_module(suffix, node.start_mark)
+        raise ValueError("Unsafe constructor not implemented in this library")
 
     def make_python_instance(self, suffix, node, args=None, kwds=None, newobj=False):
-        # type: (Any, Any, Any, Any, bool) -> Any
-        if not args:
-            args = []
-        if not kwds:
-            kwds = {}
-        cls = self.find_python_name(suffix, node.start_mark)
-        if PY3:
-            if newobj and isinstance(cls, type):
-                return cls.__new__(cls, *args, **kwds)
-            else:
-                return cls(*args, **kwds)
-        else:
-            if newobj and isinstance(cls, type(classobj)) and not args and not kwds:
-                instance = classobj()
-                instance.__class__ = cls
-                return instance
-            elif newobj and isinstance(cls, type):
-                return cls.__new__(cls, *args, **kwds)
-            else:
-                return cls(*args, **kwds)
+        raise ValueError("Unsafe constructor not implemented in this library")
 
     def set_python_instance_state(self, instance, state):
-        # type: (Any, Any) -> None
-        if hasattr(instance, "__setstate__"):
-            instance.__setstate__(state)
-        else:
-            slotstate = {}  # type: Dict[Any, Any]
-            if isinstance(state, tuple) and len(state) == 2:
-                state, slotstate = state
-            if hasattr(instance, "__dict__"):
-                instance.__dict__.update(state)
-            elif state:
-                slotstate.update(state)
-            for key, value in slotstate.items():
-                setattr(instance, key, value)
+        raise ValueError("Unsafe constructor not implemented in this library")
 
     def construct_python_object(self, suffix, node):
-        # type: (Any, Any) -> Any
-        # Format:
-        #   !!python/object:module.name { ... state ... }
-        instance = self.make_python_instance(suffix, node, newobj=True)
-        self.recursive_objects[node] = instance
-        yield instance
-        deep = hasattr(instance, "__setstate__")
-        state = self.construct_mapping(node, deep=deep)
-        self.set_python_instance_state(instance, state)
+        raise ValueError("Unsafe constructor not implemented in this library")
 
     def construct_python_object_apply(self, suffix, node, newobj=False):
-        # type: (Any, Any, bool) -> Any
-        # Format:
-        #   !!python/object/apply       # (or !!python/object/new)
-        #   args: [ ... arguments ... ]
-        #   kwds: { ... keywords ... }
-        #   state: ... state ...
-        #   listitems: [ ... listitems ... ]
-        #   dictitems: { ... dictitems ... }
-        # or short format:
-        #   !!python/object/apply [ ... arguments ... ]
-        # The difference between !!python/object/apply and !!python/object/new
-        # is how an object is created, check make_python_instance for details.
-        if isinstance(node, SequenceNode):
-            args = self.construct_sequence(node, deep=True)
-            kwds = {}  # type: Dict[Any, Any]
-            state = {}  # type: Dict[Any, Any]
-            listitems = []  # type: List[Any]
-            dictitems = {}  # type: Dict[Any, Any]
-        else:
-            value = self.construct_mapping(node, deep=True)
-            args = value.get("args", [])
-            kwds = value.get("kwds", {})
-            state = value.get("state", {})
-            listitems = value.get("listitems", [])
-            dictitems = value.get("dictitems", {})
-        instance = self.make_python_instance(suffix, node, args, kwds, newobj)
-        if bool(state):
-            self.set_python_instance_state(instance, state)
-        if bool(listitems):
-            instance.extend(listitems)
-        if bool(dictitems):
-            for key in dictitems:
-                instance[key] = dictitems[key]
-        return instance
+        raise ValueError("Unsafe constructor not implemented in this library")
 
     def construct_python_object_new(self, suffix, node):
-        # type: (Any, Any) -> Any
-        return self.construct_python_object_apply(suffix, node, newobj=True)
+        raise ValueError("Unsafe constructor not implemented in this library")
 
 
 Constructor.add_constructor(

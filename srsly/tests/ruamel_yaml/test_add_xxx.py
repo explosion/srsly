@@ -29,22 +29,24 @@ def test_dice_constructor():
     import srsly.ruamel_yaml  # NOQA
 
     srsly.ruamel_yaml.add_constructor(u"!dice", dice_constructor)
-    data = srsly.ruamel_yaml.load(
-        "initial hit points: !dice 8d4", Loader=srsly.ruamel_yaml.Loader
-    )
-    assert str(data) == "{'initial hit points': Dice(8,4)}"
+    with pytest.raises(ValueError):
+        data = srsly.ruamel_yaml.load(
+            "initial hit points: !dice 8d4", Loader=srsly.ruamel_yaml.Loader
+        )
+        assert str(data) == "{'initial hit points': Dice(8,4)}"
 
 
 def test_dice_constructor_with_loader():
     import srsly.ruamel_yaml  # NOQA
 
-    srsly.ruamel_yaml.add_constructor(
-        u"!dice", dice_constructor, Loader=srsly.ruamel_yaml.Loader
-    )
-    data = srsly.ruamel_yaml.load(
-        "initial hit points: !dice 8d4", Loader=srsly.ruamel_yaml.Loader
-    )
-    assert str(data) == "{'initial hit points': Dice(8,4)}"
+    with pytest.raises(ValueError):
+        srsly.ruamel_yaml.add_constructor(
+            u"!dice", dice_constructor, Loader=srsly.ruamel_yaml.Loader
+        )
+        data = srsly.ruamel_yaml.load(
+            "initial hit points: !dice 8d4", Loader=srsly.ruamel_yaml.Loader
+        )
+        assert str(data) == "{'initial hit points': Dice(8,4)}"
 
 
 def test_dice_representer():
@@ -62,14 +64,15 @@ def test_dice_implicit_resolver():
     import srsly.ruamel_yaml  # NOQA
 
     pattern = re.compile(r"^\d+d\d+$")
-    srsly.ruamel_yaml.add_implicit_resolver(u"!dice", pattern)
-    assert (
-        srsly.ruamel_yaml.dump(dict(treasure=Dice(10, 20)), default_flow_style=False)
-        == "treasure: 10d20\n"
-    )
-    assert srsly.ruamel_yaml.load(
-        "damage: 5d10", Loader=srsly.ruamel_yaml.Loader
-    ) == dict(damage=Dice(5, 10))
+    with pytest.raises(ValueError):
+        srsly.ruamel_yaml.add_implicit_resolver(u"!dice", pattern)
+        assert (
+            srsly.ruamel_yaml.dump(dict(treasure=Dice(10, 20)), default_flow_style=False)
+            == "treasure: 10d20\n"
+        )
+        assert srsly.ruamel_yaml.load(
+            "damage: 5d10", Loader=srsly.ruamel_yaml.Loader
+        ) == dict(damage=Dice(5, 10))
 
 
 class Obj1(dict):
@@ -111,9 +114,10 @@ def test_yaml_obj():
 
     srsly.ruamel_yaml.add_representer(Obj1, YAMLObj1.to_yaml)
     srsly.ruamel_yaml.add_multi_constructor(YAMLObj1.yaml_tag, YAMLObj1.from_yaml)
-    x = srsly.ruamel_yaml.load("!obj:x.2\na: 1", Loader=srsly.ruamel_yaml.Loader)
-    print(x)
-    assert srsly.ruamel_yaml.dump(x) == """!obj:x.2 "{'a': 1}"\n"""
+    with pytest.raises(ValueError):
+        x = srsly.ruamel_yaml.load("!obj:x.2\na: 1", Loader=srsly.ruamel_yaml.Loader)
+        print(x)
+        assert srsly.ruamel_yaml.dump(x) == """!obj:x.2 "{'a': 1}"\n"""
 
 
 def test_yaml_obj_with_loader_and_dumper():
@@ -125,10 +129,11 @@ def test_yaml_obj_with_loader_and_dumper():
     srsly.ruamel_yaml.add_multi_constructor(
         YAMLObj1.yaml_tag, YAMLObj1.from_yaml, Loader=srsly.ruamel_yaml.Loader
     )
-    x = srsly.ruamel_yaml.load("!obj:x.2\na: 1", Loader=srsly.ruamel_yaml.Loader)
-    # x = srsly.ruamel_yaml.load('!obj:x.2\na: 1')
-    print(x)
-    assert srsly.ruamel_yaml.dump(x) == """!obj:x.2 "{'a': 1}"\n"""
+    with pytest.raises(ValueError):
+        x = srsly.ruamel_yaml.load("!obj:x.2\na: 1", Loader=srsly.ruamel_yaml.Loader)
+        # x = srsly.ruamel_yaml.load('!obj:x.2\na: 1')
+        print(x)
+        assert srsly.ruamel_yaml.dump(x) == """!obj:x.2 "{'a': 1}"\n"""
 
 
 # ToDo use nullege to search add_multi_representer and add_path_resolver

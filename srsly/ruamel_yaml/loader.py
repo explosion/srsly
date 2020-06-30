@@ -46,13 +46,7 @@ class SafeLoader(Reader, Scanner, Parser, Composer, SafeConstructor, VersionedRe
 
 class Loader(Reader, Scanner, Parser, Composer, Constructor, VersionedResolver):
     def __init__(self, stream, version=None, preserve_quotes=None):
-        # type: (StreamTextType, Optional[VersionType], Optional[bool]) -> None
-        Reader.__init__(self, stream, loader=self)
-        Scanner.__init__(self, loader=self)
-        Parser.__init__(self, loader=self)
-        Composer.__init__(self, loader=self)
-        Constructor.__init__(self, loader=self)
-        VersionedResolver.__init__(self, version, loader=self)
+        raise ValueError("Unsafe loader not implemented in this library.")
 
 
 class RoundTripLoader(
