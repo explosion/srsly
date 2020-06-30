@@ -322,7 +322,7 @@ class TestIssues:
         d = yaml.load(yaml_str)
         print(d)
         '''
-        assert save_and_run(dedent(program_src), tmpdir, optimized=True) == 1
+        assert save_and_run(dedent(program_src), tmpdir, optimized=True) == 0
 
     def test_issue_221_add(self):
         from srsly.ruamel_yaml.comments import CommentedSeq
