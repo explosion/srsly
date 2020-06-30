@@ -35,7 +35,7 @@ wheel.
 - [`msgpack`](https://github.com/msgpack/msgpack-python)
 - [`msgpack-numpy`](https://github.com/lebedov/msgpack-numpy)
 - [`cloudpickle`](https://github.com/cloudpipe/cloudpickle)
-- [`ruamel.yaml`](https://github.com/pycontribs/ruamel-yaml)
+- [`ruamel.yaml`](https://github.com/pycontribs/ruamel-yaml) (without unsafe implementations!)
 
 ## Installation
 
