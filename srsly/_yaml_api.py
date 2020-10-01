@@ -63,22 +63,22 @@ def yaml_loads(data: Union[str, IO]) -> YAMLOutput:
         raise ValueError(f"Invalid YAML: {e}")
 
 
-def read_yaml(location: FilePath) -> YAMLOutput:
+def read_yaml(path: FilePath) -> YAMLOutput:
     """Load YAML from file or standard input.
 
-    location (unicode / Path): The file path. "-" for reading from stdin.
-    RETURNS (dict / list): The loaded content.
+    location (FilePath): The file path. "-" for reading from stdin.
+    RETURNS (YAMLOutput): The loaded content.
     """
-    if location == "-":  # reading from sys.stdin
+    if path == "-":  # reading from sys.stdin
         data = sys.stdin.read()
         return yaml_loads(data)
-    file_path = force_path(location)
+    file_path = force_path(path)
     with file_path.open("r", encoding="utf8") as f:
         return yaml_loads(f)
 
 
 def write_yaml(
-    location: FilePath,
+    path: FilePath,
     data: YAMLInput,
     indent_mapping: int = 2,
     indent_sequence: int = 4,
@@ -88,8 +88,8 @@ def write_yaml(
     """Create a .json file and dump contents or write to standard
     output.
 
-    location (unicode / Path): The file path. "-" for writing to stdout.
-    data: The JSON-serializable data to output.
+    location (FilePath): The file path. "-" for writing to stdout.
+    data (YAMLInput): The JSON-serializable data to output.
     indent_mapping (int): Mapping indentation.
     indent_sequence (int): Sequence indentation.
     indent_offset (int): Indentation offset.
@@ -102,10 +102,10 @@ def write_yaml(
         indent_offset=indent_offset,
         sort_keys=sort_keys,
     )
-    if location == "-":  # writing to stdout
+    if path == "-":  # writing to stdout
         print(yaml_data)
     else:
-        file_path = force_path(location, require_exists=False)
+        file_path = force_path(path, require_exists=False)
         with file_path.open("w", encoding="utf8") as f:
             f.write(yaml_data)
 
