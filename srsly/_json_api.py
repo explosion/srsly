@@ -36,99 +36,99 @@ def json_loads(data: Union[str, bytes]) -> JSONOutput:
     return ujson.loads(data)
 
 
-def read_json(location: FilePath) -> JSONOutput:
+def read_json(path: FilePath) -> JSONOutput:
     """Load JSON from file or standard input.
 
-    location (unicode / Path): The file path. "-" for reading from stdin.
-    RETURNS (dict / list): The loaded JSON content.
+    path (FilePath): The file path. "-" for reading from stdin.
+    RETURNS (JSONOutput): The loaded JSON content.
     """
-    if location == "-":  # reading from sys.stdin
+    if path == "-":  # reading from sys.stdin
         data = sys.stdin.read()
         return ujson.loads(data)
-    file_path = force_path(location)
+    file_path = force_path(path)
     with file_path.open("r", encoding="utf8") as f:
         return ujson.load(f)
 
 
-def read_gzip_json(location: FilePath) -> JSONOutput:
+def read_gzip_json(path: FilePath) -> JSONOutput:
     """Load JSON from a gzipped file.
 
-        location (unicode / Path): The file path.
-        RETURNS (dict / list): The loaded JSON content.
+        location (FilePath): The file path.
+        RETURNS (JSONOutput): The loaded JSON content.
     """
-    file_path = force_string(location)
+    file_path = force_string(path)
     with gzip.open(file_path, "r") as f:
         return ujson.load(f)
 
 
-def write_json(location: FilePath, data: JSONInput, indent: int = 2) -> None:
+def write_json(path: FilePath, data: JSONInput, indent: int = 2) -> None:
     """Create a .json file and dump contents or write to standard
     output.
 
-    location (unicode / Path): The file path. "-" for writing to stdout.
-    data: The JSON-serializable data to output.
+    location (FilePath): The file path. "-" for writing to stdout.
+    data (JSONInput): The JSON-serializable data to output.
     indent (int): Number of spaces used to indent JSON.
     """
     json_data = json_dumps(data, indent=indent)
-    if location == "-":  # writing to stdout
+    if path == "-":  # writing to stdout
         print(json_data)
     else:
-        file_path = force_path(location, require_exists=False)
+        file_path = force_path(path, require_exists=False)
         with file_path.open("w", encoding="utf8") as f:
             f.write(json_data)
 
 
-def write_gzip_json(location: FilePath, data: JSONInput, indent: int = 2) -> None:
+def write_gzip_json(path: FilePath, data: JSONInput, indent: int = 2) -> None:
     """Create a .json.gz file and dump contents.
 
-    location (unicode / Path): The file path.
-    data: The JSON-serializable data to output.
+    path (FilePath): The file path.
+    data (JSONInput): The JSON-serializable data to output.
     indent (int): Number of spaces used to indent JSON.
     """
     json_data = json_dumps(data, indent=indent)
-    file_path = force_string(location)
+    file_path = force_string(path)
     with gzip.open(file_path, "w") as f:
         f.write(json_data.encode("utf-8"))
 
 
-def read_jsonl(location: FilePath, skip: bool = False) -> Iterable[JSONOutput]:
+def read_jsonl(path: FilePath, skip: bool = False) -> Iterable[JSONOutput]:
     """Read a .jsonl file or standard input and yield contents line by line.
     Blank lines will always be skipped.
 
-    location (unicode / Path): The file path. "-" for reading from stdin.
+    path (FilePath): The file path. "-" for reading from stdin.
     skip (bool): Skip broken lines and don't raise ValueError.
-    YIELDS: The loaded JSON contents of each line.
+    YIELDS (JSONOutput): The loaded JSON contents of each line.
     """
-    if location == "-":  # reading from sys.stdin
+    if path == "-":  # reading from sys.stdin
         for line in _yield_json_lines(sys.stdin, skip=skip):
             yield line
     else:
-        file_path = force_path(location)
+        file_path = force_path(path)
         with file_path.open("r", encoding="utf8") as f:
             for line in _yield_json_lines(f, skip=skip):
                 yield line
 
 
 def write_jsonl(
-    location: FilePath,
+    path: FilePath,
     lines: Sequence[JSONInput],
     append: bool = False,
     append_new_line: bool = True,
 ) -> None:
     """Create a .jsonl file and dump contents or write to standard output.
 
-    location (unicode / Path): The file path. "-" for writing to stdout.
-    lines (list): The JSON-serializable contents of each line.
+    location (FilePath): The file path. "-" for writing to stdout.
+    lines (Sequence[JSONInput]): The JSON-serializable contents of each line.
     append (bool): Whether or not to append to the location.
     append_new_line (bool): Whether or not to write a new line before appending
         to the file.
     """
-    if location == "-":  # writing to stdout
+    if path == "-":  # writing to stdout
         for line in lines:
             print(json_dumps(line))
     else:
         mode = "a" if append else "w"
-        file_path = force_path(location, require_exists=False)
+        file_path = force_path(path, require_exists=False)
         with file_path.open(mode, encoding="utf-8") as f:
             if append and append_new_line:
                 f.write("\n")

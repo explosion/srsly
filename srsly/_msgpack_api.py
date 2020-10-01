@@ -28,26 +28,26 @@ def msgpack_loads(data: bytes, use_list: bool = True) -> JSONOutputBin:
     return msg
 
 
-def write_msgpack(location: FilePath, data: JSONInputBin) -> None:
+def write_msgpack(path: FilePath, data: JSONInputBin) -> None:
     """Create a msgpack file and dump contents.
 
-    location (unicode / Path): The file path.
-    data: The data to serialize.
+    location (FilePath): The file path.
+    data (JSONInputBin): The data to serialize.
     """
-    file_path = force_path(location, require_exists=False)
+    file_path = force_path(path, require_exists=False)
     with file_path.open("wb") as f:
         msgpack.dump(data, f, use_bin_type=True)
 
 
-def read_msgpack(location: FilePath, use_list: bool = True) -> JSONOutputBin:
+def read_msgpack(path: FilePath, use_list: bool = True) -> JSONOutputBin:
     """Load a msgpack file.
 
-    location (unicode / Path): The file path.
+    location (FilePath): The file path.
     use_list (bool): Don't use tuples instead of lists. Can make
         deserialization slower.
-    RETURNS: The loaded and deserialized content.
+    RETURNS (JSONOutputBin): The loaded and deserialized content.
     """
-    file_path = force_path(location)
+    file_path = force_path(path)
     with file_path.open("rb") as f:
         # msgpack-python docs suggest disabling gc before unpacking large messages
         gc.disable()
