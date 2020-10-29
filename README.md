@@ -41,9 +41,11 @@ wheel.
 
 > ⚠️ Note that `v2.x` is only compatible with **Python 3.6+**. For 2.7+ compatibility, use `v1.x`.
 
-`srsly` can be installed from pip:
+`srsly` can be installed from pip. Before installing, make sure that your `pip`,
+`setuptools` and `wheel` are up to date.
 
 ```bash
+pip install -U pip setuptools wheel
 pip install srsly
 ```
 
