@@ -169,7 +169,7 @@ def setup_package():
             url=about["__uri__"],
             license=about["__license__"],
             ext_modules=ext_modules,
-            setup_requires=["cython>=0.29.1,<0.30.0", "numpy>=1.15.0"],
+            setup_requires=["cython>=0.29.1,<0.30.0"],
             install_requires=['pathlib==1.0.1; python_version < "3.4"'],
             classifiers=[
                 "Development Status :: 5 - Production/Stable",
