@@ -35,6 +35,9 @@ def test_unpack_ext_type():
           ExtType(0x42, b'A'*0x00012345))                   # ext 32
 
 
+@pytest.mark.skipif(
+    is_python2, reason="frombytes instead of fromstring not supported"
+)
 def test_extension_type():
     def default(obj):
         print('default called', obj)
