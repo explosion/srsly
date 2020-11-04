@@ -2,11 +2,12 @@
 # coding: utf-8
 
 import pytest
+import sys
 from ...msgpack import packb, unpackb
 
 
 @pytest.mark.skipif(
-    is_python2, reason="frombytes instead of fromstring not supported"
+    sys.version_info[0] == 2, reason="frombytes instead of fromstring not supported"
 )
 def test_unpack_buffer():
     from array import array

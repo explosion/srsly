@@ -1,5 +1,7 @@
 from __future__ import print_function
 import array
+import pytest
+import sys
 from ... import msgpack
 from ...msgpack._ext_type import ExtType
 
@@ -36,7 +38,7 @@ def test_unpack_ext_type():
 
 
 @pytest.mark.skipif(
-    is_python2, reason="frombytes instead of fromstring not supported"
+    sys.version_info[0] == 2, reason="frombytes instead of fromstring not supported"
 )
 def test_extension_type():
     def default(obj):
