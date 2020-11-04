@@ -256,164 +256,6 @@ char *Tuple_iterGetName(JSOBJ obj, JSONTypeContext *tc, size_t *outLen)
   return NULL;
 }
 
-int Iter_iterNext(JSOBJ obj, JSONTypeContext *tc)
-{
-  PyObject *item;
-
-  if (GET_TC(tc)->itemValue)
-  {
-    Py_DECREF(GET_TC(tc)->itemValue);
-    GET_TC(tc)->itemValue = NULL;
-  }
-
-  if (GET_TC(tc)->iterator == NULL)
-  {
-    return 0;
-  }
-
-  item = PyIter_Next(GET_TC(tc)->iterator);
-
-  if (item == NULL)
-  {
-    return 0;
-  }
-
-  GET_TC(tc)->itemValue = item;
-  return 1;
-}
-
-void Iter_iterEnd(JSOBJ obj, JSONTypeContext *tc)
-{
-  if (GET_TC(tc)->itemValue)
-  {
-    Py_DECREF(GET_TC(tc)->itemValue);
-    GET_TC(tc)->itemValue = NULL;
-  }
-
-  if (GET_TC(tc)->iterator)
-  {
-    Py_DECREF(GET_TC(tc)->iterator);
-    GET_TC(tc)->iterator = NULL;
-  }
-}
-
-JSOBJ Iter_iterGetValue(JSOBJ obj, JSONTypeContext *tc)
-{
-  return GET_TC(tc)->itemValue;
-}
-
-char *Iter_iterGetName(JSOBJ obj, JSONTypeContext *tc, size_t *outLen)
-{
-  return NULL;
-}
-
-void Dir_iterEnd(JSOBJ obj, JSONTypeContext *tc)
-{
-  if (GET_TC(tc)->itemValue)
-  {
-    Py_DECREF(GET_TC(tc)->itemValue);
-    GET_TC(tc)->itemValue = NULL;
-  }
-
-  if (GET_TC(tc)->itemName)
-  {
-    Py_DECREF(GET_TC(tc)->itemName);
-    GET_TC(tc)->itemName = NULL;
-  }
-
-  Py_DECREF( (PyObject *) GET_TC(tc)->attrList);
-  PRINTMARK();
-}
-
-int Dir_iterNext(JSOBJ _obj, JSONTypeContext *tc)
-{
-  PyObject *obj = (PyObject *) _obj;
-  PyObject *itemValue = GET_TC(tc)->itemValue;
-  PyObject *itemName = GET_TC(tc)->itemName;
-  PyObject* attr;
-  PyObject* attrName;
-  char* attrStr;
-
-  if (itemValue)
-  {
-    Py_DECREF(GET_TC(tc)->itemValue);
-    GET_TC(tc)->itemValue = itemValue = NULL;
-  }
-
-  if (itemName)
-  {
-    Py_DECREF(GET_TC(tc)->itemName);
-    GET_TC(tc)->itemName = itemName = NULL;
-  }
-
-  for (; GET_TC(tc)->index  < GET_TC(tc)->size; GET_TC(tc)->index ++)
-  {
-    attrName = PyList_GET_ITEM(GET_TC(tc)->attrList, GET_TC(tc)->index);
-#if PY_MAJOR_VERSION >= 3
-    attr = PyUnicode_AsUTF8String(attrName);
-#else
-    attr = attrName;
-    Py_INCREF(attr);
-#endif
-    attrStr = PyString_AS_STRING(attr);
-
-    if (attrStr[0] == '_')
-    {
-      PRINTMARK();
-      Py_DECREF(attr);
-      continue;
-    }
-
-    itemValue = PyObject_GetAttr(obj, attrName);
-    if (itemValue == NULL)
-    {
-      PyErr_Clear();
-      Py_DECREF(attr);
-      PRINTMARK();
-      continue;
-    }
-
-    if (PyCallable_Check(itemValue))
-    {
-      Py_DECREF(itemValue);
-      Py_DECREF(attr);
-      PRINTMARK();
-      continue;
-    }
-
-    PRINTMARK();
-    itemName = attr;
-    break;
-  }
-
-  if (itemName == NULL)
-  {
-    GET_TC(tc)->index = GET_TC(tc)->size;
-    GET_TC(tc)->itemValue = NULL;
-    return 0;
-  }
-
-  GET_TC(tc)->itemName = itemName;
-  GET_TC(tc)->itemValue = itemValue;
-  GET_TC(tc)->index ++;
-
-  PRINTMARK();
-  return 1;
-}
-
-JSOBJ Dir_iterGetValue(JSOBJ obj, JSONTypeContext *tc)
-{
-  PRINTMARK();
-  return GET_TC(tc)->itemValue;
-}
-
-char *Dir_iterGetName(JSOBJ obj, JSONTypeContext *tc, size_t *outLen)
-{
-  PRINTMARK();
-  *outLen = PyString_GET_SIZE(GET_TC(tc)->itemName);
-  return PyString_AS_STRING(GET_TC(tc)->itemName);
-}
-
 int List_iterNext(JSOBJ obj, JSONTypeContext *tc)
 {
   if (GET_TC(tc)->index >= GET_TC(tc)->size)
@@ -658,7 +500,7 @@ void SetupDictIter(PyObject *dictObj, TypeContext *pc, JSONObjectEncoder *enc)
 
 void Object_beginTypeContext (JSOBJ _obj, JSONTypeContext *tc, JSONObjectEncoder *enc)
 {
-  PyObject *obj, *exc, *iter;
+  PyObject *obj, *objRepr, *exc;
   TypeContext *pc;
   PRINTMARK();
   if (!_obj)
@@ -822,20 +664,6 @@ ISITERABLE:
 
     return;
   }
-  /*
-  else
-  if (PyAnySet_Check(obj))
-  {
-    PRINTMARK();
-    tc->type = JT_ARRAY;
-    pc->iterBegin = NULL;
-    pc->iterEnd = Iter_iterEnd;
-    pc->iterNext = Iter_iterNext;
-    pc->iterGetValue = Iter_iterGetValue;
-    pc->iterGetName = Iter_iterGetName;
-    return;
-  }
-  */
 
   if (PyObject_HasAttrString(obj, "toDict"))
   {
@@ -899,42 +727,15 @@ ISITERABLE:
   PRINTMARK();
   PyErr_Clear();
 
-  iter = PyObject_GetIter(obj);
-
-  if (iter != NULL)
-  {
-    PRINTMARK();
-    tc->type = JT_ARRAY;
-    pc->iterator = iter;
-    pc->iterEnd = Iter_iterEnd;
-    pc->iterNext = Iter_iterNext;
-    pc->iterGetValue = Iter_iterGetValue;
-    pc->iterGetName = Iter_iterGetName;
-    return;
-  }
-
-  PRINTMARK();
-  PyErr_Clear();
-
-  PRINTMARK();
-  tc->type = JT_OBJECT;
-  GET_TC(tc)->attrList = PyObject_Dir(obj);
-  
-  if (GET_TC(tc)->attrList == NULL)
-  {
-    PyErr_Clear();
-    goto INVALID;
-  }
-
-  GET_TC(tc)->index = 0;
-  GET_TC(tc)->size = PyList_GET_SIZE(GET_TC(tc)->attrList);
-  PRINTMARK();
-  
-  pc->iterEnd = Dir_iterEnd;
-  pc->iterNext = Dir_iterNext;
-  pc->iterGetValue = Dir_iterGetValue;
-  pc->iterGetName = Dir_iterGetName;
-  return;
+  objRepr = PyObject_Repr(obj);
+#if PY_MAJOR_VERSION >= 3
+  PyObject* str = PyUnicode_AsEncodedString(objRepr, "utf-8", "~E~");
+  PyErr_Format (PyExc_TypeError, "%s is not JSON serializable", PyString_AS_STRING(str));
+  Py_XDECREF(str);
+#else
+  PyErr_Format (PyExc_TypeError, "%s is not JSON serializable", PyString_AS_STRING(objRepr));
+#endif
+  Py_DECREF(objRepr);
 
 INVALID:
   PRINTMARK();
