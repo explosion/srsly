@@ -813,6 +813,7 @@ class UltraJSONTests(unittest.TestCase):
         sortedKeys = ujson.dumps(data, sort_keys=True)
         self.assertEqual(sortedKeys, '{"a":1,"b":1,"c":1,"d":1,"e":1,"f":1}')
 
+    @unittest.skipIf(not hasattr(sys, 'getrefcount') == True, reason="test requires sys.refcount")
     def test_does_not_leak_dictionary_values(self):
         import gc
 
@@ -823,6 +824,7 @@ class UltraJSONTests(unittest.TestCase):
         ujson.dumps(data)
         self.assertEqual(ref_count, sys.getrefcount(value))
 
+    @unittest.skipIf(not hasattr(sys, 'getrefcount') == True, reason="test requires sys.refcount")
     def test_does_not_leak_dictionary_keys(self):
         import gc
 
@@ -838,6 +840,7 @@ class UltraJSONTests(unittest.TestCase):
         self.assertEqual(ref_count1, sys.getrefcount(key1))
         self.assertEqual(ref_count2, sys.getrefcount(key2))
 
+    @unittest.skipIf(not hasattr(sys, 'getrefcount') == True, reason="test requires sys.refcount")
     def test_does_not_leak_dictionary_string_key(self):
         import gc
 
@@ -849,6 +852,7 @@ class UltraJSONTests(unittest.TestCase):
         ujson.dumps(data)
         self.assertEqual(ref_count1, sys.getrefcount(key1))
 
+    @unittest.skipIf(not hasattr(sys, 'getrefcount') == True, reason="test requires sys.refcount")
     def test_does_not_leak_dictionary_tuple_key(self):
         import gc
 
@@ -860,6 +864,7 @@ class UltraJSONTests(unittest.TestCase):
         ujson.dumps(data)
         self.assertEqual(ref_count1, sys.getrefcount(key1))
 
+    @unittest.skipIf(not hasattr(sys, 'getrefcount') == True, reason="test requires sys.refcount")
     def test_does_not_leak_dictionary_bytes_key(self):
         import gc
 
@@ -871,6 +876,7 @@ class UltraJSONTests(unittest.TestCase):
         ujson.dumps(data)
         self.assertEqual(ref_count1, sys.getrefcount(key1))
 
+    @unittest.skipIf(not hasattr(sys, 'getrefcount') == True, reason="test requires sys.refcount")
     def test_does_not_leak_dictionary_None_key(self):
         import gc
 
