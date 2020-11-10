@@ -1,5 +1,7 @@
 from __future__ import print_function
 import array
+import pytest
+import sys
 from ... import msgpack
 from ...msgpack._ext_type import ExtType
 
@@ -35,6 +37,9 @@ def test_unpack_ext_type():
           ExtType(0x42, b'A'*0x00012345))                   # ext 32
 
 
+@pytest.mark.skipif(
+    sys.version_info[0] == 2, reason="tobytes instead of tostring not supported"
+)
 def test_extension_type():
     def default(obj):
         print('default called', obj)

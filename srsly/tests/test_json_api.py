@@ -8,9 +8,11 @@ from pathlib import Path
 from contextlib import contextmanager
 import shutil
 import gzip
+import numpy
 
 from .._json_api import read_json, write_json, read_jsonl, write_jsonl
 from .._json_api import write_gzip_json, json_dumps, is_json_serializable
+from .._json_api import json_dumps
 from ..util import force_string
 
 
@@ -191,3 +193,9 @@ def test_write_jsonl_stdout(capsys):
 )
 def test_is_json_serializable(obj, expected):
     assert is_json_serializable(obj) == expected
+
+
+def test_unsupported_type_error():
+    f = numpy.float32()
+    with pytest.raises(TypeError):
+        s = json_dumps(f)
