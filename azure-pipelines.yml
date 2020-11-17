@@ -68,7 +68,7 @@ jobs:
 
   - bash: |
       SDIST=$(python -c "import os;print(os.listdir('./dist')[-1])" 2>&1)
-      pip install -v dist/$SDIST
+      pip install dist/$SDIST
     displayName: 'Install from sdist'
 
   - script: |
