@@ -64,6 +64,7 @@ jobs:
   - script: |
       pip freeze > installed.txt
       pip uninstall -y -r installed.txt
+      pip install --upgrade pip setuptools
     displayName: 'Uninstall all packages'
 
   - bash: |
