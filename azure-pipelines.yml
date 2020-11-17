@@ -47,7 +47,7 @@ jobs:
       architecture: 'x64'
 
   - script: |
-      python -m pip install --upgrade pip wheel
+      python -m pip install --upgrade pip setuptools wheel
       pip install -r requirements.txt
     displayName: 'Install dependencies'
 
@@ -64,12 +64,11 @@ jobs:
   - script: |
       pip freeze > installed.txt
       pip uninstall -y -r installed.txt
-      pip install --upgrade pip setuptools
     displayName: 'Uninstall all packages'
 
   - bash: |
       SDIST=$(python -c "import os;print(os.listdir('./dist')[-1])" 2>&1)
-      pip install dist/$SDIST
+      pip install -v dist/$SDIST
     displayName: 'Install from sdist'
 
   - script: |
