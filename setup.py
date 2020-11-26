@@ -13,7 +13,7 @@ from distutils import ccompiler, msvccompiler
 from setuptools import Extension, setup, find_packages
 
 
-PACKAGE_DATA = {"": ["*.pyx", "*.pxd", "*.c", "*.h", "*.cpp"]}
+PACKAGE_DATA = {"": ["*.pyx", "*.pxd", "*.c", "*.h"]}
 
 
 PACKAGES = find_packages()
