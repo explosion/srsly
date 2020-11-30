@@ -7,10 +7,11 @@ import subprocess
 import sys
 import contextlib
 from glob import glob
+from setuptools import Extension, setup, find_packages
 from distutils.command.build_ext import build_ext
 from distutils.sysconfig import get_python_inc
 from distutils import ccompiler, msvccompiler
-from setuptools import Extension, setup, find_packages
+from Cython.Build import cythonize
 
 
 PACKAGE_DATA = {"": ["*.pyx", "*.pxd", "*.c", "*.h"]}
@@ -57,20 +58,6 @@ class build_ext_subclass(build_ext, build_ext_options):
         build_ext.build_extensions(self)
 
 
-def generate_cython(root, source):
-    print("Cythonizing sources")
-    p = subprocess.call(
-        [sys.executable, os.path.join(root, "bin", "cythonize.py"), source],
-        env=os.environ,
-    )
-    if p != 0:
-        raise RuntimeError("Running cythonize failed")
-
-
-def is_source_release(path):
-    return os.path.exists(os.path.join(path, "PKG-INFO"))
-
-
 def clean(path):
     for name in MOD_NAMES:
         name = name.replace(".", "/")
@@ -114,7 +101,7 @@ def setup_package():
 
         ext_modules = []
         for mod_name in MOD_NAMES:
-            mod_path = mod_name.replace(".", "/") + ".cpp"
+            mod_path = mod_name.replace(".", "/") + ".pyx"
             extra_link_args = []
             extra_compile_args = []
             # ???
@@ -152,9 +139,6 @@ def setup_package():
             )
         )
 
-        if not is_source_release(root):
-            generate_cython(root, "srsly")
-
         setup(
             name="srsly",
             zip_safe=True,
@@ -168,7 +152,7 @@ def setup_package():
             version=about["__version__"],
             url=about["__uri__"],
             license=about["__license__"],
-            ext_modules=ext_modules,
+            ext_modules=cythonize(ext_modules),
             setup_requires=["cython>=0.29.1,<0.30.0"],
             install_requires=['pathlib==1.0.1; python_version < "3.4"'],
             classifiers=[
