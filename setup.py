@@ -3,14 +3,11 @@ from __future__ import print_function
 
 import io
 import os
-import subprocess
 import sys
 import contextlib
-from glob import glob
 from setuptools import Extension, setup, find_packages
 from distutils.command.build_ext import build_ext
 from distutils.sysconfig import get_python_inc
-from distutils import ccompiler, msvccompiler
 from Cython.Build import cythonize
 
 
