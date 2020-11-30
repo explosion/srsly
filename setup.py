@@ -149,7 +149,7 @@ def setup_package():
             version=about["__version__"],
             url=about["__uri__"],
             license=about["__license__"],
-            ext_modules=cythonize(ext_modules),
+            ext_modules=cythonize(ext_modules, language_level=2),
             setup_requires=["cython>=0.29.1,<0.30.0"],
             install_requires=['pathlib==1.0.1; python_version < "3.4"'],
             classifiers=[
