@@ -122,7 +122,7 @@ def setup_package():
             )
         )
         print("Cythonizing sources")
-        ext_modules = cythonize(ext_modules, compiler_directives=COMPILER_DIRECTIVES)
+        ext_modules = cythonize(ext_modules, compiler_directives=COMPILER_DIRECTIVES, language_level=2)
 
         setup(
             name="srsly",

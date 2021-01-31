@@ -47,7 +47,7 @@ jobs:
       architecture: 'x64'
 
   - script: |
-      python -m pip install --upgrade pip wheel
+      python -m pip install --upgrade pip setuptools
       pip install -r requirements.txt
     displayName: 'Install dependencies'
 
@@ -61,10 +61,17 @@ jobs:
       contents: 'srsly'
     displayName: 'Delete source directory'
 
+  - script: |
+      pip freeze > installed.txt
+      pip uninstall -y -r installed.txt
+    displayName: 'Uninstall all packages'
+
   - bash: |
       SDIST=$(python -c "import os;print(os.listdir('./dist')[-1])" 2>&1)
       pip install dist/$SDIST
     displayName: 'Install from sdist'
 
-  - script: python -m pytest --pyargs srsly
+  - script: |
+      pip install -r requirements.txt
+      python -m pytest --pyargs srsly
     displayName: 'Run tests'
