@@ -1,6 +1,7 @@
 import gc
 
 from . import msgpack
+from .msgpack import msgpack_encoders, msgpack_decoders  # noqa: F401
 from .util import force_path, FilePath, JSONInputBin, JSONOutputBin
 
 
