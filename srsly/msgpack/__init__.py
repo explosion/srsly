@@ -1,6 +1,8 @@
 # coding: utf-8
 
 import functools
+import catalogue
+
 from ._version import version
 from .exceptions import *
 from ._packer import Packer as _Packer
@@ -12,20 +14,29 @@ from ._msgpack_numpy import encode_numpy as _encode_numpy
 from ._msgpack_numpy import decode_numpy as _decode_numpy
 
 
+msgpack_encoders = catalogue.create("srsly", "msgpack_encoders", entry_points=True)
+msgpack_decoders = catalogue.create("srsly", "msgpack_decoders", entry_points=True)
+
+msgpack_encoders.register("numpy", func=_encode_numpy)
+msgpack_decoders.register("numpy", func=_decode_numpy)
+
+
 # msgpack_numpy extensions
 class Packer(_Packer):
     def __init__(self, *args, **kwargs):
-        kwargs["default"] = functools.partial(
-            _encode_numpy, chain=kwargs.get("default")
-        )
+        default = kwargs.get("default")
+        for encoder in msgpack_encoders.get_all().values():
+            default = functools.partial(encoder, chain=default)
+        kwargs["default"] = default
         super(Packer, self).__init__(*args, **kwargs)
 
 
 class Unpacker(_Unpacker):
     def __init__(self, *args, **kwargs):
-        kwargs["object_hook"] = functools.partial(
-            _decode_numpy, chain=kwargs.get("object_hook")
-        )
+        object_hook = kwargs.get("object_hook")
+        for decoder in msgpack_decoders.get_all().values():
+            object_hook = functools.partial(decoder, chain=object_hook)
+        kwargs["object_hook"] = object_hook
         super(Unpacker, self).__init__(*args, **kwargs)
 
 
@@ -50,7 +61,9 @@ def unpack(stream, **kwargs):
     """
     if "object_pairs_hook" not in kwargs:
         object_hook = kwargs.get("object_hook")
-        kwargs["object_hook"] = functools.partial(_decode_numpy, chain=object_hook)
+        for decoder in msgpack_decoders.get_all().values():
+            object_hook = functools.partial(decoder, chain=object_hook)
+        kwargs["object_hook"] = object_hook
     return _unpack(stream, **kwargs)
 
 
@@ -60,7 +73,9 @@ def unpackb(packed, **kwargs):
     """
     if "object_pairs_hook" not in kwargs:
         object_hook = kwargs.get("object_hook")
-        kwargs["object_hook"] = functools.partial(_decode_numpy, chain=object_hook)
+        for decoder in msgpack_decoders.get_all().values():
+            object_hook = functools.partial(decoder, chain=object_hook)
+        kwargs["object_hook"] = object_hook
     return _unpackb(packed, **kwargs)
 
 
