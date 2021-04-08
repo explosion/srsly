@@ -111,7 +111,7 @@ def read_jsonl(path: FilePath, skip: bool = False) -> Iterable[JSONOutput]:
 
 def write_jsonl(
     path: FilePath,
-    lines: Sequence[JSONInput],
+    lines: Iterable[JSONInput],
     append: bool = False,
     append_new_line: bool = True,
 ) -> None:
