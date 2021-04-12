@@ -33,6 +33,9 @@ def json_loads(data: Union[str, bytes]) -> JSONOutput:
     data (str / bytes): The data to deserialize.
     RETURNS: The deserialized Python object.
     """
+    # Avoid transforming the string '-' into the int '0'
+    if data == "-":
+        raise ValueError("Expected object or value")
     return ujson.loads(data)
 
 

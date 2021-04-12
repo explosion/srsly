@@ -6,7 +6,7 @@ import numpy
 
 from .._json_api import read_json, write_json, read_jsonl, write_jsonl
 from .._json_api import write_gzip_json, json_dumps, is_json_serializable
-from .._json_api import json_dumps
+from .._json_api import json_loads
 from ..util import force_string
 from .util import make_tempdir
 
@@ -176,6 +176,28 @@ def test_write_jsonl_stdout(capsys):
 )
 def test_is_json_serializable(obj, expected):
     assert is_json_serializable(obj) == expected
+
+
+@pytest.mark.parametrize(
+    "obj,expected",
+    [
+        ("-32", -32),
+        ("32", 32),
+        ("0", 0),
+        ("-0", 0),
+    ],
+)
+def test_json_loads_number_string(obj, expected):
+    assert json_loads(obj) == expected
+
+
+@pytest.mark.parametrize(
+    "obj",
+    ["HI", "-", "-?", "?!", "THIS IS A STRING"],
+)
+def test_json_loads_raises(obj):
+    with pytest.raises(ValueError):
+        json_loads(obj)
 
 
 def test_unsupported_type_error():
