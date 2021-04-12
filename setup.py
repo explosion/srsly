@@ -93,7 +93,7 @@ def setup_package():
         about = {}
         exec(f.read(), about)
 
-    with chdir(root):
+    with chdir(str(root)):
         include_dirs = [get_python_inc(plat_specific=True), "."]
         ext_modules = []
         for name in MOD_NAMES:
