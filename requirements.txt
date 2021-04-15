@@ -1,4 +1,4 @@
-catalogue>=2.0.2,<2.1.0
+catalogue>=2.0.3,<2.1.0
 # Development requirements
 cython>=0.29.1,<0.30.0
 pytest>=4.6.5
