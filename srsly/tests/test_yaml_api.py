@@ -83,7 +83,10 @@ def test_write_yaml_stdout(capsys):
         ({"a": "b", "c": 123}, True),
         ("hello", True),
         (lambda x: x, False),
+        ({"a": lambda x: x}, False),
     ],
 )
 def test_is_yaml_serializable(obj, expected):
+    assert is_yaml_serializable(obj) == expected
+    # Check again to be sure it's consistent
     assert is_yaml_serializable(obj) == expected
