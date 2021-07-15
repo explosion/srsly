@@ -46,6 +46,7 @@ def yaml_dumps(
     sort_keys (bool): Sort dictionary keys.
     RETURNS (str): The serialized string.
     """
+    yaml = CustomYaml()
     yaml.sort_base_mapping_type_on_output = sort_keys
     yaml.indent(mapping=indent_mapping, sequence=indent_sequence, offset=indent_offset)
     return yaml.dump(data)
