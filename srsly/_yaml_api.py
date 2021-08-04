@@ -25,9 +25,6 @@ class CustomYaml(YAML):
             return stream.getvalue()
 
 
-yaml = CustomYaml()
-
-
 def yaml_dumps(
     data: YAMLInput,
     indent_mapping: int = 2,
@@ -58,6 +55,7 @@ def yaml_loads(data: Union[str, IO]) -> YAMLOutput:
     data (str / file): The data to deserialize.
     RETURNS: The deserialized Python object.
     """
+    yaml = CustomYaml()
     try:
         return yaml.load(data)
     except Exception as e:
