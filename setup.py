@@ -11,7 +11,7 @@ from distutils.sysconfig import get_python_inc
 from Cython.Build import cythonize
 
 
-PACKAGE_DATA = {"": ["*.pyx", "*.pxd", "*.c", "*.h"]}
+PACKAGE_DATA = {"": ["*.pyx", "*.pxd", "*.c", "*.h", "*.json"]}
 
 
 PACKAGES = find_packages()
