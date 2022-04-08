@@ -3,7 +3,9 @@ import json
 import math
 import sys
 import unittest
+import pytest
 from io import StringIO
+from pathlib import Path
 from srsly import ujson
 
 
@@ -930,3 +932,29 @@ if __name__ == '__main__':
         heap = hp.heapu()
         print(heap)
 """
+
+
+@pytest.mark.parametrize("indent", list(range(65537, 65542)))
+def test_dump_huge_indent(indent):
+    ujson.encode({"a": True}, indent=indent)
+
+
+@pytest.mark.parametrize("first_length", list(range(2, 7)))
+@pytest.mark.parametrize("second_length", list(range(10919, 10924)))
+def test_dump_long_string(first_length, second_length):
+    ujson.dumps(["a" * first_length, "\x00" * second_length])
+
+
+def test_dump_indented_nested_list():
+    a = _a = []
+    for i in range(20):
+        _a.append(list(range(i)))
+        _a = _a[-1]
+        ujson.dumps(a, indent=i)
+
+
+@pytest.mark.parametrize("indent", [0, 1, 2, 4, 5, 8, 49])
+def test_issue_334(indent):
+    path = Path(__file__).with_name("334-reproducer.json")
+    a = ujson.loads(path.read_bytes())
+    ujson.dumps(a, indent=indent)
