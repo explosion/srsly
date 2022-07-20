@@ -1,5 +1,4 @@
-﻿import ctypes
-import decimal
+﻿import decimal
 import json
 import math
 import sys
@@ -985,10 +984,6 @@ def test_issue_334(indent):
     ],
 )
 def test_decode_surrogate_characters(test_input, expected):
-    # FIXME Wrong output (combined char) on platforms with 16-bit wchar_t
-    if test_input == '"\uD83D\uDCA9"' and ctypes.sizeof(ctypes.c_wchar) == 2:
-        pytest.skip("Raw surrogate pairs are not supported with 16-bit wchar_t")
-
     assert ujson.loads(test_input) == expected
     assert ujson.loads(test_input.encode("utf-8", "surrogatepass")) == expected
 
