@@ -1,4 +1,4 @@
-﻿import decimal
+import decimal
 import json
 import math
 import sys
