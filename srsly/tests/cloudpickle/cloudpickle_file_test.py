@@ -1,11 +1,13 @@
-import unittest
-import tempfile
 import os
 import shutil
-import pickle
+import sys
+import tempfile
+import unittest
+
 import pytest
-from mock import patch, mock_open
-import srsly.cloudpickle.cloudpickle
+
+import srsly.cloudpickle as cloudpickle
+from srsly.cloudpickle.compat import pickle
 
 
 class CloudPickleFileTests(unittest.TestCase):
@@ -14,64 +16,61 @@ class CloudPickleFileTests(unittest.TestCase):
 
     def setUp(self):
         self.tmpdir = tempfile.mkdtemp()
-        self.tmpfilepath = os.path.join(self.tmpdir, "testfile")
-        self.teststring = u"Hello world!"
+        self.tmpfilepath = os.path.join(self.tmpdir, 'testfile')
+        self.teststring = 'Hello world!'
 
     def tearDown(self):
         shutil.rmtree(self.tmpdir)
 
     def test_empty_file(self):
         # Empty file
-        open(self.tmpfilepath, "w").close()
-        with open(self.tmpfilepath, "r") as f:
-            self.assertEqual(
-                "", pickle.loads(srsly.cloudpickle.cloudpickle.dumps(f)).read()
-            )
+        open(self.tmpfilepath, 'w').close()
+        with open(self.tmpfilepath, 'r') as f:
+            self.assertEqual('', pickle.loads(cloudpickle.dumps(f)).read())
         os.remove(self.tmpfilepath)
 
     def test_closed_file(self):
         # Write & close
-        with open(self.tmpfilepath, "w") as f:
+        with open(self.tmpfilepath, 'w') as f:
             f.write(self.teststring)
         with pytest.raises(pickle.PicklingError) as excinfo:
-            srsly.cloudpickle.cloudpickle.dumps(f)
+            cloudpickle.dumps(f)
         assert "Cannot pickle closed files" in str(excinfo.value)
         os.remove(self.tmpfilepath)
 
     def test_r_mode(self):
         # Write & close
-        with open(self.tmpfilepath, "w") as f:
+        with open(self.tmpfilepath, 'w') as f:
             f.write(self.teststring)
         # Open for reading
-        with open(self.tmpfilepath, "r") as f:
-            new_f = pickle.loads(srsly.cloudpickle.cloudpickle.dumps(f))
+        with open(self.tmpfilepath, 'r') as f:
+            new_f = pickle.loads(cloudpickle.dumps(f))
             self.assertEqual(self.teststring, new_f.read())
         os.remove(self.tmpfilepath)
 
     def test_w_mode(self):
-        with open(self.tmpfilepath, "w") as f:
+        with open(self.tmpfilepath, 'w') as f:
             f.write(self.teststring)
             f.seek(0)
-            self.assertRaises(
-                pickle.PicklingError, lambda: srsly.cloudpickle.cloudpickle.dumps(f)
-            )
+            self.assertRaises(pickle.PicklingError,
+                              lambda: cloudpickle.dumps(f))
         os.remove(self.tmpfilepath)
 
     def test_plus_mode(self):
         # Write, then seek to 0
-        with open(self.tmpfilepath, "w+") as f:
+        with open(self.tmpfilepath, 'w+') as f:
             f.write(self.teststring)
             f.seek(0)
-            new_f = pickle.loads(srsly.cloudpickle.cloudpickle.dumps(f))
+            new_f = pickle.loads(cloudpickle.dumps(f))
             self.assertEqual(self.teststring, new_f.read())
         os.remove(self.tmpfilepath)
 
     def test_seek(self):
         # Write, then seek to arbitrary position
-        with open(self.tmpfilepath, "w+") as f:
+        with open(self.tmpfilepath, 'w+') as f:
             f.write(self.teststring)
             f.seek(4)
-            unpickled = pickle.loads(srsly.cloudpickle.cloudpickle.dumps(f))
+            unpickled = pickle.loads(cloudpickle.dumps(f))
             # unpickled StringIO is at position 4
             self.assertEqual(4, unpickled.tell())
             self.assertEqual(self.teststring[4:], unpickled.read())
@@ -80,19 +79,14 @@ class CloudPickleFileTests(unittest.TestCase):
             self.assertEqual(self.teststring, unpickled.read())
         os.remove(self.tmpfilepath)
 
-    def NOT_WORKING_test_tty(self):
-        # FIXME: Mocking 'file' is not trivial... and fails for now
-        from sys import version_info
-
-        if version_info.major == 2:
-            import __builtin__ as builtins  # pylint:disable=import-error
-        else:
-            import builtins  # pylint:disable=import-error
-
-        with patch.object(builtins, "open", mock_open(), create=True):
-            with open("foo", "w+") as handle:
-                srsly.cloudpickle.cloudpickle.dumps(handle)
+    @pytest.mark.skip(reason="Requires pytest -s to pass")
+    def test_pickling_special_file_handles(self):
+        # Warning: if you want to run your tests with nose, add -s option
+        for out in sys.stdout, sys.stderr:  # Regression test for SPARK-3415
+            self.assertEqual(out, pickle.loads(cloudpickle.dumps(out)))
+        self.assertRaises(pickle.PicklingError,
+                          lambda: cloudpickle.dumps(sys.stdin))
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     unittest.main()
