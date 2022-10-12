@@ -7,3 +7,4 @@ unittest2==1.1.0; python_version < "3.4"
 pytz==2018.7
 mock>=2.0.0,<3.0.0
 numpy>=1.15.0
+psutil
