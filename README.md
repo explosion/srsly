@@ -18,7 +18,7 @@ serialization utilities we need in a single binary wheel. Currently supports **J
 Serialization is hard, especially across Python versions and multiple platforms.
 After dealing with many subtle bugs over the years (encodings, locales, large
 files) our libraries like [spaCy](https://github.com/explosion/spaCy) and
-[Prodigy](https://prodi.gy) have steadily grown a number of utility functions to
+[Prodigy](https://prodi.gy) had steadily grown a number of utility functions to
 wrap the multiple serialization formats we need to support (especially `json`,
 `msgpack` and `pickle`). These wrapping functions ended up duplicated across our
 codebases, so we wanted to put them in one place.
@@ -45,8 +45,8 @@ wheel.
 `setuptools` and `wheel` are up to date.
 
 ```bash
-pip install -U pip setuptools wheel
-pip install srsly
+python -m pip install -U pip setuptools wheel
+python -m pip install srsly
 ```
 
 Or from conda via conda-forge:
@@ -56,13 +56,38 @@ conda install -c conda-forge srsly
 ```
 
 Alternatively, you can also compile the library from source. You'll need to make
-sure that you have a development environment consisting of a Python distribution
+sure that you have a development environment with a Python distribution
 including header files, a compiler (XCode command-line tools on macOS / OS X or
-Visual C++ build tools on Windows), pip, virtualenv and git installed.
+Visual C++ build tools on Windows), pip and git installed.
+
+Install from source:
 
 ```bash
-pip install -r requirements.txt  # install development dependencies
-python setup.py build_ext --inplace  # compile the library
+# clone the repo
+git clone https://github.com/explosion/srsly
+cd srsly
+
+# create a virtual environment
+python -m venv .env
+source .env/bin/activate
+
+# update pip
+python -m pip install -U pip setuptools wheel
+
+# compile and install from source
+python -m pip install .
+```
+
+For developers, install requirements separately and then install in editable
+mode without build isolation:
+
+```bash
+# install in editable mode
+python -m pip install -r requirements.txt
+python -m pip install --no-build-isolation --editable .
+
+# run test suite
+python -m pytest --pyargs srsly
 ```
 
 ## API

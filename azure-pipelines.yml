@@ -3,6 +3,10 @@ trigger:
   branches:
     include:
     - '*'
+pr:
+  paths:
+    exclude:
+      - "*.md"
 
 jobs:
 
