@@ -10,8 +10,8 @@ FilePath = Union[str, Path]
 JSONOutput = Union[str, int, float, bool, None, Dict[str, Any], List[Any]]
 JSONOutputBin = Union[bytes, str, int, float, bool, None, Dict[str, Any], List[Any]]
 # For input, we also accept tuples, ordered dicts etc.
-JSONInput = Union[str, int, float, bool, None, Dict[str, Any], List[Any], Tuple[Any], OrderedDict]
-JSONInputBin = Union[bytes, str, int, float, bool, None, Dict[str, Any], List[Any], Tuple[Any], OrderedDict]
+JSONInput = Union[str, int, float, bool, None, Dict[str, Any], List[Any], Tuple[Any, ...], OrderedDict]
+JSONInputBin = Union[bytes, str, int, float, bool, None, Dict[str, Any], List[Any], Tuple[Any, ...], OrderedDict]
 YAMLInput = JSONInput
 YAMLOutput = JSONOutput
 # fmt: on
