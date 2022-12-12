@@ -7,8 +7,8 @@ from collections import OrderedDict
 FilePath = Union[str, Path]
 # Superficial JSON input/output types
 # https://github.com/python/typing/issues/182#issuecomment-186684288
-JSONOutput = Union[str, int, float, bool, None, Dict[str, Any], List[Any]]
-JSONOutputBin = Union[bytes, str, int, float, bool, None, Dict[str, Any], List[Any]]
+JSONOutput = Union[str, int, float, bool, None, Dict[str, Any], List[Any], Tuple[Any, ...]]
+JSONOutputBin = Union[bytes, str, int, float, bool, None, Dict[str, Any], List[Any], Tuple[Any, ...]]
 # For input, we also accept tuples, ordered dicts etc.
 JSONInput = Union[str, int, float, bool, None, Dict[str, Any], List[Any], Tuple[Any, ...], OrderedDict]
 JSONInputBin = Union[bytes, str, int, float, bool, None, Dict[str, Any], List[Any], Tuple[Any, ...], OrderedDict]
