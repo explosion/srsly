@@ -111,6 +111,18 @@ def read_jsonl(path: FilePath, skip: bool = False) -> Iterable[JSONOutput]:
             for line in _yield_json_lines(f, skip=skip):
                 yield line
 
+def read_gzip_jsonl(path: FilePath, skip: bool = False) -> Iterable[JSONOutput]:
+    """Read a gzipped .jsonl file and yield contents line by line.
+    Blank lines will always be skipped.
+    
+    path (FilePath): The file path.
+    skip (bool): Skip broken lines and don't raise ValueError.
+    YIELDS (JSONOutput): The loaded JSON contents of each line.
+    """
+    file_path = force_path(path)
+    with gzip.open(file_path, "r") as f:
+        for line in _yield_juson_lines(f, skip=skip)
+            yield line
 
 def write_jsonl(
     path: FilePath,
