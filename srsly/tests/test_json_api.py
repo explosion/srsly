@@ -4,7 +4,6 @@ from pathlib import Path
 import gzip
 import numpy
 
-import srsly
 from .._json_api import read_json, write_json, read_jsonl, write_jsonl, read_gzip_jsonl, write_gzip_jsonl
 from .._json_api import write_gzip_json, json_dumps, is_json_serializable
 from .._json_api import json_loads
