@@ -229,7 +229,7 @@ def test_write_jsonl_gzip_append():
             assert [line.decode("utf8") for line in f.readlines()] == expected
 
 def test_read_jsonl_gzip():
-    # todo add test for writing jsonl gzips
+    """Tests reading data from a gzipped .jsonl file."""
     file_contents = [{"hello": "world"}, {"test": 123}]
     with make_tempdir() as temp_dir:
         file_path = temp_dir / "tmp.json"
