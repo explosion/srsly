@@ -136,11 +136,11 @@ data = {"foo": "bar", "baz": 123}
 srsly.write_json("/path/to/file.json", data)
 ```
 
-| Argument   | Type         | Description                                            |
-| ---------- | ------------ | ------------------------------------------------------ |
-| `path` | str / `Path` | The file path or `"-"` to write to stdout.             |
-| `data`     | -            | The JSON-serializable data to output.                  |
-| `indent`   | int          | Number of spaces used to indent JSON. Defaults to `2`. |
+| Argument | Type         | Description                                            |
+| -------- | ------------ | ------------------------------------------------------ |
+| `path`   | str / `Path` | The file path or `"-"` to write to stdout.             |
+| `data`   | -            | The JSON-serializable data to output.                  |
+| `indent` | int          | Number of spaces used to indent JSON. Defaults to `2`. |
 
 #### <kbd>function</kbd> `srsly.read_json`
 
@@ -152,7 +152,7 @@ data = srsly.read_json("/path/to/file.json")
 
 | Argument    | Type         | Description                                |
 | ----------- | ------------ | ------------------------------------------ |
-| `path`  | str / `Path` | The file path or `"-"` to read from stdin. |
+| `path`      | str / `Path` | The file path or `"-"` to read from stdin. |
 | **RETURNS** | dict / list  | The loaded JSON content.                   |
 
 #### <kbd>function</kbd> `srsly.write_gzip_json`
@@ -164,11 +164,27 @@ data = {"foo": "bar", "baz": 123}
 srsly.write_gzip_json("/path/to/file.json.gz", data)
 ```
 
-| Argument   | Type         | Description                                            |
-| ---------- | ------------ | ------------------------------------------------------ |
-| `path` | str / `Path` | The file path.                                         |
-| `data`     | -            | The JSON-serializable data to output.                  |
-| `indent`   | int          | Number of spaces used to indent JSON. Defaults to `2`. |
+| Argument | Type         | Description                                            |
+| -------- | ------------ | ------------------------------------------------------ |
+| `path`   | str / `Path` | The file path.                                         |
+| `data`   | -            | The JSON-serializable data to output.                  |
+| `indent` | int          | Number of spaces used to indent JSON. Defaults to `2`. |
+
+#### <kbd>function</kbd> `srsly.write_gzip_jsonl`
+
+Create a gzipped JSONL file and dump contents.
+
+```python
+data = [{"foo": "bar"}, {"baz": 123}]
+srsly.write_gzip_json("/path/to/file.jsonl.gz", data)
+```
+
+| Argument          | Type         | Description                                                                                                                                                                                                             |
+| ----------------- | ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `path`            | str / `Path` | The file path.                                                                                                                                                                                                          |
+| `lines`           | -            | The JSON-serializable contents of each line.                                                                                                                                                                            |
+| `append`          | bool         | Whether or not to append to the location. Appending to .gz files is generally not recommended, as it doesn't allow the algorithm to take advantage of all data when compressing - files may hence be poorly compressed. |
+| `append_new_line` | bool         | Whether or not to write a new line before appending to the file.                                                                                                                                                        |
 
 #### <kbd>function</kbd> `srsly.read_gzip_json`
 
@@ -180,8 +196,21 @@ data = srsly.read_gzip_json("/path/to/file.json.gz")
 
 | Argument    | Type         | Description              |
 | ----------- | ------------ | ------------------------ |
-| `path`  | str / `Path` | The file path.           |
+| `path`      | str / `Path` | The file path.           |
 | **RETURNS** | dict / list  | The loaded JSON content. |
+
+#### <kbd>function</kbd> `srsly.read_gzip_jsonl`
+
+Load gzipped JSONL from a file.
+
+```python
+data = srsly.read_gzip_jsonl("/path/to/file.jsonl.gz")
+```
+
+| Argument    | Type         | Description               |
+| ----------- | ------------ | ------------------------- |
+| `path`      | str / `Path` | The file path.            |
+| **RETURNS** | dict / list  | The loaded JSONL content. |
 
 #### <kbd>function</kbd> `srsly.write_jsonl`
 
@@ -195,7 +224,7 @@ srsly.write_jsonl("/path/to/file.jsonl", data)
 
 | Argument          | Type         | Description                                                                                                            |
 | ----------------- | ------------ | ---------------------------------------------------------------------------------------------------------------------- |
-| `path`        | str / `Path` | The file path or `"-"` to write to stdout.                                                                             |
+| `path`            | str / `Path` | The file path or `"-"` to write to stdout.                                                                             |
 | `lines`           | iterable     | The JSON-serializable lines.                                                                                           |
 | `append`          | bool         | Append to an existing file. Will open it in `"a"` mode and insert a newline before writing lines. Defaults to `False`. |
 | `append_new_line` | bool         | Defines whether a new line should first be written when appending to an existing file. Defaults to `True`.             |
@@ -211,7 +240,7 @@ data = srsly.read_jsonl("/path/to/file.jsonl")
 
 | Argument   | Type       | Description                                                          |
 | ---------- | ---------- | -------------------------------------------------------------------- |
-| `path` | str / Path | The file path or `"-"` to read from stdin.                           |
+| `path`     | str / Path | The file path or `"-"` to read from stdin.                           |
 | `skip`     | bool       | Skip broken lines and don't raise `ValueError`. Defaults to `False`. |
 | **YIELDS** | -          | The loaded JSON contents of each line.                               |
 
@@ -272,10 +301,10 @@ data = {"foo": "bar", "baz": 123}
 srsly.write_msgpack("/path/to/file.msg", data)
 ```
 
-| Argument   | Type         | Description            |
-| ---------- | ------------ | ---------------------- |
-| `path` | str / `Path` | The file path.         |
-| `data`     | -            | The data to serialize. |
+| Argument | Type         | Description            |
+| -------- | ------------ | ---------------------- |
+| `path`   | str / `Path` | The file path.         |
+| `data`   | -            | The data to serialize. |
 
 #### <kbd>function</kbd> `srsly.read_msgpack`
 
@@ -287,7 +316,7 @@ data = srsly.read_msgpack("/path/to/file.msg")
 
 | Argument    | Type         | Description                                                                             |
 | ----------- | ------------ | --------------------------------------------------------------------------------------- |
-| `path`  | str / `Path` | The file path.                                                                          |
+| `path`      | str / `Path` | The file path.                                                                          |
 | `use_list`  | bool         | Don't use tuples instead of lists. Can make deserialization slower. Defaults to `True`. |
 | **RETURNS** | -            | The loaded and deserialized content.                                                    |
 
@@ -343,7 +372,7 @@ yaml_string = srsly.yaml_dumps(data)
 | ----------------- | ---- | ------------------------------------------ |
 | `data`            | -    | The JSON-serializable data to output.      |
 | `indent_mapping`  | int  | Mapping indentation. Defaults to `2`.      |
-| `indent_sequence` | int  | Sequence indentation. Defaults to `4`.      |
+| `indent_sequence` | int  | Sequence indentation. Defaults to `4`.     |
 | `indent_offset`   | int  | Indentation offset. Defaults to `2`.       |
 | `sort_keys`       | bool | Sort dictionary keys. Defaults to `False`. |
 | **RETURNS**       | str  | The serialized string.                     |
@@ -373,10 +402,10 @@ srsly.write_yaml("/path/to/file.yml", data)
 
 | Argument          | Type         | Description                                |
 | ----------------- | ------------ | ------------------------------------------ |
-| `path`        | str / `Path` | The file path or `"-"` to write to stdout. |
+| `path`            | str / `Path` | The file path or `"-"` to write to stdout. |
 | `data`            | -            | The JSON-serializable data to output.      |
 | `indent_mapping`  | int          | Mapping indentation. Defaults to `2`.      |
-| `indent_sequence` | int          | Sequence indentation. Defaults to `4`.      |
+| `indent_sequence` | int          | Sequence indentation. Defaults to `4`.     |
 | `indent_offset`   | int          | Indentation offset. Defaults to `2`.       |
 | `sort_keys`       | bool         | Sort dictionary keys. Defaults to `False`. |
 
@@ -390,7 +419,7 @@ data = srsly.read_yaml("/path/to/file.yml")
 
 | Argument    | Type         | Description                                |
 | ----------- | ------------ | ------------------------------------------ |
-| `path`  | str / `Path` | The file path or `"-"` to read from stdin. |
+| `path`      | str / `Path` | The file path or `"-"` to read from stdin. |
 | **RETURNS** | dict / list  | The loaded YAML content.                   |
 
 #### <kbd>function</kbd> `srsly.is_yaml_serializable`
