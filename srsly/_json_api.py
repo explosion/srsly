@@ -56,8 +56,8 @@ def read_json(path: FilePath) -> JSONOutput:
 def read_gzip_json(path: FilePath) -> JSONOutput:
     """Load JSON from a gzipped file.
 
-        location (FilePath): The file path.
-        RETURNS (JSONOutput): The loaded JSON content.
+    location (FilePath): The file path.
+    RETURNS (JSONOutput): The loaded JSON content.
     """
     file_path = force_string(path)
     with gzip.open(file_path, "r") as f:
