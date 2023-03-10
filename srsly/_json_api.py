@@ -91,15 +91,25 @@ def read_json_dict(path: FilePath) -> Dict[str, Any]:
     return data
 
 
-def read_json_list(path: FilePath) -> List[Dict[str, Any]]:
+def read_json_list(path: FilePath, validate_inner: bool = False, skip_invalid: bool = False) -> List[Dict[str, Any]]:
     """Load JSON from file or standard input.
 
     path (FilePath): The file path. "-" for reading from stdin.
     RETURNS (JSONOutput): The loaded JSON content.
     """
+
     data = read_json(path)
+    err_msg = "Invalid JSON, data could not be parsed to a list of dicts."
     if not isinstance(data, list):
-        raise ValueError("Invalid JSON, data could not be parsed to a list of dicts.")
+        raise ValueError(err_msg)
+
+    output = []
+    for i, obj in enumerate(data):
+        if not isinstance(obj, dict):
+            if skip_invalid:
+                continue
+            raise ValueError(f"Invalid JSON Object at index: {i + 1}. Value is not a valid dict.")
+        output.append(obj)
     return data
 
 
