@@ -1,4 +1,4 @@
-from typing import Union, Iterable, Sequence, Any, Optional, Iterator
+from typing import Any, Iterable, Dict, List, Optional, Iterator, Union, Type, cast
 import sys
 import json as _builtin_json
 import gzip
@@ -39,6 +39,32 @@ def json_loads(data: Union[str, bytes]) -> JSONOutput:
     return ujson.loads(data)
 
 
+def json_loads_dict(data: Union[str, bytes]) -> Dict[str, Any]:
+    """Deserialize unicode or bytes to a Python dict.
+
+    data (str / bytes): The data to deserialize.
+    RAISES: ValueError if the loaded data is not a dict
+    RETURNS: The deserialized Python dict.
+    """
+    obj = json_loads(data)
+    if not isinstance(obj, dict):
+        raise ValueError("JSON data could not be parsed to a dict.")
+    return obj
+
+
+def json_loads_list(data: Union[str, bytes]) -> List[Dict[str, Any]]:
+    """Deserialize unicode or bytes to a Python list of dicts.
+
+    data (str / bytes): The data to deserialize.
+    RAISES: ValueError if the loaded data is not a list
+    RETURNS: The deserialized Python list.
+    """
+    loaded = json_loads(data)
+    if not isinstance(loaded, list):
+        raise ValueError("JSON data could not be parsed to a list of dicts.")
+    return loaded
+
+
 def read_json(path: FilePath) -> JSONOutput:
     """Load JSON from file or standard input.
 
@@ -51,6 +77,30 @@ def read_json(path: FilePath) -> JSONOutput:
     file_path = force_path(path)
     with file_path.open("r", encoding="utf8") as f:
         return ujson.load(f)
+
+
+def read_json_dict(path: FilePath) -> Dict[str, Any]:
+    """Load JSON from file or standard input.
+
+    path (FilePath): The file path. "-" for reading from stdin.
+    RETURNS (JSONOutput): The loaded JSON content.
+    """
+    data = read_json(path)
+    if not isinstance(data, dict):
+        raise ValueError("Invalid JSON, data could not be parsed to a dict.")
+    return data
+
+
+def read_json_list(path: FilePath) -> List[Dict[str, Any]]:
+    """Load JSON from file or standard input.
+
+    path (FilePath): The file path. "-" for reading from stdin.
+    RETURNS (JSONOutput): The loaded JSON content.
+    """
+    data = read_json(path)
+    if not isinstance(data, list):
+        raise ValueError("Invalid JSON, data could not be parsed to a list of dicts.")
+    return data
 
 
 def read_gzip_json(path: FilePath) -> JSONOutput:
@@ -147,6 +197,22 @@ def read_jsonl(path: FilePath, skip: bool = False) -> Iterable[JSONOutput]:
         with file_path.open("r", encoding="utf8") as f:
             for line in _yield_json_lines(f, skip=skip):
                 yield line
+
+
+def read_jsonl_dicts(path: FilePath, skip: bool = False) -> Iterable[Dict[str, Any]]:
+    """Read a .jsonl file or standard input and yield contents line by line.
+    Blank lines will always be skipped. Validates the contents of each line is a dict.
+
+    path (FilePath): The file path. "-" for reading from stdin.
+    skip (bool): Skip broken lines and don't raise ValueError.
+    YIELDS (JSONOutput): The loaded JSON contents of each line.
+    """
+    for i, line in enumerate(read_jsonl(path, skip=skip)):
+        if not isinstance(line, dict):
+            if skip:
+                continue
+            raise ValueError(f"Invalid JSON Object on line: {i + 1}. Line is not a valid dict.")
+        yield line
 
 
 def write_jsonl(
