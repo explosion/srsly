@@ -99,17 +99,19 @@ def read_json_list(path: FilePath, validate_inner: bool = False, skip_invalid: b
     """
 
     data = read_json(path)
-    err_msg = "Invalid JSON, data could not be parsed to a list of dicts."
     if not isinstance(data, list):
-        raise ValueError(err_msg)
+        raise ValueError("Invalid JSON, data could not be parsed to a list of dicts.")
 
-    output = []
-    for i, obj in enumerate(data):
-        if not isinstance(obj, dict):
-            if skip_invalid:
-                continue
-            raise ValueError(f"Invalid JSON Object at index: {i + 1}. Value is not a valid dict.")
-        output.append(obj)
+    if validate_inner:
+        output = []
+        for i, obj in enumerate(data):
+            if not isinstance(obj, dict):
+                if skip_invalid:
+                    continue
+                raise ValueError(f"Invalid JSON Object at index: {i + 1}. Value is not a valid dict.")
+            output.append(obj)
+    else:
+        output = data
     return data
 
 
