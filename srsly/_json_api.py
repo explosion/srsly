@@ -39,7 +39,7 @@ def json_loads(data: Union[str, bytes]) -> JSONOutput:
     return ujson.loads(data)
 
 
-def json_loads_dict(data: Union[str, bytes]) -> Dict[str, Any]:
+def json_loads_dict(data: Union[str, bytes]) -> Dict[str, JSONOutput]:
     """Deserialize unicode or bytes to a Python dict.
 
     data (str / bytes): The data to deserialize.
@@ -52,7 +52,7 @@ def json_loads_dict(data: Union[str, bytes]) -> Dict[str, Any]:
     return obj
 
 
-def json_loads_list(data: Union[str, bytes]) -> List[Dict[str, Any]]:
+def json_loads_list(data: Union[str, bytes]) -> List[Dict[str, JSONOutput]]:
     """Deserialize unicode or bytes to a Python list of dicts.
 
     data (str / bytes): The data to deserialize.
@@ -79,7 +79,7 @@ def read_json(path: FilePath) -> JSONOutput:
         return ujson.load(f)
 
 
-def read_json_dict(path: FilePath) -> Dict[str, Any]:
+def read_json_dict(path: FilePath) -> Dict[str, JSONOutput]:
     """Load JSON from file or standard input.
 
     path (FilePath): The file path. "-" for reading from stdin.
@@ -92,7 +92,7 @@ def read_json_dict(path: FilePath) -> Dict[str, Any]:
 
 
 def read_json_list(path: FilePath) -> List[JSONOutput]:
-    """Load JSON from file or standard input.
+    """Load JSON from file or standard input. Parse as a list
 
     path (FilePath): The file path. "-" for reading from stdin.
     RETURNS (JSONOutput): The loaded JSON content.
@@ -105,8 +105,8 @@ def read_json_list(path: FilePath) -> List[JSONOutput]:
 
 
 
-def read_json_list_of_dicts(path: FilePath, skip_invalid: bool = False) -> List[Dict[str, Any]]:
-    """Load JSON from file or standard input.
+def read_json_list_of_dicts(path: FilePath, skip_invalid: bool = False) -> List[Dict[str, JSONOutput]]:
+    """Load JSON from file or standard input. Parse as list of dicts
 
     path (FilePath): The file path. "-" for reading from stdin.
     RETURNS (JSONOutput): The loaded JSON content.
@@ -221,7 +221,7 @@ def read_jsonl(path: FilePath, skip: bool = False) -> Iterable[JSONOutput]:
                 yield line
 
 
-def read_jsonl_dicts(path: FilePath, skip: bool = False) -> Iterable[Dict[str, Any]]:
+def read_jsonl_dicts(path: FilePath, skip: bool = False) -> Iterable[Dict[str, JSONOutput]]:
     """Read a .jsonl file or standard input and yield contents line by line.
     Blank lines will always be skipped. Validates the contents of each line is a dict.
 

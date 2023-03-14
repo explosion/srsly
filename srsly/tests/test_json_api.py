@@ -7,6 +7,7 @@ import numpy
 from typing import Any, Dict, List, Union
 
 from .._json_api import (
+    JSONOutput,
     read_json,
     read_json_dict,
     read_json_list,
@@ -16,6 +17,7 @@ from .._json_api import (
     write_jsonl,
     read_gzip_jsonl,
     write_gzip_jsonl,
+
 )
 from .._json_api import write_gzip_json, json_dumps, is_json_serializable
 from .._json_api import json_loads
@@ -281,7 +283,7 @@ READ_JSONL_DICTS_TEST_CASES = {
     READ_JSONL_DICTS_TEST_CASES.values(),
     ids=READ_JSONL_DICTS_TEST_CASES.keys()
 )
-def test_read_jsonl_dicts(file_contents: str, expected: Union[List[Dict[str, Any]], ValueError]):
+def test_read_jsonl_dicts(file_contents: str, expected: Union[List[Dict[str, JSONOutput]], ValueError]):
 
     with make_tempdir({"tmp.json": file_contents}) as temp_dir:
         file_path = temp_dir / "tmp.json"
