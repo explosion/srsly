@@ -269,12 +269,7 @@ def test_read_jsonl_gzip():
     assert data[1]["test"] == 123
 
 
-READ_JSON_DICT_TEST_CASES = {
-
-}
-
-
-READ_JSONL_DICT_TEST_CASES = {
+READ_JSONL_DICTS_TEST_CASES = {
     "invalid_str": ('"test"', ValueError()),
     "invalid_num": ('-32', ValueError()),
     "invalid_json_list": ('[{"hello": "world"}\n{"test": 123}]', ValueError()),
@@ -283,8 +278,8 @@ READ_JSONL_DICT_TEST_CASES = {
 
 @pytest.mark.parametrize(
     "file_contents, expected",
-    READ_JSONL_DICT_TEST_CASES.values(),
-    ids=READ_JSONL_DICT_TEST_CASES.keys()
+    READ_JSONL_DICTS_TEST_CASES.values(),
+    ids=READ_JSONL_DICTS_TEST_CASES.keys()
 )
 def test_read_jsonl_dicts(file_contents: str, expected: Union[List[Dict[str, Any]], ValueError]):
 
