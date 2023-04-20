@@ -5,9 +5,10 @@
 This package bundles some of the best Python serialization libraries into one
 standalone package, with a high-level API that makes it easy to write code
 that's correct across platforms and Pythons. This allows us to provide all the
-serialization utilities we need in a single binary wheel. Currently supports **JSON**, **JSONL**, **MessagePack**, **Pickle** and **YAML**.
+serialization utilities we need in a single binary wheel. Currently supports
+**JSON**, **JSONL**, **MessagePack**, **Pickle** and **YAML**.
 
-[![Azure Pipelines](https://img.shields.io/azure-devops/build/explosion-ai/public/4/master.svg?logo=azure-pipelines&style=flat-square)](https://dev.azure.com/explosion-ai/public/_build?definitionId=4)
+[![tests](https://github.com/explosion/srsly/actions/workflows/tests.yml/badge.svg)](https://github.com/explosion/srsly/actions/workflows/tests.yml)
 [![PyPi](https://img.shields.io/pypi/v/srsly.svg?style=flat-square&logo=pypi&logoColor=white)](https://pypi.python.org/pypi/srsly)
 [![conda](https://img.shields.io/conda/vn/conda-forge/srsly.svg?style=flat-square&logo=conda-forge&logoColor=white)](https://anaconda.org/conda-forge/srsly)
 [![GitHub](https://img.shields.io/github/release/explosion/srsly/all.svg?style=flat-square&logo=github)](https://github.com/explosion/srsly)
@@ -35,11 +36,13 @@ wheel.
 - [`msgpack`](https://github.com/msgpack/msgpack-python)
 - [`msgpack-numpy`](https://github.com/lebedov/msgpack-numpy)
 - [`cloudpickle`](https://github.com/cloudpipe/cloudpickle)
-- [`ruamel.yaml`](https://github.com/pycontribs/ruamel-yaml) (without unsafe implementations!)
+- [`ruamel.yaml`](https://github.com/pycontribs/ruamel-yaml) (without unsafe
+  implementations!)
 
 ## Installation
 
-> ⚠️ Note that `v2.x` is only compatible with **Python 3.6+**. For 2.7+ compatibility, use `v1.x`.
+> ⚠️ Note that `v2.x` is only compatible with **Python 3.6+**. For 2.7+
+> compatibility, use `v1.x`.
 
 `srsly` can be installed from pip. Before installing, make sure that your `pip`,
 `setuptools` and `wheel` are up to date.
@@ -99,7 +102,8 @@ python -m pytest --pyargs srsly
 
 #### <kbd>function</kbd> `srsly.json_dumps`
 
-Serialize an object to a JSON string. Falls back to `json` if `sort_keys=True` is used (until it's fixed in `ujson`).
+Serialize an object to a JSON string. Falls back to `json` if `sort_keys=True`
+is used (until it's fixed in `ujson`).
 
 ```python
 data = {"foo": "bar", "baz": 123}
@@ -356,12 +360,14 @@ data = srsly.pickle_loads(pickled_data)
 
 ### YAML
 
-> 📦 The underlying module is exposed via `srsly.ruamel_yaml`. However, we normally
-> interact with it via the utility functions only.
+> 📦 The underlying module is exposed via `srsly.ruamel_yaml`. However, we
+> normally interact with it via the utility functions only.
 
 #### <kbd>function</kbd> `srsly.yaml_dumps`
 
-Serialize an object to a YAML string. See the [`ruamel.yaml` docs](https://yaml.readthedocs.io/en/latest/detail.html?highlight=indentation#indentation-of-block-sequences) for details on the indentation format.
+Serialize an object to a YAML string. See the
+[`ruamel.yaml` docs](https://yaml.readthedocs.io/en/latest/detail.html?highlight=indentation#indentation-of-block-sequences)
+for details on the indentation format.
 
 ```python
 data = {"foo": "bar", "baz": 123}
