@@ -11,6 +11,10 @@ import textwrap
 import pytest
 from pathlib import Path
 
+pytestmark = pytest.mark.filterwarnings(
+    "ignore::pytest.PytestUnraisableExceptionWarning"
+)
+
 
 class TestNewAPI:
     def test_duplicate_keys_00(self):
