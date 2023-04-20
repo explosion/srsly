@@ -7,7 +7,7 @@ standalone package, with a high-level API that makes it easy to write code
 that's correct across platforms and Pythons. This allows us to provide all the
 serialization utilities we need in a single binary wheel.
 
-[![Azure Pipelines](https://img.shields.io/azure-devops/build/explosion-ai/public/4/master.svg?logo=azure-pipelines&style=flat-square)](https://dev.azure.com/explosion-ai/public/_build?definitionId=4)
+[![tests](https://github.com/explosion/srsly/actions/workflows/tests.yml/badge.svg)](https://github.com/explosion/srsly/actions/workflows/tests.yml)
 [![PyPi](https://img.shields.io/pypi/v/srsly.svg?style=flat-square&logo=pypi&logoColor=white)](https://pypi.python.org/pypi/srsly)
 [![conda](https://img.shields.io/conda/vn/conda-forge/srsly.svg?style=flat-square&logo=conda-forge&logoColor=white)](https://anaconda.org/conda-forge/srsly)
 [![GitHub](https://img.shields.io/github/release/explosion/srsly/all.svg?style=flat-square&logo=github)](https://github.com/explosion/srsly)
