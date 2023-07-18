@@ -54,10 +54,6 @@ tree doesn't have cyclic references.
 #define __ULTRAJSON_H__
 
 #include <stdio.h>
-#include <wchar.h>
-
-// Don't output any extra whitespaces when encoding
-#define JSON_NO_EXTRA_WHITESPACE
 
 // Max decimals to encode double floating point numbers with
 #ifndef JSON_DOUBLE_MAX_DECIMALS
@@ -301,7 +297,7 @@ EXPORTFUNCTION char *JSON_EncodeObject(JSOBJ obj, JSONObjectEncoder *enc, char *
 
 typedef struct __JSONObjectDecoder
 {
-  JSOBJ (*newString)(void *prv, wchar_t *start, wchar_t *end);
+  JSOBJ (*newString)(void *prv, JSUINT32 *start, JSUINT32 *end);
   void (*objectAddKey)(void *prv, JSOBJ obj, JSOBJ name, JSOBJ value);
   void (*arrayAddItem)(void *prv, JSOBJ obj, JSOBJ value);
   JSOBJ (*newTrue)(void *prv);
