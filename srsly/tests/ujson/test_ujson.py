@@ -10,7 +10,6 @@ import json
 import math
 import time
 import sys
-import pytz
 import pytest
 
 if six.PY2:
