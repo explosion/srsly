@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import sys
-from distutils.command.build_ext import build_ext
-from distutils.sysconfig import get_python_inc
+from setuptools.command.build_ext import build_ext
+from sysconfig import get_path
 from setuptools import Extension, setup, find_packages
 from pathlib import Path
 from Cython.Build import cythonize
@@ -94,7 +94,7 @@ def setup_package():
         exec(f.read(), about)
 
     with chdir(str(root)):
-        include_dirs = [get_python_inc(plat_specific=True), "."]
+        include_dirs = [get_path("include"), "."]
         ext_modules = []
         for name in MOD_NAMES:
             mod_path = name.replace(".", "/") + ".pyx"
