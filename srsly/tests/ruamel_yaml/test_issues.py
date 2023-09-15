@@ -4,6 +4,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 
 
 import pytest  # NOQA
+import sys
 
 
 from .roundtrip import (
@@ -34,9 +35,14 @@ class TestIssues:
         )
         data = srsly.ruamel_yaml.round_trip_load(s)
         assert str(data["comb"]) == str(data["def"])
-        assert (
-            str(data["comb"]) == "ordereddict([('key', 'value'), ('key1', 'value1')])"
-        )
+        if sys.version_info >= (3, 12):
+            assert (
+                str(data["comb"]) == "ordereddict({'key': 'value', 'key1': 'value1'})"
+            )
+        else:
+            assert (
+                str(data["comb"]) == "ordereddict([('key', 'value'), ('key1', 'value1')])"
+            )
 
     def test_issue_82(self, tmpdir):
         program_src = r'''
