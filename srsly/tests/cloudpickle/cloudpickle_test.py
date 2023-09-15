@@ -1999,6 +1999,7 @@ class CloudPickleTest(unittest.TestCase):
         self.assertEqual(depickled_method('a'), 1)
         self.assertEqual(depickled_method('b'), None)
 
+    @pytest.mark.skipif(sys.version_info >= (3, 12), reason="Deprecation warning in python 3.12 about future deprecation in python 3.14")
     def test_itertools_count(self):
         counter = itertools.count(1, step=2)
 
