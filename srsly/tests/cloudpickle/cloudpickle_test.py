@@ -740,13 +740,13 @@ class CloudPickleTest(unittest.TestCase):
         pytest.importorskip("_cloudpickle_testpkg")
         from srsly.cloudpickle.compat import pickle
         import os.path
-        import distutils
-        import distutils.ccompiler
+        import collections
+        import collections.abc
 
         assert _should_pickle_by_reference(pickle)
         assert _should_pickle_by_reference(os.path)  # fake (aliased) module
-        assert _should_pickle_by_reference(distutils)  # package
-        assert _should_pickle_by_reference(distutils.ccompiler)  # module in package
+        assert _should_pickle_by_reference(collections)  # package
+        assert _should_pickle_by_reference(collections.abc)  # module in package
 
         dynamic_module = types.ModuleType('dynamic_module')
         assert not _should_pickle_by_reference(dynamic_module)
@@ -874,8 +874,8 @@ class CloudPickleTest(unittest.TestCase):
             or platform.python_implementation() == "PyPy"
             or (sys.version_info[:2] == (3, 10) and sys.version_info >= (3, 10, 8))
             # Skipping tests on 3.11 due to https://github.com/cloudpipe/cloudpickle/pull/486.
-            or sys.version_info[:2] == (3, 11),
-        reason="Fails on aarch64 + python 3.10+ in cibuildwheel, currently unable to replicate failure elsewhere; fails sometimes for pypy on conda-forge; fails for python 3.10.8+ and 3.11")
+            or sys.version_info[:2] >= (3, 11),
+        reason="Fails on aarch64 + python 3.10+ in cibuildwheel, currently unable to replicate failure elsewhere; fails sometimes for pypy on conda-forge; fails for python 3.10.8+ and 3.11+")
     def test_builtin_classmethod(self):
         obj = 1.5  # float object
 
@@ -1999,6 +1999,7 @@ class CloudPickleTest(unittest.TestCase):
         self.assertEqual(depickled_method('a'), 1)
         self.assertEqual(depickled_method('b'), None)
 
+    @pytest.mark.skipif(sys.version_info >= (3, 12), reason="Deprecation warning in python 3.12 about future deprecation in python 3.14")
     def test_itertools_count(self):
         counter = itertools.count(1, step=2)
 
