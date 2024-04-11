@@ -10,6 +10,7 @@ cdef extern from "Python.h":
 from libc.stdlib cimport *
 from libc.string cimport *
 from libc.limits cimport *
+from libc.stdint cimport uint64_t
 
 from .exceptions import (
     BufferFull,
@@ -315,7 +316,7 @@ cdef class Unpacker(object):
     cdef object object_hook, object_pairs_hook, list_hook, ext_hook
     cdef object encoding, unicode_errors
     cdef Py_ssize_t max_buffer_size
-    cdef unsigned long long stream_offset
+    cdef uint64_t stream_offset
 
     def __cinit__(self):
         self.buf = NULL
