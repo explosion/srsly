@@ -4,13 +4,20 @@ from pathlib import Path
 import gzip
 import numpy
 
+from typing import Any, Dict, List, Union
+
 from .._json_api import (
+    JSONOutput,
     read_json,
+    read_json_dict,
+    read_json_list,
+    read_jsonl_dicts,
     write_json,
     read_jsonl,
     write_jsonl,
     read_gzip_jsonl,
     write_gzip_jsonl,
+
 )
 from .._json_api import write_gzip_json, json_dumps, is_json_serializable
 from .._json_api import json_loads
@@ -262,3 +269,35 @@ def test_read_jsonl_gzip():
     assert len(data[1]) == 1
     assert data[0]["hello"] == "world"
     assert data[1]["test"] == 123
+
+
+READ_JSONL_DICTS_TEST_CASES = {
+    "invalid_str": ('"test"', ValueError()),
+    "invalid_num": ('-32', ValueError()),
+    "invalid_json_list": ('[{"hello": "world"}\n{"test": 123}]', ValueError()),
+    "valid_dicts": ('{"hello": "world"}\n{"test": 123}', [{"hello": "world"}, {"test": 123}]),
+}
+
+@pytest.mark.parametrize(
+    "file_contents, expected",
+    READ_JSONL_DICTS_TEST_CASES.values(),
+    ids=READ_JSONL_DICTS_TEST_CASES.keys()
+)
+def test_read_jsonl_dicts(file_contents: str, expected: Union[List[Dict[str, JSONOutput]], ValueError]):
+
+    with make_tempdir({"tmp.json": file_contents}) as temp_dir:
+        file_path = temp_dir / "tmp.json"
+        assert file_path.exists()
+        data = read_jsonl_dicts(file_path)
+        # Make sure this returns a generator, not just a list
+        assert not hasattr(data, "__len__")
+        try:
+            # actually consume the generator to trigger errors
+            data = list(data)
+        except ValueError:
+            assert isinstance(expected, ValueError)
+        else:
+            assert isinstance(expected, list)
+            assert len(data) == len(expected)
+            for data_item, expected_item in zip(data, expected):
+                assert data_item == expected_item
