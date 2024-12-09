@@ -33,6 +33,13 @@ jobs:
       - name: Check out repo
         uses: actions/checkout@v3
 
+      - name: Install gettext
+        # Needed for Python3.9
+        if: runner.os == 'macOS' && runner.arch == 'X64'
+        run: |
+          brew install gettext
+          brew link gettext --force
+
       - name: Configure Python version
         uses: actions/setup-python@v4
         with:
