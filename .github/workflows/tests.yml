@@ -35,7 +35,7 @@ jobs:
 
       - name: Install gettext
         # Needed for Python3.9
-        if: runner.os == 'macOS' && runner.arch == 'X64'
+        if: runner.os == 'macOS'
         run: |
           brew install gettext
           brew link gettext --force
