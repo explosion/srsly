@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: pypi
-      url: https://pypi.org/p/cymem
+      url: https://pypi.org/p/srsly
     permissions:
       id-token: write
       contents: read
