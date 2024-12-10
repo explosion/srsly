@@ -2,13 +2,18 @@ name: tests
 
 on:
   push:
+    tags-ignore:
+      - '**'
     paths-ignore:
       - "*.md"
+      - ".github/cibuildwheel.yml"
+      - ".github/publish_pypi.yml"
   pull_request:
     types: [opened, synchronize, reopened, edited]
     paths-ignore:
       - "*.md"
-
+      - ".github/cibuildwheel.yml"
+      - ".github/publish_pypi.yml"
 env:
   MODULE_NAME: 'srsly'
   RUN_MYPY: 'false'
@@ -27,7 +32,6 @@ jobs:
     steps:
       - name: Check out repo
         uses: actions/checkout@v3
-
       - name: Configure Python version
         uses: actions/setup-python@v4
         with:
