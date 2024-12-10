@@ -15,9 +15,11 @@ import os
 Options.docstrings = True
 
 
-PACKAGE_DATA = {"": ["*.pyx", "*.pxd", "*.c", "*.h"]}
+PACKAGE_DATA = {"": ["*.pyx", "*.pxd", "*.c", "*.h", "*.cpp"]}
 PACKAGES = find_packages()
-MOD_NAMES = ["srsly.msgpack._unpacker", "srsly.msgpack._packer"]
+# msgpack has this whacky build where it only builds _cmsgpack which textually includes
+# _packer and _unpacker. I refactored this.
+MOD_NAMES = ["srsly.msgpack._epoch", "srsly.msgpack._packer", "srsly.msgpack._unpacker"]
 COMPILE_OPTIONS = {
     "msvc": ["/Ox", "/EHsc"],
     "mingw32": ["-O2", "-Wno-strict-prototypes", "-Wno-unused-function"],
@@ -94,7 +96,7 @@ def setup_package():
         exec(f.read(), about)
 
     with chdir(str(root)):
-        include_dirs = [get_path("include"), "."]
+        include_dirs = [get_path("include"), ".", "srsly"]
         ext_modules = []
         for name in MOD_NAMES:
             mod_path = name.replace(".", "/") + ".pyx"
@@ -122,7 +124,9 @@ def setup_package():
             )
         )
         print("Cythonizing sources")
-        ext_modules = cythonize(ext_modules, compiler_directives=COMPILER_DIRECTIVES, language_level=2)
+        ext_modules = cythonize(
+            ext_modules, compiler_directives=COMPILER_DIRECTIVES, language_level=2
+        )
 
         setup(
             name="srsly",

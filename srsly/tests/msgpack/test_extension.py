@@ -1,6 +1,6 @@
 import array
 from srsly import msgpack
-from srsly.msgpack._ext_type import ExtType
+from srsly.msgpack.ext import ExtType
 
 
 def test_pack_ext_type():
