@@ -15,9 +15,11 @@ import os
 Options.docstrings = True
 
 
-PACKAGE_DATA = {"": ["*.pyx", "*.pxd", "*.c", "*.h"]}
+PACKAGE_DATA = {"": ["*.pyx", "*.pxd", "*.c", "*.h", "*.cpp"]}
 PACKAGES = find_packages()
-MOD_NAMES = ["srsly.msgpack._cmsgpack"]
+# msgpack has this whacky build where it only builds _cmsgpack which textually includes
+# _packer and _unpacker. I refactored this.
+MOD_NAMES = ["srsly.msgpack._epoch", "srsly.msgpack._packer", "srsly.msgpack._unpacker"]
 COMPILE_OPTIONS = {
     "msvc": ["/Ox", "/EHsc"],
     "mingw32": ["-O2", "-Wno-strict-prototypes", "-Wno-unused-function"],

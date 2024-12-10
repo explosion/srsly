@@ -6,11 +6,13 @@ from cpython.datetime cimport (
     PyDateTime_CheckExact, PyDelta_CheckExact,
     datetime_tzinfo, timedelta_days, timedelta_seconds, timedelta_microseconds,
 )
+from ._epoch import utc, epoch
 
 cdef ExtType
 cdef Timestamp
 
 from .ext import ExtType, Timestamp
+from .util import ensure_bytes
 
 
 cdef extern from "Python.h":
@@ -104,13 +106,16 @@ cdef class Packer:
     """
     cdef msgpack_packer pk
     cdef object _default
-    cdef object _berrors
-    cdef const char *unicode_errors
     cdef size_t exports  # number of exported buffers
     cdef bint strict_types
     cdef bint use_float
     cdef bint autoreset
     cdef bint datetime
+    cdef object _bencoding
+    cdef object _berrors
+    cdef const char *encoding
+    cdef const char *unicode_errors
+
 
     def __cinit__(self, buf_size=256*1024, **_kwargs):
         self.pk.buf = <char*> PyMem_Malloc(buf_size)
@@ -129,8 +134,8 @@ cdef class Packer:
         if self.exports > 0:
             raise BufferError("Existing exports of data: Packer cannot be changed")
 
-    def __init__(self, *, default=None,
-                 bint use_single_float=False, bint autoreset=True, bint use_bin_type=True,
+    def __init__(self, *, default=None, encoding=None,
+                 bint use_single_float=False, bint autoreset=True, bint use_bin_type=False,
                  bint strict_types=False, bint datetime=False, unicode_errors=None,
                  buf_size=256*1024):
         self.use_float = use_single_float
@@ -143,6 +148,19 @@ cdef class Packer:
                 raise TypeError("default must be a callable.")
         self._default = default
 
+        if encoding is None:
+            if PY_MAJOR_VERSION < 3:
+                encoding = 'utf-8'
+            if encoding is None:
+                self._bencoding = None
+                self.encoding = NULL
+            else:
+                self._bencoding = ensure_bytes(encoding)
+                self.encoding = self._bencoding
+        else:
+            self._bencoding = ensure_bytes(encoding)
+            self.encoding = self._bencoding
+        unicode_errors = ensure_bytes(unicode_errors)
         self._berrors = unicode_errors
         if unicode_errors is None:
             self.unicode_errors = NULL
@@ -191,12 +209,12 @@ cdef class Packer:
             msgpack_pack_bin(&self.pk, L)
             msgpack_pack_raw_body(&self.pk, rawval, L)
         elif PyUnicode_CheckExact(o) if strict else PyUnicode_Check(o):
-            if self.unicode_errors == NULL:
+            if self.unicode_errors == NULL and self.encoding == NULL:
                 rawval = PyUnicode_AsUTF8AndSize(o, &L)
                 if L >ITEM_LIMIT:
                     raise ValueError("unicode string is too large")
             else:
-                o = PyUnicode_AsEncodedString(o, NULL, self.unicode_errors)
+                o = PyUnicode_AsEncodedString(o, self.encoding, self.unicode_errors)
                 L = Py_SIZE(o)
                 if L > ITEM_LIMIT:
                     raise ValueError("unicode string is too large")
