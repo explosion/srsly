@@ -1,7 +1,7 @@
 import pytest
 from pathlib import Path
 import datetime
-from mock import patch
+from unittest.mock import patch
 import numpy
 
 from .._msgpack_api import read_msgpack, write_msgpack
