@@ -101,7 +101,6 @@ FASTCALL_ATTR JSOBJ FASTCALL_MSVC decodePreciseFloat(struct DecoderState *ds)
 FASTCALL_ATTR JSOBJ FASTCALL_MSVC decode_numeric (struct DecoderState *ds)
 {
   int intNeg = 1;
-  int mantSize = 0;
   JSUINT64 intValue;
   JSUINT64 prevIntValue;
   int chr;
@@ -154,7 +153,6 @@ FASTCALL_ATTR JSOBJ FASTCALL_MSVC decode_numeric (struct DecoderState *ds)
         }
 
         offset ++;
-        mantSize ++;
         break;
       }
       case '.':
