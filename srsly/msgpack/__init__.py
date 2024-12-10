@@ -3,13 +3,18 @@
 import functools
 import catalogue
 
+# These need to be imported before packer and unpacker
+from ._epoch import utc, epoch  # noqa
+
 from ._version import version
 from .exceptions import *
+
+# In msgpack-python these are put under a _cmsgpack module that textually includes
+# them. I dislike this so I refactored it.
 from ._packer import Packer as _Packer
 from ._unpacker import unpackb as _unpackb
-from ._unpacker import unpack as _unpack
 from ._unpacker import Unpacker as _Unpacker
-from ._ext_type import ExtType
+from .ext import ExtType
 from ._msgpack_numpy import encode_numpy as _encode_numpy
 from ._msgpack_numpy import decode_numpy as _decode_numpy
 
@@ -64,7 +69,8 @@ def unpack(stream, **kwargs):
         for decoder in msgpack_decoders.get_all().values():
             object_hook = functools.partial(decoder, chain=object_hook)
         kwargs["object_hook"] = object_hook
-    return _unpack(stream, **kwargs)
+    data = stream.read()
+    return _unpackb(data, **kwargs)
 
 
 def unpackb(packed, **kwargs):
