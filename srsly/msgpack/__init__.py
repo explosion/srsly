@@ -1,48 +1,27 @@
-# coding: utf-8
+# ruff: noqa: F401
+import os
 
-import functools
-import catalogue
+from .exceptions import *  # noqa: F403
+from .ext import ExtType, Timestamp
 
-from ._version import version
-from .exceptions import *
-from ._packer import Packer as _Packer
-from ._unpacker import unpackb as _unpackb
-from ._unpacker import unpack as _unpack
-from ._unpacker import Unpacker as _Unpacker
-from ._ext_type import ExtType
-from ._msgpack_numpy import encode_numpy as _encode_numpy
-from ._msgpack_numpy import decode_numpy as _decode_numpy
+version = (1, 1, 0)
+__version__ = "1.1.0"
 
 
-msgpack_encoders = catalogue.create("srsly", "msgpack_encoders", entry_points=True)
-msgpack_decoders = catalogue.create("srsly", "msgpack_decoders", entry_points=True)
-
-msgpack_encoders.register("numpy", func=_encode_numpy)
-msgpack_decoders.register("numpy", func=_decode_numpy)
-
-
-# msgpack_numpy extensions
-class Packer(_Packer):
-    def __init__(self, *args, **kwargs):
-        default = kwargs.get("default")
-        for encoder in msgpack_encoders.get_all().values():
-            default = functools.partial(encoder, chain=default)
-        kwargs["default"] = default
-        super(Packer, self).__init__(*args, **kwargs)
-
-
-class Unpacker(_Unpacker):
-    def __init__(self, *args, **kwargs):
-        object_hook = kwargs.get("object_hook")
-        for decoder in msgpack_decoders.get_all().values():
-            object_hook = functools.partial(decoder, chain=object_hook)
-        kwargs["object_hook"] = object_hook
-        super(Unpacker, self).__init__(*args, **kwargs)
+if os.environ.get("MSGPACK_PUREPYTHON"):
+    from .fallback import Packer, Unpacker, unpackb
+else:
+    try:
+        from ._cmsgpack import Packer, Unpacker, unpackb
+    except ImportError:
+        from .fallback import Packer, Unpacker, unpackb
 
 
 def pack(o, stream, **kwargs):
     """
-    Pack an object and write it to a stream.
+    Pack object `o` and write it to `stream`
+
+    See :class:`Packer` for options.
     """
     packer = Packer(**kwargs)
     stream.write(packer.pack(o))
@@ -50,33 +29,22 @@ def pack(o, stream, **kwargs):
 
 def packb(o, **kwargs):
     """
-    Pack an object and return the packed bytes.
+    Pack object `o` and return packed bytes
+
+    See :class:`Packer` for options.
     """
     return Packer(**kwargs).pack(o)
 
 
 def unpack(stream, **kwargs):
     """
-    Unpack a packed object from a stream.
-    """
-    if "object_pairs_hook" not in kwargs:
-        object_hook = kwargs.get("object_hook")
-        for decoder in msgpack_decoders.get_all().values():
-            object_hook = functools.partial(decoder, chain=object_hook)
-        kwargs["object_hook"] = object_hook
-    return _unpack(stream, **kwargs)
+    Unpack an object from `stream`.
 
-
-def unpackb(packed, **kwargs):
+    Raises `ExtraData` when `stream` contains extra bytes.
+    See :class:`Unpacker` for options.
     """
-    Unpack a packed object.
-    """
-    if "object_pairs_hook" not in kwargs:
-        object_hook = kwargs.get("object_hook")
-        for decoder in msgpack_decoders.get_all().values():
-            object_hook = functools.partial(decoder, chain=object_hook)
-        kwargs["object_hook"] = object_hook
-    return _unpackb(packed, **kwargs)
+    data = stream.read()
+    return unpackb(data, **kwargs)
 
 
 # alias for compatibility to simplejson/marshal/pickle.

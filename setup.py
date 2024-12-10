@@ -17,7 +17,7 @@ Options.docstrings = True
 
 PACKAGE_DATA = {"": ["*.pyx", "*.pxd", "*.c", "*.h"]}
 PACKAGES = find_packages()
-MOD_NAMES = ["srsly.msgpack._unpacker", "srsly.msgpack._packer"]
+MOD_NAMES = ["srsly.msgpack._cmsgpack"]
 COMPILE_OPTIONS = {
     "msvc": ["/Ox", "/EHsc"],
     "mingw32": ["-O2", "-Wno-strict-prototypes", "-Wno-unused-function"],
@@ -94,7 +94,7 @@ def setup_package():
         exec(f.read(), about)
 
     with chdir(str(root)):
-        include_dirs = [get_path("include"), "."]
+        include_dirs = [get_path("include"), ".", "srsly"]
         ext_modules = []
         for name in MOD_NAMES:
             mod_path = name.replace(".", "/") + ".pyx"
@@ -122,7 +122,9 @@ def setup_package():
             )
         )
         print("Cythonizing sources")
-        ext_modules = cythonize(ext_modules, compiler_directives=COMPILER_DIRECTIVES, language_level=2)
+        ext_modules = cythonize(
+            ext_modules, compiler_directives=COMPILER_DIRECTIVES, language_level=2
+        )
 
         setup(
             name="srsly",
