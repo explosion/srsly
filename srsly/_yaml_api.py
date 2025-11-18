@@ -2,8 +2,9 @@ from typing import Union, IO, Any
 from io import StringIO
 import sys
 
-from .ruamel_yaml import YAML
-from .ruamel_yaml.representer import RepresenterError
+from ruamel.yaml import YAML
+from ruamel.yaml.representer import RepresenterError
+
 from .util import force_path, FilePath, YAMLInput, YAMLOutput
 
 

@@ -4,7 +4,7 @@ import pytest
 
 from .._yaml_api import yaml_dumps, yaml_loads, read_yaml, write_yaml
 from .._yaml_api import is_yaml_serializable
-from ..ruamel_yaml.comments import CommentedMap
+from ruamel.yaml.comments import CommentedMap
 from .util import make_tempdir
 
 

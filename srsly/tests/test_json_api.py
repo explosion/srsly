@@ -2,7 +2,6 @@ import pytest
 from io import StringIO
 from pathlib import Path
 import gzip
-import numpy
 
 from .._json_api import (
     read_json,
@@ -55,8 +54,8 @@ def test_write_json_file():
     data = {"hello": "world", "test": 123}
     # Provide two expected options, depending on how keys are ordered
     expected = [
-        '{\n  "hello":"world",\n  "test":123\n}',
-        '{\n  "test":123,\n  "hello":"world"\n}',
+        '{\n  "hello": "world",\n  "test": 123\n}',
+        '{\n  "test": 123,\n  "hello": "world"\n}',
     ]
     with make_tempdir() as temp_dir:
         file_path = temp_dir / "tmp.json"
@@ -69,8 +68,8 @@ def test_write_json_file_gzip():
     data = {"hello": "world", "test": 123}
     # Provide two expected options, depending on how keys are ordered
     expected = [
-        '{\n  "hello":"world",\n  "test":123\n}',
-        '{\n  "test":123,\n  "hello":"world"\n}',
+        '{\n  "hello": "world",\n  "test": 123\n}',
+        '{\n  "test": 123,\n  "hello": "world"\n}',
     ]
     with make_tempdir() as temp_dir:
         file_path = force_string(temp_dir / "tmp.json")
@@ -83,8 +82,8 @@ def test_write_json_stdout(capsys):
     data = {"hello": "world", "test": 123}
     # Provide two expected options, depending on how keys are ordered
     expected = [
-        '{\n  "hello":"world",\n  "test":123\n}\n',
-        '{\n  "test":123,\n  "hello":"world"\n}\n',
+        '{\n  "hello": "world",\n  "test": 123\n}\n',
+        '{\n  "test": 123,\n  "hello": "world"\n}\n',
     ]
     write_json("-", data)
     captured = capsys.readouterr()
@@ -208,9 +207,8 @@ def test_json_loads_raises(obj):
 
 
 def test_unsupported_type_error():
-    f = numpy.float32()
-    with pytest.raises(TypeError):
-        s = json_dumps(f)
+    with pytest.raises(TypeError, match="is not JSON serializable"):
+        s = json_dumps({1, 2})
 
 
 def test_write_jsonl_gzip():
