@@ -1,12 +1,18 @@
-name: Build
+name: Build wheels
 
 on:
   push:
-    tags:
-      # ytf did they invent their own syntax that's almost regex?
-      # ** matches 'zero or more of any character'
-      - 'release-v[0-9]+.[0-9]+.[0-9]+**'
-      - 'prerelease-v[0-9]+.[0-9]+.[0-9]+**'
+    branches: [master]
+  pull_request:
+    branches: ["*"]
+  workflow_dispatch: # allows you to trigger manually
+
+# When this workflow is queued, automatically cancel any previous running
+# or pending jobs from the same branch
+concurrency:
+  group: Build-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build_wheels:
     uses: explosion/gha-cibuildwheel/.github/workflows/cibuildwheel.yml@main
@@ -16,6 +22,6 @@ jobs:
     with:
       wheel-name-pattern: "srsly-*.whl"
       pure-python: false
+      create-release: ${{ startsWith(github.ref, 'refs/tags/release-') || startsWith(github.ref, 'refs/tags/prerelease-') }}
     secrets:
       gh-token: ${{ secrets.GITHUB_TOKEN }}
-

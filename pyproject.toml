@@ -1,13 +1,13 @@
 [build-system]
 requires = [
     "setuptools",
-    "cython>=0.25",
+    "cython>=0.29.1",
 ]
 build-backend = "setuptools.build_meta"
 
 [tool.cibuildwheel]
 build = "*"
-skip = "cp38*"
+skip = ["cp38*", "cp314t-*"]
 test-skip = ""
 
 archs = ["native"]
