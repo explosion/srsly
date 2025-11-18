@@ -37,7 +37,6 @@ jobs:
         with:
           python-version: ${{ matrix.python_version }}
           architecture: x64
-          allow-prereleases: true
 
       - name: Build sdist
         run: |
