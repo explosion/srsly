@@ -7,7 +7,11 @@ build-backend = "setuptools.build_meta"
 
 [tool.cibuildwheel]
 build = "*"
-skip = ["cp38*", "cp314t-*"]
+skip = [
+    "cp38*",   # Obsolete
+    "cp314-*",  # FIXME ujson segfaults
+    "cp314t-*",  # TODO free-threading support (note: 3.13t is skipped by default)
+]
 test-skip = ""
 
 archs = ["native"]
