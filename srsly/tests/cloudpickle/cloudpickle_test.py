@@ -116,7 +116,7 @@ def test_extract_class_dict():
         expected_keys = ["C_CONSTANT", "__doc__", "__firstlineno__", "method_c"]
     else:
         expected_keys = ["C_CONSTANT", "__doc__", "method_c"]
-    assert sorted(clsdict.keys()) == expected_keys
+    assert sorted(clsdict) == expected_keys
     assert clsdict["C_CONSTANT"] == 43
     assert clsdict["__doc__"] is None
     assert clsdict["method_c"](C()) == C().method_c()
