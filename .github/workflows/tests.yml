@@ -1,39 +1,38 @@
-name: tests
+name: Test
 
 on:
   push:
-    tags-ignore:
-      - '**'
-    paths-ignore:
-      - "*.md"
-      - ".github/cibuildwheel.yml"
-      - ".github/publish_pypi.yml"
+    branches: [master]
   pull_request:
-    types: [opened, synchronize, reopened, edited]
-    paths-ignore:
-      - "*.md"
-      - ".github/cibuildwheel.yml"
-      - ".github/publish_pypi.yml"
+    branches: ["*"]
+  workflow_dispatch: # allows you to trigger manually
+
+# When this workflow is queued, automatically cancel any previous running
+# or pending jobs from the same branch
+concurrency:
+  group: Test-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   MODULE_NAME: 'srsly'
   RUN_MYPY: 'false'
 
 jobs:
   tests:
-    name: Test
-    if: github.repository_owner == 'explosion'
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
-        python_version: ["3.9", "3.10", "3.11", "3.12"]
+        # FIXME: ujson segfault on 3.14
+        python_version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
     runs-on: ${{ matrix.os }}
 
     steps:
       - name: Check out repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
+
       - name: Configure Python version
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python_version }}
           architecture: x64
