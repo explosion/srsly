@@ -8,6 +8,22 @@ from ._msgpack_numpy import encode_numpy, decode_numpy
 
 
 class _MsgpackExtensions:
+    """API for extending msgpack (de)serialization:
+
+        srsly.msgpack_encoders.register(name, func)
+        srsly.msgpack_decoders.register(name, func)
+
+    where `name` is a unique ID and `func` is a callable that accepts a single
+    argument:
+
+    - For encoders, the argument is the object to serialize. The callable should
+      return a new object (typically a dict) or the original object if the callback
+      does not recognize it.
+    - For decoders, the argument is the dict to deserialize, as returned by the encoders.
+      The callable should return a new object or the original dict if the callback
+      does not recognize it.
+    """
+
     __slots__ = ("_ext",)
 
     def __init__(self):
@@ -25,11 +41,20 @@ class _MsgpackExtensions:
             out = func(obj)
             if out is not obj:
                 return out
+        return obj
+
+
+class _MsgpackEncoderExtensions(_MsgpackExtensions):
+    def _run(self, obj):
+        out = super()._run(obj)
+        if out is not obj:
+            return out
 
         # Convert subtypes of base types and tuples to lists.
         # Effectively this undoes the strict_types=True option of msgpack.
         # This is needed to support np.float64, which is a subclass of builtin float.
         # Run this last to allow the user to register their own handlers first.
+
         if isinstance(obj, tuple):
             return list(obj)
         # Note: bool and memoryview can't be subclassed
@@ -41,7 +66,7 @@ class _MsgpackExtensions:
         return obj
 
 
-msgpack_encoders = _MsgpackExtensions()
+msgpack_encoders = _MsgpackEncoderExtensions()
 msgpack_decoders = _MsgpackExtensions()
 
 
