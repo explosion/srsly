@@ -4,6 +4,7 @@ import pytest
 
 from .._yaml_api import yaml_dumps, yaml_loads, read_yaml, write_yaml
 from .._yaml_api import is_yaml_serializable
+from ruamel.yaml import YAML
 from ruamel.yaml.comments import CommentedMap
 from .util import make_tempdir
 
@@ -90,3 +91,38 @@ def test_is_yaml_serializable(obj, expected):
     assert is_yaml_serializable(obj) == expected
     # Check again to be sure it's consistent
     assert is_yaml_serializable(obj) == expected
+
+
+class Malicious:
+    init_count = 0
+
+    def __new__(cls):
+        cls.init_count += 1
+        return object.__new__(cls)
+
+
+def test_yaml_safe():
+    """Old versions of PyYAML / ruamel.yaml were unsafe by default,
+    with `yaml.load` allowing arbitrary code execution.
+    Test that srsly does not allow deserializing arbitrary Python objects.
+    """
+
+    m = Malicious()
+    buf = StringIO()
+    yaml = YAML(typ="full")
+    yaml.dump(m, buf)
+    payload = buf.getvalue()
+    assert payload.startswith("!!python/object:")
+
+    prev_count = Malicious.init_count
+    with pytest.raises(ValueError, match="python/object"):
+        yaml_loads(payload)
+    # No arbitrary code execution happened
+    assert Malicious.init_count == prev_count
+
+    # By default, even the wrapped ruamel.yaml does not allow it;
+    # you need to explicitly opt in with `typ='unsafe'` (deprecated).
+    yaml2 = YAML()
+    buf.seek(0)
+    _ = yaml2.load(buf)
+    assert Malicious.init_count == prev_count
