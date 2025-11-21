@@ -3,6 +3,5 @@ catalogue>=2.0.3,<2.1.0
 cython>=0.29.1
 pytest>=4.6.5
 pytest-timeout>=1.3.3
-mock>=2.0.0,<3.0.0
 numpy>=1.15.0
 psutil
