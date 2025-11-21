@@ -6,6 +6,7 @@ from .._yaml_api import yaml_dumps, yaml_loads, read_yaml, write_yaml
 from .._yaml_api import is_yaml_serializable
 from ruamel.yaml import YAML
 from ruamel.yaml.comments import CommentedMap
+from ruamel.yaml.representer import RepresenterError
 from .util import make_tempdir
 
 
@@ -101,12 +102,24 @@ class Malicious:
         return object.__new__(cls)
 
 
+def test_yaml_no_arbitrary_objects():
+    """srsly.write_yaml, unlike PyYAML / ruamel.yaml, does not
+    support serializing arbitrary Python objects.
+    """
+    m = Malicious()
+    with pytest.raises(RepresenterError, match=r"cannot represent.*Malicious"):
+        yaml_dumps(m)
+
+
 def test_yaml_safe():
     """Old versions of PyYAML / ruamel.yaml were unsafe by default,
     with `yaml.load` allowing arbitrary code execution.
     Test that srsly does not allow deserializing arbitrary Python objects.
     """
-
+    # Craft malicious payload, that in old versions of PyYAML and ruamel.yaml
+    # would execute arbitrary code upon deserialization.
+    # Note that this is not possible with srsly's yaml_loads
+    # (see ).
     m = Malicious()
     buf = StringIO()
     yaml = YAML(typ="full")
@@ -118,11 +131,4 @@ def test_yaml_safe():
     with pytest.raises(ValueError, match="python/object"):
         yaml_loads(payload)
     # No arbitrary code execution happened
-    assert Malicious.init_count == prev_count
-
-    # By default, even the wrapped ruamel.yaml does not allow it;
-    # you need to explicitly opt in with `typ='unsafe'` (deprecated).
-    yaml2 = YAML()
-    buf.seek(0)
-    _ = yaml2.load(buf)
     assert Malicious.init_count == prev_count
