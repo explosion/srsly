@@ -211,6 +211,13 @@ def test_unsupported_type_error():
         s = json_dumps({1, 2})
 
 
+def test_unsupported_type_error_numpy():
+    numpy = pytest.importorskip("numpy")
+    f = numpy.float32()
+    with pytest.raises(TypeError, match="is not JSON serializable"):
+        s = json_dumps(f)
+
+
 def test_write_jsonl_gzip():
     """Tests writing data to a gzipped .jsonl file."""
     data = [{"hello": "world"}, {"test": 123}]

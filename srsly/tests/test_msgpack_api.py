@@ -63,11 +63,10 @@ def test_msgpack_complex():
     assert type(out["a"]) is complex
 
 
-def test_msgpack_unknown_types():
-    """Test that msgpack raises correct errors (e.g. when serializing
-    datetime objects, the error should be msgpack's TypeError,
-    not a "'np' is not defined error").
-    """
+def test_msgpack_without_numpy():
+    """Test that msgpack works with and without numpy and raises correct errors (e.g.
+    when serializing datetime objects, the error should be msgpack's TypeError,
+    not a "'np' is not defined error")."""
     with pytest.raises(TypeError, match="datetime.datetime"):
         msgpack_dumps(datetime.datetime.now())
 
