@@ -89,9 +89,6 @@ python -m pytest --pyargs srsly
 
 ### JSON
 
-> 📦 The underlying module is exposed via `srsly.ujson`. However, we normally
-> interact with it via the utility functions only.
-
 #### <kbd>function</kbd> `srsly.json_dumps`
 
 Serialize an object to a JSON string. Falls back to `json` if `sort_keys=True`
@@ -256,9 +253,6 @@ assert srsly.is_json_serializable(lambda x: x) is False
 
 ### msgpack
 
-> 📦 The underlying module is exposed via `srsly.msgpack`. However, we normally
-> interact with it via the utility functions only.
-
 #### <kbd>function</kbd> `srsly.msgpack_dumps`
 
 Serialize an object to a msgpack byte string.
@@ -318,9 +312,6 @@ data = srsly.read_msgpack("/path/to/file.msg")
 
 ### pickle
 
-> 📦 The underlying module is exposed via `srsly.cloudpickle`. However, we
-> normally interact with it via the utility functions only.
-
 #### <kbd>function</kbd> `srsly.pickle_dumps`
 
 Serialize a Python object with pickle.
@@ -351,9 +342,6 @@ data = srsly.pickle_loads(pickled_data)
 | **RETURNS** | -     | The deserialized Python object. |
 
 ### YAML
-
-> 📦 The underlying module is exposed via `srsly.ruamel_yaml`. However, we
-> normally interact with it via the utility functions only.
 
 #### <kbd>function</kbd> `srsly.yaml_dumps`
 
