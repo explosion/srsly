@@ -119,7 +119,9 @@ def test_yaml_safe():
     # Craft malicious payload, that in old versions of PyYAML and ruamel.yaml
     # would execute arbitrary code upon deserialization.
     # Note that this is not possible with srsly's yaml_loads
-    # (see ).
+    # (see test_yaml_no_arbitrary_objects).
+    # It's best to craft the payload on the fly to make this test
+    # resilient e.g. to module name changes.
     m = Malicious()
     buf = StringIO()
     yaml = YAML(typ="full")
