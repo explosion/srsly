@@ -3,7 +3,7 @@
 # srsly: Modern high-performance serialization utilities for Python
 
 This package bundles some of the best Python serialization libraries into one
-standalone package, with a high-level API that makes it easy to write code
+convenience package, with a high-level API that makes it easy to write code
 that's correct across platforms and Pythons. This allows us to provide all the
 serialization utilities we need in a single binary wheel. Currently supports
 **JSON**, **JSONL**, **MessagePack**, **Pickle** and **YAML**.
@@ -24,31 +24,24 @@ wrap the multiple serialization formats we need to support (especially `json`,
 `msgpack` and `pickle`). These wrapping functions ended up duplicated across our
 codebases, so we wanted to put them in one place.
 
-At the same time, we noticed that having a lot of small dependencies was making
-maintenance harder, and making installation slower. To solve this, we've made
-`srsly` standalone, by including the component packages directly within it. This
-way we can provide all the serialization utilities we need in a single binary
-wheel.
-
-`srsly` currently includes forks of the following packages:
+`srsly` currently includes wrappers around the following packages:
 
 - [`ujson`](https://github.com/esnme/ultrajson)
 - [`msgpack`](https://github.com/msgpack/msgpack-python)
-- [`msgpack-numpy`](https://github.com/lebedov/msgpack-numpy)
 - [`cloudpickle`](https://github.com/cloudpipe/cloudpickle)
 - [`ruamel.yaml`](https://github.com/pycontribs/ruamel-yaml) (without unsafe
   implementations!)
 
+Additionally, it includes a heavily customized fork of 
+[`msgpack-numpy`](https://github.com/lebedov/msgpack-numpy), with corrected
+round-trip behaviour for np.float64 objects.
+
+
 ## Installation
 
-> ⚠️ Note that `v2.x` is only compatible with **Python 3.6+**. For 2.7+
-> compatibility, use `v1.x`.
-
-`srsly` can be installed from pip. Before installing, make sure that your `pip`,
-`setuptools` and `wheel` are up to date.
+`srsly` can be installed from pip.
 
 ```bash
-python -m pip install -U pip setuptools wheel
 python -m pip install srsly
 ```
 
@@ -58,12 +51,15 @@ Or from conda via conda-forge:
 conda install -c conda-forge srsly
 ```
 
-Alternatively, you can also compile the library from source. You'll need to make
-sure that you have a development environment with a Python distribution
-including header files, a compiler (XCode command-line tools on macOS / OS X or
-Visual C++ build tools on Windows), pip and git installed.
+This will automatically install/upgrade all dependencies.
 
-Install from source:
+numpy and cupy are optional dependencies for msgpack.
+If numpy is installed, numpy objects can be serialized.
+If cupy is installed, cupy objects will be automaticaly converted
+to numpy and then serialized.
+
+
+Alternatively, you can also install the library from the repository:
 
 ```bash
 # clone the repo
@@ -74,10 +70,7 @@ cd srsly
 python -m venv .env
 source .env/bin/activate
 
-# update pip
-python -m pip install -U pip setuptools wheel
-
-# compile and install from source
+# install from source
 python -m pip install .
 ```
 
@@ -86,7 +79,6 @@ mode without build isolation:
 
 ```bash
 # install in editable mode
-python -m pip install -r requirements.txt
 python -m pip install --no-build-isolation --editable .
 
 # run test suite
@@ -96,9 +88,6 @@ python -m pytest --pyargs srsly
 ## API
 
 ### JSON
-
-> 📦 The underlying module is exposed via `srsly.ujson`. However, we normally
-> interact with it via the utility functions only.
 
 #### <kbd>function</kbd> `srsly.json_dumps`
 
@@ -264,9 +253,6 @@ assert srsly.is_json_serializable(lambda x: x) is False
 
 ### msgpack
 
-> 📦 The underlying module is exposed via `srsly.msgpack`. However, we normally
-> interact with it via the utility functions only.
-
 #### <kbd>function</kbd> `srsly.msgpack_dumps`
 
 Serialize an object to a msgpack byte string.
@@ -326,9 +312,6 @@ data = srsly.read_msgpack("/path/to/file.msg")
 
 ### pickle
 
-> 📦 The underlying module is exposed via `srsly.cloudpickle`. However, we
-> normally interact with it via the utility functions only.
-
 #### <kbd>function</kbd> `srsly.pickle_dumps`
 
 Serialize a Python object with pickle.
@@ -359,9 +342,6 @@ data = srsly.pickle_loads(pickled_data)
 | **RETURNS** | -     | The deserialized Python object. |
 
 ### YAML
-
-> 📦 The underlying module is exposed via `srsly.ruamel_yaml`. However, we
-> normally interact with it via the utility functions only.
 
 #### <kbd>function</kbd> `srsly.yaml_dumps`
 

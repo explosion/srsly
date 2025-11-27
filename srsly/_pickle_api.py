@@ -1,6 +1,7 @@
 from typing import Optional
 
-from . import cloudpickle
+import cloudpickle
+
 from .util import JSONInput, JSONOutput
 
 
