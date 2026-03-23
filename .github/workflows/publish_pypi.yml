@@ -1,5 +1,5 @@
-# The cibuildwheel action triggers on creation of a release, this
-# triggers on publication.
+# The cibuildwheel action triggers on all pushes and PRs;
+# this action triggers on release publication.
 # The expected workflow is to create a draft release and let the wheels
 # upload, and then hit 'publish', which uploads to PyPi.
 
