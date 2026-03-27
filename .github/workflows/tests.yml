@@ -14,6 +14,8 @@ on:
       - "*.md"
       - ".github/cibuildwheel.yml"
       - ".github/publish_pypi.yml"
+permissions:
+  contents: read
 env:
   MODULE_NAME: 'srsly'
   RUN_MYPY: 'false'
