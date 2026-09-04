@@ -206,6 +206,16 @@ def test_json_loads_raises(obj):
         json_loads(obj)
 
 
+@pytest.mark.parametrize(
+    "obj",
+    [b"-", "-"],
+)
+def test_json_loads_bare_minus_raises(obj):
+    # ujson decodes a bare "-" as 0; the guard must cover bytes too.
+    with pytest.raises(ValueError):
+        json_loads(obj)
+
+
 def test_unsupported_type_error():
     with pytest.raises(TypeError, match="is not JSON serializable"):
         s = json_dumps({1, 2})
