@@ -34,8 +34,9 @@ def json_loads(data: Union[str, bytes]) -> JSONOutput:
     data (str / bytes): The data to deserialize.
     RETURNS: The deserialized Python object.
     """
-    # Avoid transforming the string '-' into the int '0'
-    if data == "-":
+    # Avoid transforming a bare '-' into the int '0'. ujson does this for both
+    # str and bytes input, so the guard must cover bytes too.
+    if data == "-" or data == b"-":
         raise ValueError("Expected object or value")
     return ujson.loads(data)
 
