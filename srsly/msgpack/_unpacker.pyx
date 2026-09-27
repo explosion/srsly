@@ -482,7 +482,7 @@ cdef class Unpacker:
                 obj = unpack_data(&self.ctx)
                 unpack_init(&self.ctx)
                 return obj
-            elif ret == 0:
+            if ret == 0:
                 if self.file_like is not None:
                     self.read_from_file()
                     continue
@@ -490,7 +490,9 @@ cdef class Unpacker:
                     raise StopIteration("No more data to unpack.")
                 else:
                     raise OutOfData("No more data to unpack.")
-            elif ret == -2:
+
+            unpack_clear(&self.ctx)
+            if ret == -2:
                 raise FormatError
             elif ret == -3:
                 raise StackError
