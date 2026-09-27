@@ -755,7 +755,7 @@ void encode(JSOBJ obj, JSONObjectEncoder *enc, const char *name, size_t cbName)
 {
   const char *value;
   char *objName;
-  int count;
+  int count, res;
   JSOBJ iterObj;
   size_t szlen;
   JSONTypeContext tc;
@@ -860,8 +860,19 @@ void encode(JSOBJ obj, JSONObjectEncoder *enc, const char *name, size_t cbName)
     Buffer_AppendCharUnchecked (enc, '{');
     Buffer_AppendIndentNewlineUnchecked (enc);
 
-    while (enc->iterNext(obj, &tc))
+    while ((res = enc->iterNext(obj, &tc)))
     {
+      if (res < 0)
+      {
+        // iterNext failed (e.g. sort_keys with unorderable keys). Stop
+        // encoding so nothing else runs with the Python error pending.
+        SetError (obj, enc, "Failed to iterate over object");
+        enc->iterEnd(obj, &tc);
+        enc->endTypeContext(obj, &tc);
+        enc->level --;
+        return;
+      }
+
       // The extra 2 bytes cover the comma and optional newline.
       Buffer_Reserve (enc, enc->indent * (enc->level + 1) + 2);
 

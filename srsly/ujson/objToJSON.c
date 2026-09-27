@@ -394,11 +394,22 @@ int SortedDict_iterNext(JSOBJ obj, JSONTypeContext *tc)
     }
 
     // Obtain the value for each key, and pack a list of (key, value) 2-tuples.
+    // On every path to error, key and item have already been released or
+    // handed over, so only items needs cleaning up.
     nitems = PyList_GET_SIZE(items);
     for (i = 0; i < nitems; i++)
     {
       key = PyList_GET_ITEM(items, i);
+      // Borrowed reference.
       value = PyDict_GetItem(GET_TC(tc)->dictObj, key);
+      if (value == NULL)
+      {
+        if (!PyErr_Occurred())
+        {
+          PyErr_SetObject(PyExc_KeyError, key);
+        }
+        goto error;
+      }
 
       // Subject the key to the same type restrictions and conversions as in Dict_iterGetValue.
       if (PyUnicode_Check(key))
@@ -409,26 +420,34 @@ int SortedDict_iterNext(JSOBJ obj, JSONTypeContext *tc)
       {
         key = PyObject_Str(key);
 #if PY_MAJOR_VERSION >= 3
-        keyTmp = key;
-        key = PyUnicode_AsUTF8String(key);
-        Py_DECREF(keyTmp);
+        if (key != NULL)
+        {
+          keyTmp = key;
+          key = PyUnicode_AsUTF8String(key);
+          Py_DECREF(keyTmp);
+        }
 #endif
       }
       else
       {
         Py_INCREF(key);
       }
+      if (key == NULL)
+      {
+        goto error;
+      }
 
       item = PyTuple_Pack(2, key, value);
+      Py_DECREF(key);
       if (item == NULL)
       {
         goto error;
       }
+      // Steals the reference to item, even on failure.
       if (PyList_SetItem(items, i, item))
       {
         goto error;
       }
-      Py_DECREF(key);
     }
 
     // Store the sorted list of tuples in the newObj slot.
@@ -449,9 +468,6 @@ int SortedDict_iterNext(JSOBJ obj, JSONTypeContext *tc)
   return 1;
 
 error:
-  Py_XDECREF(item);
-  Py_XDECREF(key);
-  Py_XDECREF(value);
   Py_XDECREF(items);
   return -1;
 }
@@ -460,7 +476,7 @@ void SortedDict_iterEnd(JSOBJ obj, JSONTypeContext *tc)
 {
   GET_TC(tc)->itemName = NULL;
   GET_TC(tc)->itemValue = NULL;
-  Py_DECREF(GET_TC(tc)->newObj);
+  // newObj (the sorted items list) is released in Object_endTypeContext.
   Py_DECREF(GET_TC(tc)->dictObj);
   PRINTMARK();
 }

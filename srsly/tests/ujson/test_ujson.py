@@ -815,6 +815,41 @@ class UltraJSONTests(unittest.TestCase):
         sortedKeys = ujson.dumps(data, sort_keys=True)
         self.assertEqual(sortedKeys, '{"a":1,"b":1,"c":1,"d":1,"e":1,"f":1}')
 
+    def test_sortKeys_nested(self):
+        self.assertEqual(ujson.dumps({}, sort_keys=True), "{}")
+        data = {"b": {"d": 1, "c": [{"z": 0, "y": 1}, {}]}, "a": 2}
+        self.assertEqual(
+            ujson.dumps(data, sort_keys=True),
+            '{"a":2,"b":{"c":[{"y":1,"z":0},{}],"d":1}}',
+        )
+
+    def test_sortKeys_unorderable(self):
+        # Used to segfault instead of raising.
+        for data in (
+            {1: 1, "a": 2},
+            {"x": {1: 1, "a": 2}, "y": 3},
+            [{"a": 1}, {1: 1, "a": 2}],
+        ):
+            with self.assertRaises(TypeError):
+                ujson.dumps(data, sort_keys=True)
+
+    @unittest.skipIf(not hasattr(sys, 'getrefcount') == True, reason="test requires sys.refcount")
+    def test_sortKeys_does_not_leak(self):
+        import gc
+
+        gc.collect()
+        key = "key" + str(id(self))
+        value = ["abc"]
+        data = {key: value, "z": 1}
+        key_refs, value_refs = sys.getrefcount(key), sys.getrefcount(value)
+        for _ in range(100):
+            ujson.dumps(data, sort_keys=True)
+            with self.assertRaises(TypeError):
+                ujson.dumps({key: value, 1: 1}, sort_keys=True)
+        gc.collect()
+        self.assertEqual(key_refs, sys.getrefcount(key))
+        self.assertEqual(value_refs, sys.getrefcount(value))
+
     @unittest.skipIf(not hasattr(sys, 'getrefcount') == True, reason="test requires sys.refcount")
     def test_does_not_leak_dictionary_values(self):
         import gc
