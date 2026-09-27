@@ -2178,6 +2178,10 @@ class CloudPickleTest(unittest.TestCase):
         platform.python_implementation() == "PyPy",
         reason="Skip PyPy because memory grows too much",
     )
+    @pytest.mark.skipif(
+        sys.platform == "darwin",
+        reason="Memory growth on macOS is close to the 50MB bound and it fails intermittently",
+    )
     def test_interactive_remote_function_calls_no_memory_leak(self):
         code = """if __name__ == "__main__":
         from srsly.tests.cloudpickle.testutils import subprocess_worker
