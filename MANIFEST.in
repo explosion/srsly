@@ -1,3 +1,4 @@
 recursive-include srsly *.h *.pyx *.pxd *.cc *.c *.cpp *.json
 include LICENSE
 include README.md
+recursive-include srsly/tests/cloudpickle/mock_local_folder *.py
