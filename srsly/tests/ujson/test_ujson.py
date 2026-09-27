@@ -1024,3 +1024,33 @@ def test_decode_surrogate_characters(test_input, expected):
 
     # Ensure that this matches stdlib's behaviour
     assert json.loads(test_input) == expected
+
+
+@pytest.mark.parametrize(
+    "bad_value,error",
+    [
+        (float("nan"), OverflowError),  # error raised by the encoder
+        (object(), TypeError),  # error raised by Python
+        ({1: 1, "a": 2}, TypeError),  # unorderable keys with sort_keys
+    ],
+)
+def test_encode_error_does_not_leak_buffer(bad_value, error):
+    # The value is large enough that the output buffer is heap-allocated,
+    # and it was never freed when encoding then failed.
+    import tracemalloc
+
+    data = ["x" * 100000, bad_value]
+    tracemalloc.start()
+    try:
+        for _ in range(5):
+            with pytest.raises(error):
+                ujson.dumps(data, sort_keys=True)
+        before = tracemalloc.get_traced_memory()[0]
+        for _ in range(100):
+            with pytest.raises(error):
+                ujson.dumps(data, sort_keys=True)
+        growth = tracemalloc.get_traced_memory()[0] - before
+    finally:
+        tracemalloc.stop()
+    # A leak is at least 100 * 100KB = 10MB.
+    assert growth < 1000000, growth
