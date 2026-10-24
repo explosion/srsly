@@ -264,7 +264,7 @@ int List_iterNext(JSOBJ obj, JSONTypeContext *tc)
     return 0;
   }
 
-  GET_TC(tc)->itemValue = PyList_GET_ITEM (obj, GET_TC(tc)->index);
+  GET_TC(tc)->itemValue = PyList_GET_ITEM (GET_TC(tc)->newObj, GET_TC(tc)->index);
   GET_TC(tc)->index ++;
   return 1;
 }
@@ -400,7 +400,18 @@ int SortedDict_iterNext(JSOBJ obj, JSONTypeContext *tc)
     for (i = 0; i < nitems; i++)
     {
       key = PyList_GET_ITEM(items, i);
-      // Borrowed reference.
+      // New reference, so the value can't be freed by a concurrent update to
+      // the dict before it's packed below.
+#if PY_VERSION_HEX >= 0x030D0000
+      if (PyDict_GetItemRef(GET_TC(tc)->dictObj, key, &value) <= 0)
+      {
+        if (!PyErr_Occurred())
+        {
+          PyErr_SetObject(PyExc_KeyError, key);
+        }
+        goto error;
+      }
+#else
       value = PyDict_GetItem(GET_TC(tc)->dictObj, key);
       if (value == NULL)
       {
@@ -410,6 +421,8 @@ int SortedDict_iterNext(JSOBJ obj, JSONTypeContext *tc)
         }
         goto error;
       }
+      Py_INCREF(value);
+#endif
 
       // Subject the key to the same type restrictions and conversions as in Dict_iterGetValue.
       if (PyUnicode_Check(key))
@@ -434,11 +447,13 @@ int SortedDict_iterNext(JSOBJ obj, JSONTypeContext *tc)
       }
       if (key == NULL)
       {
+        Py_DECREF(value);
         goto error;
       }
 
       item = PyTuple_Pack(2, key, value);
       Py_DECREF(key);
+      Py_DECREF(value);
       if (item == NULL)
       {
         goto error;
@@ -661,8 +676,16 @@ ISITERABLE:
     pc->iterNext = List_iterNext;
     pc->iterGetValue = List_iterGetValue;
     pc->iterGetName = List_iterGetName;
+    // Iterate over a private copy, so items stay alive and in bounds even if
+    // the list is mutated while encoding (by another thread, or by a
+    // __json__/toDict callback). Released in Object_endTypeContext.
+    GET_TC(tc)->newObj = PyList_GetSlice(obj, 0, PY_SSIZE_T_MAX);
+    if (!GET_TC(tc)->newObj)
+    {
+      goto INVALID;
+    }
     GET_TC(tc)->index =  0;
-    GET_TC(tc)->size = PyList_GET_SIZE( (PyObject *) obj);
+    GET_TC(tc)->size = PyList_GET_SIZE(GET_TC(tc)->newObj);
     return;
   }
   else

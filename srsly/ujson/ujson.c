@@ -104,6 +104,12 @@ PYMODINITFUNC
     MODINITERROR;
   }
 
+#ifdef Py_GIL_DISABLED
+  // Module state is only written during init, and the encoder holds strong
+  // references to everything it iterates over.
+  PyUnstable_Module_SetGIL(module, Py_MOD_GIL_NOT_USED);
+#endif
+
   version_string = PyString_FromString (UJSON_VERSION);
   PyModule_AddObject (module, "__version__", version_string);
 

@@ -29,6 +29,7 @@ COMPILER_DIRECTIVES = {
     "language_level": -3,
     "embedsignature": True,
     "annotation_typing": False,
+    "freethreading_compatible": True,
 }
 LINK_OPTIONS = {"msvc": [], "mingw32": [], "other": ["-lstdc++", "-lm"]}
 
