@@ -199,7 +199,7 @@ def _yield_json_lines(
     line_no = 1
     for line in stream:
         line = line.strip()
-        if line == "":
+        if not line:
             continue
         try:
             yield ujson.loads(line)

@@ -246,6 +246,7 @@ def test_write_jsonl_gzip_append():
         write_gzip_jsonl(file_path, data, append=True)
         with gzip.open(file_path, "r") as f:
             assert [line.decode("utf8") for line in f.readlines()] == expected
+        assert list(read_gzip_jsonl(file_path)) == data + data
 
 
 def test_read_jsonl_gzip():
@@ -267,3 +268,32 @@ def test_read_jsonl_gzip():
     assert len(data[1]) == 1
     assert data[0]["hello"] == "world"
     assert data[1]["test"] == 123
+
+
+@pytest.mark.parametrize("blank_line", ["\n", " \t\r\n"])
+@pytest.mark.parametrize("skip", [False, True])
+def test_read_jsonl_gzip_blank_lines(tmp_path, blank_line, skip):
+    file_path = tmp_path / "data.jsonl.gz"
+    contents = blank_line + '{"text":"café"}\n' + blank_line + '{"id":2}\n' + blank_line
+    with gzip.open(file_path, "wb") as f:
+        f.write(contents.encode("utf8"))
+    assert list(read_gzip_jsonl(file_path, skip=skip)) == [{"text": "café"}, {"id": 2}]
+
+
+@pytest.mark.parametrize("skip", [False, True])
+def test_read_jsonl_gzip_invalid_line(tmp_path, skip):
+    file_path = tmp_path / "data.jsonl.gz"
+    with gzip.open(file_path, "wb") as f:
+        f.write(b'{"id":1}\ninvalid\n{"id":2}\n')
+    if skip:
+        assert list(read_gzip_jsonl(file_path, skip=True)) == [{"id": 1}, {"id": 2}]
+    else:
+        with pytest.raises(ValueError, match="invalid"):
+            list(read_gzip_jsonl(file_path))
+
+
+def test_read_jsonl_gzip_falsy_values(tmp_path):
+    file_path = tmp_path / "data.jsonl.gz"
+    with gzip.open(file_path, "wb") as f:
+        f.write(b'0\nfalse\nnull\n""\n{}\n[]\n')
+    assert list(read_gzip_jsonl(file_path)) == [0, False, None, "", {}, []]
