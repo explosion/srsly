@@ -18,6 +18,12 @@ from ..util import force_string
 from .util import make_tempdir
 
 
+@pytest.mark.parametrize("sort_keys", [False, True])
+def test_json_dumps_indent_none(sort_keys):
+    data = {"a": [1]}
+    assert json_dumps(data, indent=None, sort_keys=sort_keys) == '{"a":[1]}'
+
+
 def test_json_dumps_sort_keys():
     data = {"a": 1, "c": 3, "b": 2}
     result = json_dumps(data, sort_keys=True)
@@ -285,6 +291,26 @@ def test_read_jsonl_gzip_invalid_line(tmp_path, skip):
     else:
         with pytest.raises(ValueError, match="invalid"):
             list(read_gzip_jsonl(file_path))
+
+
+def test_read_jsonl_gzip_invalid_line_message(tmp_path):
+    # Line numbers count blank lines, and bytes lines are shown decoded
+    file_path = tmp_path / "data.jsonl.gz"
+    with gzip.open(file_path, "wb") as f:
+        f.write('{"id":1}\n\n{"id":2}\ninvalid café\n'.encode("utf8"))
+    with pytest.raises(ValueError) as excinfo:
+        list(read_gzip_jsonl(file_path))
+    assert str(excinfo.value) == "Invalid JSON on line 4: invalid café"
+
+
+def test_read_jsonl_invalid_line_number_after_skipped_line(tmp_path):
+    # A line skipped as invalid still counts towards later line numbers
+    file_path = tmp_path / "data.jsonl"
+    file_path.write_text('{"id":1}\n\nbad\n{"id":2}\n', encoding="utf8")
+    assert list(read_jsonl(file_path, skip=True)) == [{"id": 1}, {"id": 2}]
+    file_path.write_text('{"id":1}\n\n{"id":2}\nbad\n', encoding="utf8")
+    with pytest.raises(ValueError, match="^Invalid JSON on line 4: bad$"):
+        list(read_jsonl(file_path))
 
 
 def test_read_jsonl_gzip_falsy_values(tmp_path):

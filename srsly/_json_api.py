@@ -23,7 +23,8 @@ def json_dumps(
             data, indent=indent, separators=(",", ":"), sort_keys=sort_keys
         )
     else:
-        result = ujson.dumps(data, indent=indent, escape_forward_slashes=False)
+        # ujson requires an int indent; None means compact output, like 0
+        result = ujson.dumps(data, indent=indent or 0, escape_forward_slashes=False)
     return result
 
 
@@ -193,10 +194,11 @@ def is_json_serializable(obj: Any) -> bool:
 
 
 def _yield_json_lines(
-    stream: Iterable[str], skip: bool = False
+    stream: Iterable[Union[str, bytes]], skip: bool = False
 ) -> Iterable[JSONOutput]:
-    line_no = 1
-    for line in stream:
+    # Count every physical line (including blank and skipped ones) so the
+    # line number in error messages matches the line in the file.
+    for line_no, line in enumerate(stream, 1):
         line = line.strip()
         if not line:
             continue
@@ -205,5 +207,6 @@ def _yield_json_lines(
         except ValueError:
             if skip:
                 continue
+            if isinstance(line, bytes):
+                line = line.decode("utf8", errors="replace")
             raise ValueError(f"Invalid JSON on line {line_no}: {line}")
-        line_no += 1
