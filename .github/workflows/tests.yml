@@ -2,18 +2,21 @@ name: tests
 
 on:
   push:
+    # A push filter that only lists tags would never run on branch pushes,
+    # so branches must be listed explicitly.
+    branches:
+      - '**'
     tags-ignore:
       - '**'
     paths-ignore:
       - "*.md"
-      - ".github/cibuildwheel.yml"
-      - ".github/publish_pypi.yml"
+      - ".github/workflows/cibuildwheel.yml"
   pull_request:
     types: [opened, synchronize, reopened, edited]
     paths-ignore:
       - "*.md"
-      - ".github/cibuildwheel.yml"
-      - ".github/publish_pypi.yml"
+      - ".github/workflows/cibuildwheel.yml"
+  workflow_dispatch:
 permissions:
   contents: read
 env:
