@@ -24,7 +24,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest]
         # Note: ruamel.yaml does not support Python 3.13t
-        python_version: ["3.9", "3.10", "3.11", "3.12", "3.13", "3.14", "3.14t"]
+        python_version: ["3.9", "3.10", "3.11", "3.12", "3.13", "3.14", "3.14t", "3.15", "3.15t"]
         numpy: [true]
         include:
           - os: ubuntu-latest
@@ -38,12 +38,13 @@ jobs:
 
     steps:
       - name: Check out repo
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - name: Configure Python version
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python_version }}
+          allow-prereleases: true
 
       - name: Run mypy
         if: ${{ env.RUN_MYPY == 'true' }}
