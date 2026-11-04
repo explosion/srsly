@@ -52,6 +52,19 @@ def encode_numpy(obj):
     return obj
 
 
+def _decode_dtype_descr(descr):
+    """Restore field tuples and nested descriptor lists for NumPy dtypes."""
+    fields = []
+    for field in descr:
+        field = tuple(t.decode() if type(t) is bytes else t for t in field)
+        # msgpack uses the same array type for both tuples and lists. NumPy
+        # requires a list of field tuples at every level of a structured dtype.
+        if isinstance(field[1], (list, tuple)):
+            field = (field[0], _decode_dtype_descr(field[1])) + field[2:]
+        fields.append(field)
+    return fields
+
+
 def decode_numpy(obj):
     """
     Decoder for deserializing numpy data types.
@@ -67,10 +80,7 @@ def decode_numpy(obj):
         # Check if "kind" is in obj to enable decoding of data
         # serialized with older versions (#20):
         if b"kind" in obj and obj[b"kind"] == b"V":
-            descr = [
-                tuple(t.decode() if type(t) is bytes else t for t in d)
-                for d in obj[b"type"]
-            ]
+            descr = _decode_dtype_descr(obj[b"type"])
         else:
             descr = obj[b"type"]
         return np.frombuffer(obj[b"data"], dtype=np.dtype(descr)).reshape(obj[b"shape"])
