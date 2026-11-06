@@ -125,7 +125,7 @@ def msgpack_loads(data: bytes, use_list: bool = True) -> JSONOutputBin:
     """
     with _without_gc():
         return msgpack.loads(
-            data, raw=False, use_list=use_list, object_hook=msgpack_decoders._run
+            data, raw=False, use_list=use_list, object_hook=msgpack_decoders._run, strict_map_key=False
         )
 
 
@@ -151,5 +151,5 @@ def read_msgpack(path: FilePath, use_list: bool = True) -> JSONOutputBin:
     file_path = force_path(path)
     with file_path.open("rb") as f, _without_gc():
         return msgpack.load(
-            f, raw=False, use_list=use_list, object_hook=msgpack_decoders._run
+            f, raw=False, use_list=use_list, object_hook=msgpack_decoders._run, strict_map_key=False
         )
