@@ -346,7 +346,7 @@ data = srsly.pickle_loads(pickled_data)
 #### <kbd>function</kbd> `srsly.yaml_dumps`
 
 Serialize an object to a YAML string. See the
-[`ruamel.yaml` docs](https://yaml.readthedocs.io/en/latest/detail.html?highlight=indentation#indentation-of-block-sequences)
+`ruamel.yaml` docs
 for details on the indentation format.
 
 ```python
